@@ -1,0 +1,16 @@
+[
+{
+  "modid": "DeusCore",
+  "name": "Deus Core",
+  "description": "Common and core code for all Jezza's mods.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "logoFile": "/assets/deuscore/textures/logo.png",
+  "url": "https://github.com/Jezzadabomb338/DeusCore",
+  "authors": [ "Jezzadabomb338" ],
+  "dependencies": [
+     "MinecraftForge",
+	 "FML"
+  ]
+}
+]
