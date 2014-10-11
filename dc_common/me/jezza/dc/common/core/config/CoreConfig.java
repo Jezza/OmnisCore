@@ -1,6 +1,5 @@
 package me.jezza.dc.common.core.config;
 
-import me.jezza.dc.common.core.debug.DebugHelper;
 import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;

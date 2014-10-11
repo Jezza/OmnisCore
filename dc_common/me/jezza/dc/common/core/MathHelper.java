@@ -1,4 +1,4 @@
-package me.jezza.dc.common.core.maths;
+package me.jezza.dc.common.core;
 
 public class MathHelper {
 

@@ -22,16 +22,19 @@ public class DeusCore {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        logger.info("-- Initialising DeusCore (" + VERSION + ") --");
+        logger.info("-- Preparing DeusCore (" + VERSION + ") --");
+        logger.info("-- Pre-Initialising --");
         CoreConfig.loadConfiguration(event.getSuggestedConfigurationFile());
     }
 
     @Mod.EventHandler
     public void initialize(FMLInitializationEvent event) {
+        logger.info("-- Initialising --");
     }
 
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
+        logger.info("-- Post-Initialising --");
     }
 
 }
