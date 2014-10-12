@@ -1,4 +1,4 @@
-package me.jezzadabomb.es2.client.gui.framework;
+package me.jezza.dc.client.gui.components;
 
 public abstract class GuiUntexturedButton extends GuiWidget {
 

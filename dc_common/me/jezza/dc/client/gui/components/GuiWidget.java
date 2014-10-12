@@ -1,5 +1,7 @@
 package me.jezza.dc.client.gui.components;
 
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import me.jezza.dc.DeusCore;
 import me.jezza.dc.client.gui.interfaces.IGuiButton;
 import me.jezza.dc.client.gui.interfaces.IGuiRenderHandler;
 import net.minecraft.client.Minecraft;
@@ -25,6 +27,7 @@ public abstract class GuiWidget extends Gui implements IGuiButton {
 
     public long timeClicked = 0;
     public boolean clicked = false;
+    private boolean notifyServer = false;
     private boolean visible = true;
 
     public GuiWidget(int x, int y, int width, int height) {
@@ -65,8 +68,29 @@ public abstract class GuiWidget extends Gui implements IGuiButton {
         return this;
     }
 
+    /**
+     * Do I want it to be the button that worries of the click?
+     * Or should it be handled by the MainGui.
+     * I think the MainGui could do it.
+     * <p/>
+     * Client-side
+     * Eg, PacketSenderThingy.sendUpdateFromPlayerGui(player, buttonId)
+     * <p/>
+     * <p/>
+     * Server-side
+     * Receives name of player, and buttonID.
+     * <p/>
+     * if (player.openContainer instanceof IPacketGuiHandler)
+     * onClientClick(player, buttonID)
+     * voilà
+     */
+    public GuiWidget setNotifyServerOnClick() {
+        notifyServer = true;
+        return this;
+    }
+
     public void toggleVisiblity() {
-        setVisible(!visible);
+        visible = !visible;
     }
 
     public int getId() {
@@ -81,6 +105,14 @@ public abstract class GuiWidget extends Gui implements IGuiButton {
         return visible;
     }
 
+    public boolean shouldNotifyServerOnClick() {
+        return notifyServer;
+    }
+
+    public IMessage getDescriptionPacket() {
+        return null;
+    }
+
     @Override
     public boolean onClick(int mouseX, int mouseY, int mouseClick) {
         clicked = canClick(mouseX, mouseY);
@@ -88,6 +120,8 @@ public abstract class GuiWidget extends Gui implements IGuiButton {
             timeClicked = System.currentTimeMillis();
             if (shouldPlaySoundOnClick())
                 playButtonClick();
+            if (shouldNotifyServerOnClick())
+                DeusCore.networkDispatcher.sendToServer(getDescriptionPacket());
         }
         return clicked;
     }

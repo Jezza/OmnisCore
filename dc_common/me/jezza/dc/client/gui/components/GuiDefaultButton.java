@@ -3,8 +3,11 @@ package me.jezza.dc.client.gui.components;
 import me.jezza.dc.client.gui.lib.Colour;
 import me.jezza.dc.client.gui.lib.GuiSheet;
 import me.jezza.dc.client.gui.lib.TextAlignment;
+import net.minecraft.util.ResourceLocation;
 
 public class GuiDefaultButton extends GuiTexturedButton {
+
+    public static final ResourceLocation buttonTextures = new ResourceLocation("textures/gui/widgets.png");
 
     private String text;
     private TextAlignment textAlignment;
