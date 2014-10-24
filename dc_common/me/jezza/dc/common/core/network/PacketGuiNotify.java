@@ -3,8 +3,7 @@ package me.jezza.dc.common.core.network;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
-import me.jezza.dc.client.gui.interfaces.IPacketGuiHandler;
-import me.jezza.dc.common.core.CoreProperties;
+import me.jezza.dc.client.gui.interfaces.IGuiPacketHandler;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class PacketGuiNotify extends NetworkDispatcher.MessageAbstract<PacketGuiNotify, IMessage> {
@@ -34,8 +33,8 @@ public class PacketGuiNotify extends NetworkDispatcher.MessageAbstract<PacketGui
     @Override
     public IMessage onMessage(PacketGuiNotify message, MessageContext ctx) {
         EntityPlayer player = ctx.getServerHandler().playerEntity;
-        if (player.openContainer instanceof IPacketGuiHandler)
-            ((IPacketGuiHandler) player.openContainer).onClientClick(player, message.id, message.process);
+        if (player.openContainer instanceof IGuiPacketHandler)
+            ((IGuiPacketHandler) player.openContainer).onClientClick(player, message.id, message.process);
         return null;
     }
 

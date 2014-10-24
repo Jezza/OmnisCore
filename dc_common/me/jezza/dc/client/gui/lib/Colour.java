@@ -54,4 +54,10 @@ public class Colour {
         temp = temp | ((int) (b * 255));
         return temp;
     }
+
+
+    public static void resetToWhite() {
+        GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+    }
+
 }

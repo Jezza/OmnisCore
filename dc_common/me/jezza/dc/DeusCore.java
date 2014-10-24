@@ -5,12 +5,12 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import cpw.mods.fml.relauncher.Side;
 import me.jezza.dc.common.CommonProxy;
 import me.jezza.dc.common.core.CoreProperties;
 import me.jezza.dc.common.core.config.CoreConfig;
 import me.jezza.dc.common.core.network.NetworkDispatcher;
-import me.jezza.dc.common.core.network.NetworkHelper;
-import me.jezza.dc.common.items.debug.ItemDebug;
+import me.jezza.dc.common.core.network.PacketGuiNotify;
 
 import static me.jezza.dc.common.core.CoreProperties.*;
 
@@ -27,17 +27,14 @@ public class DeusCore {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        logger.info("-- Preparing DeusCore (" + VERSION + ") --");
-        logger.info("-- Pre-Initialising --");
+        logger.info("-- Pre-Initialising DeusCore (" + VERSION + ") --");
         CoreConfig.loadConfiguration(event.getSuggestedConfigurationFile());
 
 
         logger.info("Setting up internal network - Channel ID: " + MOD_ID);
         networkDispatcher = new NetworkDispatcher(MOD_ID);
-        NetworkHelper.init();
+        networkDispatcher.registerMessage(PacketGuiNotify.class, Side.SERVER);
         logger.info("Success! Network fully integrated.");
-
-        new ItemDebug("debugItem");
     }
 
     @Mod.EventHandler

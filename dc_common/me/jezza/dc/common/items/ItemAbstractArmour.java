@@ -1,5 +1,6 @@
 package me.jezza.dc.common.items;
 
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -80,5 +81,7 @@ public abstract class ItemAbstractArmour extends ItemArmor {
         CLOTH, CHAIN, IRON, DIAMOND, GOLD
     }
 
-    public abstract String getModIdentifier();
+    public String getModIdentifier() {
+        return Loader.instance().activeModContainer().getModId();
+    }
 }

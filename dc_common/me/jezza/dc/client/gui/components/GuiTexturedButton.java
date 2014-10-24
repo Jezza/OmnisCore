@@ -21,19 +21,19 @@ public class GuiTexturedButton extends GuiWidget {
 
         int tempX = u;
         int tempY = v;
-        int i = 0;
-        if (isClicked() || canClick(mouseX, mouseY))
-            i++;
-        if (isClicked())
-            i++;
+        int i = getPassLevel(mouseX, mouseY);
 
         if (i > 0) {
             tempX += getTextureXShift(i);
             tempY += getTextureYShift(i);
-            if (isClickTimedOut())
-                clicked = false;
         }
+        timedOutClick();
+
         drawTexturedModalRect(x, y, tempX, tempY, width, height);
+    }
+
+    public int getPassLevel(int mouseX, int mouseY) {
+        return isClicked() ? 2 : (canClick(mouseX, mouseY) ? 1 : 0);
     }
 
     public int getU() {
@@ -64,8 +64,9 @@ public class GuiTexturedButton extends GuiWidget {
         return this;
     }
 
-    public boolean isClickTimedOut() {
-        return (System.currentTimeMillis() - timeClicked) > getButtonDelay();
+    public void timedOutClick() {
+        if ((System.currentTimeMillis() - timeClicked) > getButtonDelay())
+            clicked = false;
     }
 
     public int getButtonDelay() {

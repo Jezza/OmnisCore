@@ -1,5 +1,6 @@
 package me.jezza.dc.common.blocks;
 
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -8,7 +9,6 @@ import me.jezza.dc.common.interfaces.IBlockNotifier;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -96,5 +96,7 @@ public abstract class BlockAbstract extends Block {
         return null;
     }
 
-    public abstract String getModIdentifier();
+    public String getModIdentifier() {
+        return Loader.instance().activeModContainer().getModId();
+    }
 }
