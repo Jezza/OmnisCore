@@ -5,8 +5,8 @@ import org.apache.logging.log4j.Logger;
 
 public class CoreProperties {
 
-    public static final String MOD_ID = "DeusCore";
-    public static final String MOD_NAME = "Deus Core";
+    public static final String MOD_ID = "OmnisCore";
+    public static final String MOD_NAME = "Omnis Core";
     public static final String VERSION = "0.0.1";
 
     private static final String BUILD = "1217";

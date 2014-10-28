@@ -3,7 +3,7 @@ package me.jezza.oc.client.gui;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import me.jezza.oc.DeusCore;
+import me.jezza.oc.OmnisCore;
 import me.jezza.oc.client.gui.components.GuiWidget;
 import me.jezza.oc.client.gui.interfaces.IGuiRenderHandler;
 import me.jezza.oc.client.gui.lib.Colour;
@@ -152,7 +152,7 @@ public abstract class GuiAbstract extends GuiContainer implements IGuiRenderHand
     }
 
     public static void sendMessage(IMessage message) {
-        DeusCore.networkDispatcher.sendToServer(message);
+        OmnisCore.networkDispatcher.sendToServer(message);
     }
 
     public abstract void onActionPerformed(GuiWidget widget, int mouse);

@@ -15,10 +15,10 @@ import me.jezza.oc.common.core.network.NetworkDispatcher;
 import static me.jezza.oc.common.core.CoreProperties.*;
 
 @Mod(modid = MOD_ID, name = MOD_NAME, version = VERSION, dependencies = DEPENDENCIES)
-public class DeusCore {
+public class OmnisCore {
 
     @Mod.Instance(MOD_ID)
-    public static DeusCore instance;
+    public static OmnisCore instance;
 
     @SidedProxy(clientSide = CoreProperties.CLIENT_PROXY, serverSide = CoreProperties.SERVER_PROXY)
     public static CommonProxy proxy;
@@ -27,7 +27,7 @@ public class DeusCore {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
-        logger.info("-- Pre-Initialising DeusCore (" + VERSION + ") --");
+        logger.info("-- Pre-Initialising " + MOD_ID + " (" + VERSION + ") --");
         CoreConfig.loadConfiguration(event.getSuggestedConfigurationFile());
 
         logger.info("Setting up internal network - Channel ID: " + MOD_ID);
