@@ -1,4 +1,4 @@
-package me.jezza.dc.common.core;
+package me.jezza.dc.common.core.utils;
 
 public class MathHelper {
 
@@ -7,23 +7,15 @@ public class MathHelper {
     }
 
     public static int wrapInt(int value, int min, int max) {
-        if (value < min)
-            value = max;
-        if (value > max)
-            value = min;
-        return value;
+        return value < min ? max : value > max ? min : value;
     }
 
-    public static float expandAwayFromZero(float value, float expansion) {
+    public static float expandAwayFrom(float value, float expansion) {
         return expandAwayFrom(value, 0, expansion);
     }
 
     public static float expandAwayFrom(float value, float awayFrom, float expansion) {
-        if (value < awayFrom)
-            return value - expansion;
-        else if (value > awayFrom)
-            return value + expansion;
-        return value;
+        return value < awayFrom ? value - expansion : value > awayFrom ? value + expansion : value;
     }
 
     public static boolean withinValues(float value, float lowerBound, float upperBound) {
@@ -46,12 +38,12 @@ public class MathHelper {
         return value >= (target - tolerance) && value <= (target + tolerance);
     }
 
+    public static double clipDouble(double value, double max) {
+        return clipDouble(value, 0, max);
+    }
+
     public static double clipDouble(double value, double min, double max) {
-        if (value > max)
-            value = max;
-        if (value < min)
-            value = min;
-        return value;
+        return value > max ? max : value < min ? min : value;
     }
 
     public static int clipInt(int value, int max) {
@@ -59,11 +51,7 @@ public class MathHelper {
     }
 
     public static int clipInt(int value, int min, int max) {
-        if (value > max)
-            value = max;
-        if (value < min)
-            value = min;
-        return value;
+        return value > max ? max : value < min ? min : value;
     }
 
     public static double interpolate(double a, double b, double d) {
@@ -73,4 +61,9 @@ public class MathHelper {
     public static float interpolate(float a, float b, float d) {
         return a + (b - a) * d;
     }
+
+    public static enum RoundingMethod {
+        FLOOR, CEILING, ROUND
+    }
+
 }

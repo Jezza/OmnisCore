@@ -9,13 +9,31 @@ import org.lwjgl.opengl.GL11;
  */
 public class Colour {
     public static final Colour WHITE = new Colour(1.0, 1.0, 1.0, 1.0);
-    public static final Colour LIGHTBLUE = new Colour(0.5, 0.5, 1.0, 1.0);
+
+    public static final Colour LIGHT_BLUE = new Colour(0.5, 0.5, 1.0, 1.0);
+    public static final Colour BLUE = new Colour(0.0, 0.0, 1.0, 1.0);
+    public static final Colour DARK_BLUE = new Colour(0.0, 0.0, 0.5, 1.0);
+
+    public static final Colour LIGHT_RED = new Colour(1.0, 0.5, 0.5, 1.0);
     public static final Colour RED = new Colour(1.0, 0.2, 0.2, 1.0);
-    public static final Colour ORANGE = new Colour(0.9, 0.6, 0.2, 1.0);
-    public static final Colour YELLOW = new Colour(0.0, 0.0, 0.5, 1.0);
+    public static final Colour DARK_RED = new Colour(0.5, 0.0, 0.0, 1.0);
+
+    public static final Colour LIGHT_GREEN = new Colour(0.5, 1.0, 0.5, 1.0);
     public static final Colour GREEN = new Colour(0.0, 1.0, 0.0, 1.0);
-    public static final Colour DARKGREEN = new Colour(0.0, 0.8, 0.2, 1.0);
-    public static final Colour DARKBLUE = new Colour(0.0, 0.0, 0.5, 1.0);
+
+    public static final Colour YELLOW = new Colour(1.0, 1.0, 0.0, 1.0);
+    public static final Colour CYAN = new Colour(0.0, 1.0, 1.0, 1.0);
+    public static final Colour PINK = new Colour(1.0, 0.0, 1.0, 1.0);
+
+    public static final Colour NEON_BLUE = new Colour(0.4, 0.8, 1.0, 1.0);
+    public static final Colour ORANGE = new Colour(0.9, 0.6, 0.2, 1.0);
+
+    public static final Colour PURPLE = new Colour(0.5, 0.0, 1.0, 1.0);
+
+    public static final Colour LIGHT_GREY = new Colour(0.8, 0.8, 0.8, 1.0);
+    public static final Colour GREY = new Colour(0.5, 0.5, 0.5, 1.0);
+    public static final Colour DARK_GREY = new Colour(0.2, 0.2, 0.2, 1.0);
+
     public static final Colour BLACK = new Colour(0.0, 0.0, 0.0, 1.0);
 
     public double r, g, b, a;
@@ -54,7 +72,6 @@ public class Colour {
         temp = temp | ((int) (b * 255));
         return temp;
     }
-
 
     public static void resetToWhite() {
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);

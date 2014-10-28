@@ -3,17 +3,21 @@ package me.jezza.dc.common.core.network;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
-import me.jezza.dc.client.gui.interfaces.IGuiPacketHandler;
+import me.jezza.dc.client.gui.interfaces.IGuiMessageHandler;
 import net.minecraft.entity.player.EntityPlayer;
 
-public class PacketGuiNotify extends NetworkDispatcher.MessageAbstract<PacketGuiNotify, IMessage> {
+public class MessageGuiNotify extends NetworkDispatcher.MessageAbstract<MessageGuiNotify, IMessage> {
 
     private int id, process;
 
-    public PacketGuiNotify() {
+    public MessageGuiNotify() {
     }
 
-    public PacketGuiNotify(int id, int process) {
+    /**
+     * @param id The ID of the button.
+     * @param process The ID of the process to be executed.
+     */
+    public MessageGuiNotify(int id, int process) {
         this.id = id;
         this.process = process;
     }
@@ -31,10 +35,10 @@ public class PacketGuiNotify extends NetworkDispatcher.MessageAbstract<PacketGui
     }
 
     @Override
-    public IMessage onMessage(PacketGuiNotify message, MessageContext ctx) {
+    public IMessage onMessage(MessageGuiNotify message, MessageContext ctx) {
         EntityPlayer player = ctx.getServerHandler().playerEntity;
-        if (player.openContainer instanceof IGuiPacketHandler)
-            ((IGuiPacketHandler) player.openContainer).onClientClick(player, message.id, message.process);
+        if (player.openContainer instanceof IGuiMessageHandler)
+            ((IGuiMessageHandler) player.openContainer).onClientClick(player, message.id, message.process);
         return null;
     }
 

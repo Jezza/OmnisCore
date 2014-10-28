@@ -3,8 +3,12 @@ package me.jezza.dc.client.gui.components;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+/**
+ * No touchy.
+ * Use GuiSimpleTexturedButton instead of this.
+ */
 @SideOnly(Side.CLIENT)
-public class GuiTexturedButton extends GuiWidget {
+public abstract class GuiTexturedButton<T extends GuiTexturedButton> extends GuiWidget<T> {
 
     public int u, v;
 
@@ -15,7 +19,7 @@ public class GuiTexturedButton extends GuiWidget {
     }
 
     @Override
-    public void render(int mouseX, int mouseY) {
+    public void renderBackground(int mouseX, int mouseY) {
         if (!isVisible())
             return;
 
@@ -40,28 +44,28 @@ public class GuiTexturedButton extends GuiWidget {
         return u;
     }
 
-    public GuiTexturedButton addU(int amount) {
+    public T addU(int amount) {
         this.u += amount;
-        return this;
+        return (T) this;
     }
 
-    public GuiTexturedButton setU(int u) {
+    public T setU(int u) {
         this.u = u;
-        return this;
+        return (T) this;
     }
 
     public int getV() {
         return v;
     }
 
-    public GuiTexturedButton addV(int amount) {
+    public T addV(int amount) {
         this.v += amount;
-        return this;
+        return (T) this;
     }
 
-    public GuiTexturedButton setV(int v) {
+    public T setV(int v) {
         this.v = v;
-        return this;
+        return (T) this;
     }
 
     public void timedOutClick() {
@@ -79,5 +83,9 @@ public class GuiTexturedButton extends GuiWidget {
 
     public int getTextureYShift(int pass) {
         return 0;
+    }
+
+    @Override
+    public void renderForeground(int mouseX, int mouseY) {
     }
 }

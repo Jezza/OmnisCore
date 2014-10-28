@@ -9,8 +9,8 @@ import cpw.mods.fml.relauncher.Side;
 import me.jezza.dc.common.CommonProxy;
 import me.jezza.dc.common.core.CoreProperties;
 import me.jezza.dc.common.core.config.CoreConfig;
+import me.jezza.dc.common.core.network.MessageGuiNotify;
 import me.jezza.dc.common.core.network.NetworkDispatcher;
-import me.jezza.dc.common.core.network.PacketGuiNotify;
 
 import static me.jezza.dc.common.core.CoreProperties.*;
 
@@ -30,10 +30,9 @@ public class DeusCore {
         logger.info("-- Pre-Initialising DeusCore (" + VERSION + ") --");
         CoreConfig.loadConfiguration(event.getSuggestedConfigurationFile());
 
-
         logger.info("Setting up internal network - Channel ID: " + MOD_ID);
         networkDispatcher = new NetworkDispatcher(MOD_ID);
-        networkDispatcher.registerMessage(PacketGuiNotify.class, Side.SERVER);
+        networkDispatcher.registerMessage(MessageGuiNotify.class, Side.SERVER);
         logger.info("Success! Network fully integrated.");
     }
 

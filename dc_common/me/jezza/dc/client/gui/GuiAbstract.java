@@ -1,8 +1,13 @@
 package me.jezza.dc.client.gui;
 
+import cpw.mods.fml.common.network.simpleimpl.IMessage;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import me.jezza.dc.DeusCore;
 import me.jezza.dc.client.gui.components.GuiWidget;
 import me.jezza.dc.client.gui.interfaces.IGuiRenderHandler;
 import me.jezza.dc.client.gui.lib.Colour;
+import me.jezza.dc.common.core.network.MessageGuiNotify;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -15,6 +20,7 @@ import net.minecraft.util.ResourceLocation;
 import java.util.ArrayList;
 import java.util.List;
 
+@SideOnly(Side.CLIENT)
 public abstract class GuiAbstract extends GuiContainer implements IGuiRenderHandler {
     public EntityPlayer player;
     public int middleX, middleY;
@@ -48,7 +54,8 @@ public abstract class GuiAbstract extends GuiContainer implements IGuiRenderHand
     }
 
     public void bindTexture() {
-        bindTexture(mainTexture);
+        if (mainTexture != null)
+            bindTexture(mainTexture);
     }
 
     public void bindTexture(ResourceLocation texture) {
@@ -70,7 +77,7 @@ public abstract class GuiAbstract extends GuiContainer implements IGuiRenderHand
     }
 
     /**
-     * Pass through for super buttonlist.
+     * Pass through for super.buttonList.
      */
     public int addDefaultButton(GuiButton button) {
         super.buttonList.add(button);
@@ -84,13 +91,16 @@ public abstract class GuiAbstract extends GuiContainer implements IGuiRenderHand
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float var1, int mouseX, int mouseY) {
-        if (mainTexture != null)
-            mc.renderEngine.bindTexture(mainTexture);
+        bindTexture();
+        for (GuiWidget widget : buttonList)
+            widget.renderBackground(mouseX, mouseY);
+    }
 
+    @Override
+    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+        bindTexture();
         for (GuiWidget widget : buttonList)
-            widget.render(mouseX, mouseY);
-        for (GuiWidget widget : buttonList)
-            widget.postRender(mouseX, mouseY);
+            widget.renderForeground(mouseX, mouseY);
     }
 
     @Override
@@ -99,6 +109,7 @@ public abstract class GuiAbstract extends GuiContainer implements IGuiRenderHand
             if (widget.canClick(mouseX, mouseY)) {
                 widget.onClick(mouseX, mouseY, t);
                 onActionPerformed(widget, t);
+                //break;
             }
     }
 
@@ -124,6 +135,24 @@ public abstract class GuiAbstract extends GuiContainer implements IGuiRenderHand
 
     protected void drawCentredText(int xOffset, int yOffset, String text, Colour colour) {
         fontRendererObj.drawString(text, ((xSize - fontRendererObj.getStringWidth(text)) / 2) + xOffset, (ySize) / 2 + yOffset, colour.getInt());
+    }
+
+    /**
+     * Used to send a message to the server, notifying it of certain changes.
+     * This using an embedded network system, so you have nothing to worry about transport.
+     * The only thing you have to do is on the Container on the server, you need to implement {@link me.jezza.dc.client.gui.interfaces.IGuiMessageHandler}
+     * Then {@code onClientClick} will be called with the same ID and process that you sent, the only difference, of course, is that it's on the server, as GUIs are on the client.
+     * This should give you an easy way to transport simple data based on what the client has done.
+     * Be warned, this could be exploited, so keep that in mind, but then so can the entire Minecraft GUI system.
+     * @param ID ID of the message.
+     * @param process ID of the process.
+     */
+    public void sendMessage(int ID, int process) {
+        sendMessage(new MessageGuiNotify(ID, process));
+    }
+
+    public static void sendMessage(IMessage message) {
+        DeusCore.networkDispatcher.sendToServer(message);
     }
 
     public abstract void onActionPerformed(GuiWidget widget, int mouse);

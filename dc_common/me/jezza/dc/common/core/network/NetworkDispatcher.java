@@ -15,7 +15,7 @@ import net.minecraft.network.Packet;
  * Nothing really special.
  * <p/>
  * Note: These messages aren't designed for massive loads.
- * This is for small messages.
+ * They're for small messages.
  */
 public class NetworkDispatcher {
 

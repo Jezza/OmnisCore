@@ -1,8 +1,5 @@
 package me.jezza.dc.client.gui.components;
 
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import me.jezza.dc.DeusCore;
-import me.jezza.dc.client.gui.interfaces.IGuiButton;
 import me.jezza.dc.client.gui.interfaces.IGuiRenderHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -15,7 +12,7 @@ import org.lwjgl.input.Keyboard;
 
 import java.util.List;
 
-public abstract class GuiWidget extends Gui implements IGuiButton {
+public abstract class GuiWidget<T extends GuiWidget> extends Gui {
 
     public FontRenderer fontRendererObj = Minecraft.getMinecraft().fontRenderer;
     protected static RenderItem itemRender = new RenderItem();
@@ -27,7 +24,6 @@ public abstract class GuiWidget extends Gui implements IGuiButton {
 
     public long timeClicked = 0;
     public boolean clicked = false;
-    private boolean notifyServer = false;
     private boolean visible = true;
 
     public GuiWidget(int x, int y, int width, int height) {
@@ -37,64 +33,43 @@ public abstract class GuiWidget extends Gui implements IGuiButton {
         this.height = height;
     }
 
-    public GuiWidget setRenderHandler(IGuiRenderHandler renderHandler) {
+    public T setRenderHandler(IGuiRenderHandler renderHandler) {
         this.renderHandler = renderHandler;
-        return this;
+        return (T) this;
     }
 
-    public GuiWidget setID(int id) {
+    public T setID(int id) {
         this.id = id;
-        return this;
+        return (T) this;
     }
 
-    public GuiWidget setPosition(int x, int y) {
+    public T setPosition(int x, int y) {
         this.x = x;
         this.y = y;
-        return this;
+        return (T) this;
     }
 
-    public GuiWidget setDimensions(int width, int height) {
+    public T setDimensions(int width, int height) {
         this.width = width;
         this.height = height;
-        return this;
+        return (T) this;
     }
 
-    public GuiWidget setVisible(boolean visible) {
+    public T setVisible(boolean visible) {
         this.visible = visible;
         if (!visible) {
             clicked = false;
             timeClicked = 0;
         }
-        return this;
-    }
-
-    /**
-     * Do I want it to be the button that worries of the click?
-     * Or should it be handled by the MainGui.
-     * I think the MainGui could do it.
-     * <p/>
-     * Client-side
-     * Eg, PacketSenderThingy.sendUpdateFromPlayerGui(player, buttonId)
-     * <p/>
-     * <p/>
-     * Server-side
-     * Receives name of player, and buttonID.
-     * <p/>
-     * if (player.openContainer instanceof IPacketGuiHandler)
-     * onClientClick(player, buttonID)
-     * voilà
-     */
-    public GuiWidget setNotifyServerOnClick() {
-        notifyServer = true;
-        return this;
-    }
-
-    public void toggleVisiblity() {
-        visible = !visible;
+        return (T) this;
     }
 
     public int getId() {
         return id;
+    }
+
+    public void toggleVisiblity() {
+        visible = !visible;
     }
 
     public boolean isClicked() {
@@ -105,43 +80,30 @@ public abstract class GuiWidget extends Gui implements IGuiButton {
         return visible;
     }
 
-    public boolean shouldNotifyServerOnClick() {
-        return notifyServer;
-    }
-
-    public IMessage getDescriptionPacket() {
-        return null;
-    }
-
-    @Override
     public boolean onClick(int mouseX, int mouseY, int mouseClick) {
         clicked = canClick(mouseX, mouseY);
         if (clicked) {
             timeClicked = System.currentTimeMillis();
             if (shouldPlaySoundOnClick())
                 playButtonClick();
-            if (shouldNotifyServerOnClick())
-                DeusCore.networkDispatcher.sendToServer(getDescriptionPacket());
         }
         return clicked;
     }
 
-    @Override
     public boolean canClick(int mouseX, int mouseY) {
-        return visible && isHoveringOver(mouseX, mouseY);
+        return visible && isWithinBounds(mouseX, mouseY);
     }
 
-    @Override
-    public boolean isHoveringOver(int mouseX, int mouseY) {
+    public boolean isWithinBounds(int mouseX, int mouseY) {
         return x < mouseX && mouseX < (x + width) && y < mouseY && mouseY < (y + height);
-    }
-
-    public void playButtonClick() {
-        Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("gui.button.press"), 1.0F));
     }
 
     public boolean shouldPlaySoundOnClick() {
         return true;
+    }
+
+    public void playButtonClick() {
+        Minecraft.getMinecraft().getSoundHandler().playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("gui.button.press"), 1.0F));
     }
 
     public void renderToolTip(ItemStack itemStack, int x, int y) {
@@ -154,8 +116,9 @@ public abstract class GuiWidget extends Gui implements IGuiButton {
             renderHandler.renderHoveringText(list, x, y, font);
     }
 
-    public void postRender(int mouseX, int mouseY) {
-    }
+    public abstract void renderBackground(int mouseX, int mouseY);
+
+    public abstract void renderForeground(int mouseX, int mouseY);
 
     public boolean isAltKeyDown() {
         return Keyboard.isKeyDown(Keyboard.KEY_LMENU) || Keyboard.isKeyDown(Keyboard.KEY_RMENU);

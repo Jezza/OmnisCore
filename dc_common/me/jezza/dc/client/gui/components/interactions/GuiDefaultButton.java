@@ -1,15 +1,15 @@
-package me.jezza.dc.client.gui.components;
+package me.jezza.dc.client.gui.components.interactions;
 
+import me.jezza.dc.client.gui.components.GuiTexturedButton;
 import me.jezza.dc.client.gui.interfaces.ITextAlignment;
 import me.jezza.dc.client.gui.lib.Colour;
 import me.jezza.dc.client.gui.lib.ResourceHelper;
 import me.jezza.dc.client.gui.lib.TextAlignment;
-import me.jezza.dc.common.core.CoreProperties;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 
-public class GuiDefaultButton extends GuiTexturedButton {
+public class GuiDefaultButton extends GuiTexturedButton<GuiDefaultButton> {
     public static final ResourceLocation buttonTexture = ResourceHelper.getMinecraftResource("textures/gui/widgets.png");
 
     private String text;
@@ -49,7 +49,7 @@ public class GuiDefaultButton extends GuiTexturedButton {
      * Untested...
      */
     @Override
-    public void render(int mouseX, int mouseY) {
+    public void renderBackground(int mouseX, int mouseY) {
         bindTexture(buttonTexture);
         timedOutClick();
         Colour.resetToWhite();
