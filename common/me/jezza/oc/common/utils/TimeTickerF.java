@@ -1,4 +1,4 @@
-package me.jezza.oc.common.core.utils;
+package me.jezza.oc.common.utils;
 
 import net.minecraft.util.MathHelper;
 

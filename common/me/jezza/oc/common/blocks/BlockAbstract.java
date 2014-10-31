@@ -97,6 +97,6 @@ public abstract class BlockAbstract extends Block {
     }
 
     public String getModIdentifier() {
-        return Loader.instance().activeModContainer().getModId();
+        return Loader.instance().activeModContainer().getModId() + ":";
     }
 }

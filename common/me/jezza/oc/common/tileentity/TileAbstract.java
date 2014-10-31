@@ -1,6 +1,6 @@
 package me.jezza.oc.common.tileentity;
 
-import me.jezza.oc.common.core.utils.CoordSet;
+import me.jezza.oc.common.utils.CoordSet;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;

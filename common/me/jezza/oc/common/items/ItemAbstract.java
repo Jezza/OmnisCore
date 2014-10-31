@@ -5,7 +5,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.client.ClientUtil;
-import me.jezza.oc.common.utils.MovingObjectPositionUtil;
+import me.jezza.oc.common.utils.MovingObjectPositionHelper;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -77,7 +77,7 @@ public abstract class ItemAbstract extends Item {
     @Override
     public ItemStack onItemRightClick(ItemStack itemStack, World world, EntityPlayer player) {
         if (notifyRightClick) {
-            MovingObjectPosition mop = MovingObjectPositionUtil.getCurrentMovingObjectPosition(player);
+            MovingObjectPosition mop = MovingObjectPositionHelper.getCurrentMovingObjectPosition(player);
             return onItemRightClick(itemStack, world, player, mop);
         }
         return super.onItemRightClick(itemStack, world, player);
@@ -86,7 +86,7 @@ public abstract class ItemAbstract extends Item {
     @Override
     public boolean onEntitySwing(EntityLivingBase entity, ItemStack itemStack) {
         if (notifyLeftClick) {
-            MovingObjectPosition mop = MovingObjectPositionUtil.getCurrentMovingObjectPosition(entity);
+            MovingObjectPosition mop = MovingObjectPositionHelper.getCurrentMovingObjectPosition(entity);
             return onItemLeftClick(itemStack, entity.worldObj, entity, mop);
         }
         return super.onEntitySwing(entity, itemStack);
@@ -131,6 +131,6 @@ public abstract class ItemAbstract extends Item {
     }
 
     public String getModIdentifier() {
-        return Loader.instance().activeModContainer().getModId();
+        return Loader.instance().activeModContainer().getModId() + ":";
     }
 }

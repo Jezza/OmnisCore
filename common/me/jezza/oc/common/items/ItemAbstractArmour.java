@@ -82,6 +82,6 @@ public abstract class ItemAbstractArmour extends ItemArmor {
     }
 
     public String getModIdentifier() {
-        return Loader.instance().activeModContainer().getModId();
+        return Loader.instance().activeModContainer().getModId() + ":";
     }
 }

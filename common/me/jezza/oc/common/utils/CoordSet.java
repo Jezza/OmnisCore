@@ -1,4 +1,4 @@
-package me.jezza.oc.common.core.utils;
+package me.jezza.oc.common.utils;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.block.Block;
@@ -9,7 +9,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import static me.jezza.oc.common.core.utils.MathHelper.RoundingMethod;
+import static me.jezza.oc.common.utils.MathHelper.RoundingMethod;
 
 public class CoordSet {
 

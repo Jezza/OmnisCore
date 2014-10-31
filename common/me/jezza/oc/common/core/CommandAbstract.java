@@ -80,4 +80,33 @@ public abstract class CommandAbstract extends CommandBase {
 
         return chatcomponenttext;
     }
+
+    /**
+     * Used to parse "~" at the start of an argument, so that the position can be set relative to the current one.
+     * This can also depend on the value that follows directly afterward.
+     *
+     * @param sender   The sender in question, whether a player or console.
+     * @param position The value that will be taken and adjusted accordingly, should it need adjusting.
+     * @param argument The string that contains the argument you wish to parse.
+     * @return The value given any necessary shifts.
+     */
+    public static double parseRelativePosition(ICommandSender sender, double position, String argument) {
+        return func_110665_a(sender, position, argument, -30000000, 30000000);
+    }
+
+    /**
+     * Used to parse "~" at the start of an argument, so that the position can be set relative to the current one.
+     * This can also depend on the value that follows directly afterward.
+     *
+     * @param sender     The sender in question, whether a player or console.
+     * @param position   The value that will be taken and adjusted accordingly, should it need adjusting.
+     * @param argument   The string that contains the argument you wish to parse.
+     * @param lowerBound If the adjusted number is beyond this, throws a {@link net.minecraft.command.NumberInvalidException}
+     * @param upperBound If the adjusted number is beyond this, throws a {@link net.minecraft.command.NumberInvalidException}
+     * @return The value given any necessary shifts.
+     */
+    public static double parseRelativePosition(ICommandSender sender, double position, String argument, int lowerBound, int upperBound) {
+        return CommandBase.func_110665_a(sender, position, argument, lowerBound, upperBound);
+    }
+
 }

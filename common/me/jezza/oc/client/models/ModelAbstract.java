@@ -6,6 +6,9 @@ import net.minecraftforge.client.model.IModelCustom;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 
+/**
+ * Just a wrapper for IModelCustom and the AdvancedModelLoader.
+ */
 @SideOnly(Side.CLIENT)
 public abstract class ModelAbstract {
 
