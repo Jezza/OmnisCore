@@ -3,6 +3,7 @@ package me.jezza.oc.common.core;
 import com.google.common.collect.Lists;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -15,9 +16,11 @@ public class Graph<T> {
     private final TreeSet<T> EMPTY_SET = new TreeSet<T>();
 
     private HashMap<T, TreeSet<T>> nodeMap;
+    private HashSet<T> visited;
 
     public Graph() {
         nodeMap = new HashMap<T, TreeSet<T>>();
+        visited = new HashSet<T>();
     }
 
     public void addNode(T node) {
@@ -61,11 +64,11 @@ public class Graph<T> {
             return false;
         if (!(hasNode(from) && hasNode(to)))
             return false;
-        if (isConnected(from, to))
-            return false;
 
-        nodeMap.get(from).add(to);
-        nodeMap.get(to).add(from);
+        if (!nodeMap.get(from).contains(to))
+            nodeMap.get(from).add(to);
+        if (!nodeMap.get(to).contains(from))
+            nodeMap.get(to).add(from);
         return true;
     }
 
@@ -100,18 +103,14 @@ public class Graph<T> {
     /**
      * As it's undirected it doesn't matter the order of the nodes.
      * The only difference is going to be a reversed path.
+     *
+     * @return An empty list if no path was found and a complete path with the current node as the first index.
      */
     public List<T> getPathFrom(T from, T to) {
         if (!(hasNode(from) && hasNode(to)))
             return Lists.newArrayList();
-        List<T> path;
-        int depth = 0;
-        do {
-            path = depthFirstSearch(from, from, to);
-            depth += 1;
-            if (depth > size())
-                break;
-        } while (path.isEmpty());
+        visited.clear();
+        List<T> path = depthFirstSearch(from, from, to);
         return Lists.reverse(path);
     }
 
@@ -121,8 +120,9 @@ public class Graph<T> {
             return Lists.newArrayList(to);
         List<T> result = null;
         for (T childNode : adjacentTo(from)) {
-            if (childNode.equals(parentNode))
+            if (childNode.equals(parentNode) || visited.contains(childNode))
                 continue;
+            visited.add(childNode);
             List<T> tempResult = depthFirstSearch(from, childNode, to);
             if (tempResult.isEmpty())
                 continue;

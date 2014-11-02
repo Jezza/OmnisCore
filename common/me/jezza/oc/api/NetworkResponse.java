@@ -1,6 +1,17 @@
 package me.jezza.oc.api;
 
 public enum NetworkResponse {
-    REROUTE,
+    VALIDATE,
+    INVALIDATE;
 
+    public static enum MessageResponse {
+        VALID,
+        INVALID;
+    }
+
+    public static enum Override {
+        IGNORE,
+        DELETE,
+        INTERCEPT;
+    }
 }
