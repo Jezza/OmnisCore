@@ -1,8 +1,9 @@
 package me.jezza.oc.api;
 
 public enum NetworkResponse {
-    VALIDATE,
-    INVALIDATE;
+    NETWORK_JOIN,
+    NETWORK_MERGE,
+    NETWORK_CREATION;
 
     public static enum MessageResponse {
         VALID,

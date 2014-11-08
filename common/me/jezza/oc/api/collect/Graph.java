@@ -1,48 +1,43 @@
-package me.jezza.oc.common.core;
-
-import com.google.common.collect.Lists;
+package me.jezza.oc.api.collect;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.TreeSet;
+import java.util.LinkedHashSet;
 
-/**
- * This is the backend of the network.
- * No touchy.
- */
 public class Graph<T> {
 
-    private final TreeSet<T> EMPTY_SET = new TreeSet<T>();
+    private final LinkedHashSet<T> EMPTY_SET = new LinkedHashSet<T>();
 
-    private HashMap<T, TreeSet<T>> nodeMap;
-    private HashSet<T> visited;
+    private HashMap<T, LinkedHashSet<T>> nodeMap;
 
     public Graph() {
-        nodeMap = new HashMap<T, TreeSet<T>>();
-        visited = new HashSet<T>();
+        nodeMap = new HashMap();
     }
 
     public void addNode(T node) {
         if (hasNode(node))
             return;
-        nodeMap.put(node, new TreeSet<T>());
+        nodeMap.put(node, new LinkedHashSet<T>());
     }
 
     public void removeNode(T node) {
         if (!hasNode(node))
             return;
-        TreeSet<T> treeSet = nodeMap.remove(node);
-        for (T adjacentNode : treeSet)
+        HashSet<T> set = nodeMap.remove(node);
+        for (T adjacentNode : set)
             nodeMap.get(adjacentNode).remove(node);
     }
 
     public void clear() {
-        nodeMap = new HashMap<T, TreeSet<T>>();
+        nodeMap.clear();
     }
 
     public int size() {
         return nodeMap.size();
+    }
+
+    public boolean isEmpty() {
+        return size() == 0;
     }
 
     public boolean hasNode(T node) {
@@ -72,15 +67,27 @@ public class Graph<T> {
         return true;
     }
 
-    public Iterable<T> getNodes() {
-        return nodeMap.keySet();
+    /**
+     * Add the entire given graph to this graph.
+     *
+     * @param graphToAdd the graph to add
+     */
+    public void addAll(Graph<T> graphToAdd) {
+        nodeMap.putAll(graphToAdd.nodeMap);
     }
 
     /**
-     * Return an iterator over the adjacent nodes.
+     * @return an iterable for the adjacent nodes.
      */
     public Iterable<T> adjacentTo(T node) {
         return !hasNode(node) ? EMPTY_SET : nodeMap.get(node);
+    }
+
+    /**
+     * @return all nodes currently in the network.
+     */
+    public Iterable<T> getNodes() {
+        return nodeMap.keySet();
     }
 
     @Override
@@ -100,37 +107,8 @@ public class Graph<T> {
         return stringBuilder.toString();
     }
 
-    /**
-     * As it's undirected it doesn't matter the order of the nodes.
-     * The only difference is going to be a reversed path.
-     *
-     * @return An empty list if no path was found and a complete path with the current node as the first index.
-     */
-    public List<T> getPathFrom(T from, T to) {
-        if (!(hasNode(from) && hasNode(to)))
-            return Lists.newArrayList();
-        visited.clear();
-        List<T> path = depthFirstSearch(from, from, to);
-        return Lists.reverse(path);
-    }
-
-
-    private List<T> depthFirstSearch(T parentNode, T from, T to) {
-        if (from.equals(to))
-            return Lists.newArrayList(to);
-        List<T> result = null;
-        for (T childNode : adjacentTo(from)) {
-            if (childNode.equals(parentNode) || visited.contains(childNode))
-                continue;
-            visited.add(childNode);
-            List<T> tempResult = depthFirstSearch(from, childNode, to);
-            if (tempResult.isEmpty())
-                continue;
-            tempResult.add(from);
-            if (result == null || tempResult.size() < result.size())
-                result = tempResult;
-        }
-        return result != null ? result : Lists.<T>newArrayList();
+    public static enum CollectionMethod {
+        DFS, BFS;
     }
 
 }

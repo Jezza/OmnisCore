@@ -3,34 +3,53 @@ package me.jezza.oc.api;
 import com.google.common.collect.HashMultimap;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import me.jezza.oc.api.collect.Graph;
+import me.jezza.oc.api.interfaces.IMessageProcessor;
 import me.jezza.oc.api.interfaces.INetworkMessage;
 import me.jezza.oc.api.interfaces.INetworkNode;
-import me.jezza.oc.common.core.Graph;
 
 import java.util.Collection;
 import java.util.Iterator;
 
-public class NetworkCore {
+public class NetworkCore implements IMessageProcessor {
 
     private HashMultimap<Phase, INetworkMessage> messageMap;
-    private Graph<INetworkNode> network;
+    private Graph<INetworkNode> graph;
 
     public NetworkCore() {
-        network = new Graph<>();
+        graph = new Graph<>();
         messageMap = HashMultimap.create();
-//        FMLCommonHandler.instance().bus().register(this);
     }
 
     public void addNetworkNode(INetworkNode node) {
-        network.addNode(node);
-        for (INetworkNode nearbyNode : node.getNearbyNodes())
-            network.addEdge(node, nearbyNode);
+        graph.addNode(node);
+        for (INetworkNode nearbyNodes : node.getNearbyNodes())
+            graph.addEdge(node, nearbyNodes);
+        node.setNetworkCore(this);
     }
 
-    public void removeNetworkNode(INetworkNode node) {
-        network.removeNode(node);
+    /**
+     * @param node
+     * @return if graph is empty
+     */
+    public boolean removeNetworkNode(INetworkNode node) {
+        graph.removeNode(node);
+        return graph.isEmpty();
     }
 
+    public boolean hasNetworkNode(INetworkNode node) {
+        return graph.hasNode(node);
+    }
+
+    public void merge(NetworkCore otherCore) {
+        graph.addAll(otherCore.graph);
+    }
+
+    public int size() {
+        return graph.size();
+    }
+
+    @Override
     public void postMessage(INetworkMessage message) {
         messageMap.put(Phase.PRE_PROCESSING, message);
     }
@@ -40,7 +59,6 @@ public class NetworkCore {
         postProcessingMessages();
         processingMessages();
         preProcessingMessages();
-//        CoreProperties.logger.info("Server Tick");
     }
 
     private void postProcessingMessages() {
@@ -50,8 +68,16 @@ public class NetworkCore {
         Iterator<INetworkMessage> iterator = messages.iterator();
         while (iterator.hasNext()) {
             INetworkMessage message = iterator.next();
-            message.getOwner().onMessageComplete(message);
+            NetworkResponse.MessageResponse messageResponse = message.getOwner().onMessageComplete(message);
             iterator.remove();
+            switch (messageResponse) {
+                case VALID:
+                    break;
+                case INVALID:
+                    message.resetMessage();
+                    messageMap.put(Phase.PRE_PROCESSING, message);
+                    break;
+            }
         }
     }
 
@@ -62,16 +88,8 @@ public class NetworkCore {
         Iterator<INetworkMessage> iterator = messages.iterator();
         while (iterator.hasNext()) {
             INetworkMessage message = iterator.next();
-            for (INetworkNode node : network.getNodes()) {
-                NetworkResponse.MessageResponse response = node.isValidMessage(message);
-                switch (response) {
-                    case VALID:
-                        message.addRespondingNode(node);
-                        continue;
-                    case INVALID:
-                        continue;
-                }
-            }
+            for (INetworkNode node : graph.getNodes())
+                message.isValidNode(node);
             iterator.remove();
             messageMap.put(Phase.POST_PROCESSING, message);
         }
@@ -82,15 +100,18 @@ public class NetworkCore {
         if (messages.isEmpty())
             return;
         Iterator<INetworkMessage> iterator = messages.iterator();
+
+        messageIterator:
         while (iterator.hasNext()) {
             INetworkMessage message = iterator.next();
-            for (INetworkNode node : network.getNodes()) {
+            for (INetworkNode node : graph.getNodes()) {
                 NetworkResponse.Override override = node.onMessagePosted(message);
                 switch (override) {
                     case IGNORE:
                         continue;
                     case DELETE:
-                        return;
+                        iterator.remove();
+                        continue messageIterator;
                     case INTERCEPT:
                         message.setOwner(node);
                         continue;
@@ -106,5 +127,4 @@ public class NetworkCore {
         PROCESSING,
         POST_PROCESSING;
     }
-
 }

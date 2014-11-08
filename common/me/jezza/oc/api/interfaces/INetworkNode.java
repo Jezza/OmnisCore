@@ -2,6 +2,8 @@ package me.jezza.oc.api.interfaces;
 
 import me.jezza.oc.api.NetworkResponse;
 
+import java.util.Collection;
+
 public interface INetworkNode {
 
     /**
@@ -13,19 +15,6 @@ public interface INetworkNode {
      * @param message The message in question that was posted.
      */
     public NetworkResponse.Override onMessagePosted(INetworkMessage message);
-
-    /**
-     * Called on a separate thread to check if the node in question desires it.
-     * Don't modify anything in your class unless you know enough of concurrent modifications.
-     * - VALID, This node is a valid option.
-     * - INVALID, This node is an invalid option.
-     * <p/>
-     * DON'T CHANGE ANYTHING IN THE MESSAGE, IT'S FOR CHECKING ONLY.
-     *
-     * @param message The message in question.
-     * @return If this node is interested in it.
-     */
-    public NetworkResponse.MessageResponse isValidMessage(INetworkMessage message);
 
     /**
      * Received when a message is delivered directly to the node.
@@ -43,20 +32,28 @@ public interface INetworkNode {
      * Used to determine what the system should do with the message after giving passing it off to this method.
      * This is after the message has returned and has been completed.
      * This is only called on the node that posted the message.
-     * - VALIDATE, the system will drop it, as the message is no longer needed.
-     * - INVALIDATE, the system will repost the message again into the messageQueue.
+     * - VALID, the system will drop it, as the message is no longer needed.
+     * - INVALID, the system will repost the message again to get re-processed.
      *
      * @param message The message in question that has finished being processed.
      * @return
      */
-    public NetworkResponse onMessageComplete(INetworkMessage message);
+    public NetworkResponse.MessageResponse onMessageComplete(INetworkMessage message);
 
     /**
-     * This can be done by many methods, of your own free will.
-     * Probably best to cache this, and update it when a change occurs.
+     * This can be done by many methods, do it of your own free will.
+     * However that being said, it's probably best to cache it, and update it when a change occurs.
      *
-     * @return all nearby network nodes.
+     * @return all nearby network nodes; Nodes that are also connected to this node.
      */
-    public Iterable<INetworkNode> getNearbyNodes();
+    public Collection<INetworkNode> getNearbyNodes();
+
+    /**
+     * Gets set when you pass in the node to be added.
+     * This allows you to post messages easily from the node without referring to the main NetworkInstance.
+     */
+    public void setNetworkCore(IMessageProcessor networkCore);
+
+    public IMessageProcessor getNetworkCore();
 
 }

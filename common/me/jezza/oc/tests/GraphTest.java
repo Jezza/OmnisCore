@@ -1,14 +1,11 @@
 package me.jezza.oc.tests;
 
-import me.jezza.oc.common.core.Graph;
+import me.jezza.oc.api.collect.Graph;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
 
 public class GraphTest {
 
@@ -125,38 +122,5 @@ public class GraphTest {
             index++;
         }
         return index;
-    }
-
-    @Test(timeout = 50)
-    public void testGetPathFrom() throws Exception {
-        int length = 1000;
-        ArrayList<String> pathResult = new ArrayList<>(length);
-        for (int i = 1; i <= length; i++) {
-            String node = "TestNode" + i;
-            pathResult.add(node);
-            graph.addNode(node);
-            if (i > 1)
-                graph.addEdge("TestNode" + (i - 1), node);
-            Assert.assertEquals(graph.size(), i);
-        }
-
-        int randomConnections = 1;
-        Random rand = new Random();
-        for (int i = 1; i < length; i++) {
-            int start = (rand.nextInt(length) + 1);
-            int finish = (rand.nextInt(length) + 1);
-            boolean flag = graph.addEdge("TestNode" + start, "TestNode" + finish);
-            if (flag)
-                randomConnections++;
-        }
-        System.out.println("Random Connections: " + randomConnections);
-
-        int first = rand.nextInt(length);
-        int second = rand.nextInt(length);
-        List<String> pathTo = graph.getPathFrom("TestNode" + first, "TestNode" + second);
-
-        Assert.assertTrue(pathTo.size() <= length);
-        Assert.assertEquals(pathResult.size(), length);
-
     }
 }
