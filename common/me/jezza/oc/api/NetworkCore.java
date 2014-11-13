@@ -7,46 +7,63 @@ import me.jezza.oc.api.collect.Graph;
 import me.jezza.oc.api.interfaces.IMessageProcessor;
 import me.jezza.oc.api.interfaces.INetworkMessage;
 import me.jezza.oc.api.interfaces.INetworkNode;
+import me.jezza.oc.api.interfaces.INetworkNodeHandler;
 
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.*;
 
-public class NetworkCore implements IMessageProcessor {
+public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
 
     private HashMultimap<Phase, INetworkMessage> messageMap;
     private Graph<INetworkNode> graph;
+    private LinkedHashSet<INetworkNode> messageNodesOverride;
 
     public NetworkCore() {
         graph = new Graph<>();
         messageMap = HashMultimap.create();
+        messageNodesOverride = new LinkedHashSet<>();
     }
 
-    public void addNetworkNode(INetworkNode node) {
-        graph.addNode(node);
+    @Override
+    public boolean addNetworkNode(INetworkNode node) {
+        boolean flag = graph.addNode(node);
         for (INetworkNode nearbyNodes : node.getNearbyNodes())
             graph.addEdge(node, nearbyNodes);
-        node.setNetworkCore(this);
+        node.setIMessageProcessor(this);
+        if (node.registerMessagePostedOverride())
+            messageNodesOverride.add(node);
+        return flag;
     }
 
-    /**
-     * @param node
-     * @return if graph is empty
-     */
+    @Override
     public boolean removeNetworkNode(INetworkNode node) {
-        graph.removeNode(node);
-        return graph.isEmpty();
+        if (node.registerMessagePostedOverride())
+            messageNodesOverride.remove(node);
+        return graph.removeNode(node);
     }
 
-    public boolean hasNetworkNode(INetworkNode node) {
-        return graph.hasNode(node);
+    @Override
+    public void mergeNetwork(Map<? extends INetworkNode, ? extends Collection<INetworkNode>> networkNodeMap) {
+        graph.addAll(networkNodeMap);
     }
 
-    public void merge(NetworkCore otherCore) {
-        graph.addAll(otherCore.graph);
+    @Override
+    public Map<? extends INetworkNode, ? extends Collection<INetworkNode>> getNodeMap() {
+        return graph.asImmutableMap();
     }
 
+    @Override
+    public boolean requiresRegistration() {
+        return true;
+    }
+
+    @Override
     public int size() {
         return graph.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return graph.isEmpty();
     }
 
     @Override
@@ -56,20 +73,22 @@ public class NetworkCore implements IMessageProcessor {
 
     @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent event) {
-        postProcessingMessages();
+        processingPostMessages();
         processingMessages();
-        preProcessingMessages();
+        processingPreMessages();
     }
 
-    private void postProcessingMessages() {
+    private void processingPostMessages() {
         Collection<INetworkMessage> messages = messageMap.get(Phase.POST_PROCESSING);
         if (messages.isEmpty())
             return;
         Iterator<INetworkMessage> iterator = messages.iterator();
+
         while (iterator.hasNext()) {
             INetworkMessage message = iterator.next();
+
             NetworkResponse.MessageResponse messageResponse = message.getOwner().onMessageComplete(message);
-            iterator.remove();
+
             switch (messageResponse) {
                 case VALID:
                     break;
@@ -78,6 +97,8 @@ public class NetworkCore implements IMessageProcessor {
                     messageMap.put(Phase.PRE_PROCESSING, message);
                     break;
             }
+
+            iterator.remove();
         }
     }
 
@@ -86,25 +107,43 @@ public class NetworkCore implements IMessageProcessor {
         if (messages.isEmpty())
             return;
         Iterator<INetworkMessage> iterator = messages.iterator();
+
         while (iterator.hasNext()) {
             INetworkMessage message = iterator.next();
-            for (INetworkNode node : graph.getNodes())
+
+            HashSet<INetworkNode> visited = new HashSet<>();
+            Queue<INetworkNode> queue = new PriorityQueue<>();
+            queue.offer(message.getOwner());
+
+            while (!queue.isEmpty()) {
+                INetworkNode node = queue.poll();
+                visited.add(node);
                 message.isValidNode(node);
+                for (INetworkNode childNode : graph.adjacentTo(node)) {
+                    if (visited.contains(childNode))
+                        continue;
+                    queue.offer(childNode);
+                }
+            }
+
             iterator.remove();
             messageMap.put(Phase.POST_PROCESSING, message);
         }
     }
 
-    private void preProcessingMessages() {
+    private void processingPreMessages() {
         Collection<INetworkMessage> messages = messageMap.get(Phase.PRE_PROCESSING);
-        if (messages.isEmpty())
+        if (messages.isEmpty() || messageNodesOverride.isEmpty())
             return;
         Iterator<INetworkMessage> iterator = messages.iterator();
 
         messageIterator:
         while (iterator.hasNext()) {
             INetworkMessage message = iterator.next();
-            for (INetworkNode node : graph.getNodes()) {
+            Iterator<INetworkNode> networkNodeIterator = messageNodesOverride.iterator();
+
+            while (networkNodeIterator.hasNext()) {
+                INetworkNode node = networkNodeIterator.next();
                 NetworkResponse.Override override = node.onMessagePosted(message);
                 switch (override) {
                     case IGNORE:
@@ -117,6 +156,7 @@ public class NetworkCore implements IMessageProcessor {
                         continue;
                 }
             }
+
             iterator.remove();
             messageMap.put(Phase.PROCESSING, message);
         }
@@ -127,4 +167,5 @@ public class NetworkCore implements IMessageProcessor {
         PROCESSING,
         POST_PROCESSING;
     }
+
 }

@@ -1,8 +1,9 @@
 package me.jezza.oc.api.interfaces;
 
-import me.jezza.oc.api.NetworkResponse;
-
 import java.util.Collection;
+
+import static me.jezza.oc.api.NetworkResponse.MessageResponse;
+import static me.jezza.oc.api.NetworkResponse.Override;
 
 public interface INetworkNode {
 
@@ -14,7 +15,7 @@ public interface INetworkNode {
      *
      * @param message The message in question that was posted.
      */
-    public NetworkResponse.Override onMessagePosted(INetworkMessage message);
+    public Override onMessagePosted(INetworkMessage message);
 
     /**
      * Received when a message is delivered directly to the node.
@@ -26,7 +27,7 @@ public interface INetworkNode {
      * @param message
      * @return
      */
-    public NetworkResponse.Override onMessageReceived(INetworkMessage message);
+    public Override onMessageReceived(INetworkMessage message);
 
     /**
      * Used to determine what the system should do with the message after giving passing it off to this method.
@@ -38,7 +39,7 @@ public interface INetworkNode {
      * @param message The message in question that has finished being processed.
      * @return
      */
-    public NetworkResponse.MessageResponse onMessageComplete(INetworkMessage message);
+    public MessageResponse onMessageComplete(INetworkMessage message);
 
     /**
      * This can be done by many methods, do it of your own free will.
@@ -51,9 +52,19 @@ public interface INetworkNode {
     /**
      * Gets set when you pass in the node to be added.
      * This allows you to post messages easily from the node without referring to the main NetworkInstance.
+     * If you decide, for some stupid reason, to override this value, at least make sure it's an instance of INetworkNodeHandler, or you're going to get an exception thrown at your face, because of your stupidity.
      */
-    public void setNetworkCore(IMessageProcessor networkCore);
+    public void setIMessageProcessor(IMessageProcessor networkCore);
 
-    public IMessageProcessor getNetworkCore();
+    /**
+     * @return the IMessageProcessor instance that is set upon adding a network node to a network.
+     */
+    public IMessageProcessor getIMessageProcessor();
+
+    /**
+     * @return true if you desire to be notified of other messages in the event of overriding or deleting.
+     * Look at onMessagePosted();
+     */
+    public boolean registerMessagePostedOverride();
 
 }

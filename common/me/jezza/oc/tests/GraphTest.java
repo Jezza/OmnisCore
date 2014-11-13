@@ -49,9 +49,7 @@ public class GraphTest {
 
     @Test
     public void testSize() throws Exception {
-        graph.addNode("TestNode1");
-        graph.addNode("TestNode2");
-        graph.addNode("TestNode3");
+        addNodes(3);
         int size = graph.size();
         Assert.assertEquals(size, 3);
     }
@@ -59,41 +57,35 @@ public class GraphTest {
     @Test
     public void testHasNode() throws Exception {
         graph.addNode("TestNode1");
-        Assert.assertTrue(graph.hasNode("TestNode1"));
-        Assert.assertFalse(graph.hasNode("TestNode2"));
+        Assert.assertTrue(graph.containsNode("TestNode1"));
+        Assert.assertFalse(graph.containsNode("TestNode2"));
     }
 
     @Test
     public void testIsConnected() throws Exception {
-        graph.addNode("TestNode1");
-        graph.addNode("TestNode2");
-        graph.addNode("TestNode3");
+        addNodes(3);
         graph.addEdge("TestNode1", "TestNode2");
-        Assert.assertTrue(graph.isConnected("TestNode1", "TestNode2"));
-        Assert.assertFalse(graph.isConnected("TestNode2", "TestNode2"));
-        Assert.assertFalse(graph.isConnected("TestNode2", "TestNode3"));
-        Assert.assertFalse(graph.isConnected("TestNode1", "TestNode3"));
-        Assert.assertTrue(graph.isConnected("TestNode2", "TestNode1"));
+        Assert.assertTrue(graph.isAdjacent("TestNode1", "TestNode2"));
+        Assert.assertFalse(graph.isAdjacent("TestNode2", "TestNode2"));
+        Assert.assertFalse(graph.isAdjacent("TestNode2", "TestNode3"));
+        Assert.assertFalse(graph.isAdjacent("TestNode1", "TestNode3"));
+        Assert.assertTrue(graph.isAdjacent("TestNode2", "TestNode1"));
     }
 
     @Test
     public void testAddEdge() throws Exception {
-        graph.addNode("TestNode1");
-        graph.addNode("TestNode2");
-        graph.addNode("TestNode3");
+        addNodes(3);
         graph.addEdge("TestNode1", "TestNode2");
         graph.addEdge("TestNode1", "TestNode3");
-        Assert.assertTrue(graph.isConnected("TestNode1", "TestNode2"));
-        Assert.assertFalse(graph.isConnected("TestNode2", "TestNode2"));
-        Assert.assertFalse(graph.isConnected("TestNode2", "TestNode3"));
-        Assert.assertTrue(graph.isConnected("TestNode1", "TestNode3"));
+        Assert.assertTrue(graph.isAdjacent("TestNode1", "TestNode2"));
+        Assert.assertFalse(graph.isAdjacent("TestNode2", "TestNode2"));
+        Assert.assertFalse(graph.isAdjacent("TestNode2", "TestNode3"));
+        Assert.assertTrue(graph.isAdjacent("TestNode1", "TestNode3"));
     }
 
     @Test
     public void testGetNodes() throws Exception {
-        graph.addNode("TestNode1");
-        graph.addNode("TestNode2");
-        graph.addNode("TestNode3");
+        addNodes(3);
         Iterable<String> iterable = graph.getNodes();
         int size = sizeOfIterator(iterable);
         Assert.assertEquals(size, 3);
@@ -101,9 +93,7 @@ public class GraphTest {
 
     @Test
     public void testAdjacentTo() throws Exception {
-        graph.addNode("TestNode1");
-        graph.addNode("TestNode2");
-        graph.addNode("TestNode3");
+        addNodes(3);
         graph.addEdge("TestNode1", "TestNode2");
         graph.addEdge("TestNode1", "TestNode3");
         int size = sizeOfIterator(graph.adjacentTo("TestNode1"));
@@ -111,6 +101,11 @@ public class GraphTest {
         size = sizeOfIterator(graph.adjacentTo("TestNode2"));
         Assert.assertEquals(size, 1);
 
+    }
+
+    private void addNodes(int num) {
+        for (int i = 1; i <= num; i++)
+            graph.addNode("TestNode" + i);
     }
 
     private <T> int sizeOfIterator(Iterable<T> iterable) {

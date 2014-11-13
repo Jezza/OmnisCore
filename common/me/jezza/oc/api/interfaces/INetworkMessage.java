@@ -2,8 +2,15 @@ package me.jezza.oc.api.interfaces;
 
 public interface INetworkMessage {
 
+    /**
+     * Should be set upon creation.
+     * @param node the message being passed ownership.
+     */
     public void setOwner(INetworkNode node);
 
+    /**
+     * @return current INetworkNode that is viewed as the node that sent out this message.
+     */
     public INetworkNode getOwner();
 
     /**

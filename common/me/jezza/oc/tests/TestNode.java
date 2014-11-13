@@ -43,14 +43,19 @@ public class TestNode implements INetworkNode {
     }
 
     @Override
-    public void setNetworkCore(IMessageProcessor messageProcessor) {
+    public void setIMessageProcessor(IMessageProcessor messageProcessor) {
         CoreProperties.logger.info("Setting network core.");
         this.messageProcessor = messageProcessor;
     }
 
     @Override
-    public IMessageProcessor getNetworkCore() {
+    public IMessageProcessor getIMessageProcessor() {
         return messageProcessor;
+    }
+
+    @Override
+    public boolean registerMessagePostedOverride() {
+        return false;
     }
 
     public void addNearbyNode(INetworkNode node) {
