@@ -58,7 +58,7 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
 
     @Override
     public boolean requiresRegistration() {
-        return false;
+        return true;
     }
 
     @Override
@@ -128,12 +128,12 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
             while (!queue.isEmpty()) {
                 INetworkNode node = queue.poll();
                 visited.add(node);
-                message.isValidNode(node);
-                for (INetworkNode childNode : graph.adjacentTo(node)) {
-                    if (visited.contains(childNode))
-                        continue;
-                    queue.offer(childNode);
-                }
+                NetworkResponse.MessageResponse response = message.isValidNode(node);
+                if (response == NetworkResponse.MessageResponse.INVALID)
+                    continue;
+                for (INetworkNode childNode : graph.adjacentTo(node))
+                    if (!visited.contains(childNode))
+                        queue.offer(childNode);
             }
 
             iterator.remove();

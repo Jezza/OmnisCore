@@ -1,9 +1,12 @@
 package me.jezza.oc.api.interfaces;
 
+import me.jezza.oc.api.NetworkResponse.MessageResponse;
+
 public interface INetworkMessage {
 
     /**
      * Should be set upon creation.
+     *
      * @param node the message being passed ownership.
      */
     public void setOwner(INetworkNode node);
@@ -16,7 +19,7 @@ public interface INetworkMessage {
     /**
      * Called when the message gets reposted upon an invalid network traversal.
      * This is determined by the owner node.
-     *
+     * <p/>
      * Use this to reset any values before the repost.
      */
     public void resetMessage();
@@ -27,6 +30,6 @@ public interface INetworkMessage {
      *
      * @param node The node being processed.
      */
-    public void isValidNode(INetworkNode node);
+    public MessageResponse isValidNode(INetworkNode node);
 
 }

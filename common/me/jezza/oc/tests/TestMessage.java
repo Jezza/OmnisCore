@@ -1,5 +1,6 @@
 package me.jezza.oc.tests;
 
+import me.jezza.oc.api.NetworkResponse;
 import me.jezza.oc.api.interfaces.INetworkMessage;
 import me.jezza.oc.api.interfaces.INetworkNode;
 
@@ -15,9 +16,10 @@ public class TestMessage implements INetworkMessage {
     }
 
     @Override
-    public void isValidNode(INetworkNode node) {
+    public NetworkResponse.MessageResponse isValidNode(INetworkNode node) {
         if (!respondingNodes.contains(node))
             respondingNodes.add(node);
+        return NetworkResponse.MessageResponse.VALID;
     }
 
     @Override

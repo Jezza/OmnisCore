@@ -1,12 +1,12 @@
 [
 {
-  "modid": "DeusCore",
-  "name": "Deus Core",
+  "modid": "OmnisCore",
+  "name": "Omnis Core",
   "description": "Common and core code for all Jezza's mods.",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "logoFile": "/assets/deuscore/textures/logo.png",
-  "url": "https://github.com/Jezzadabomb338/DeusCore",
+  "logoFile": "/assets/omniscore/textures/logo.png",
+  "url": "https://github.com/Jezzadabomb338/OmnisCore",
   "authors": [ "Jezzadabomb338" ],
   "dependencies": [
      "MinecraftForge",
