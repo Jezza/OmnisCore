@@ -17,6 +17,7 @@ public interface INetworkNode {
      */
     public Override onMessagePosted(INetworkMessage message);
 
+    // TODO Undecided if I want the node to also have this method fired upon message propagation.
     /**
      * Received when a message is delivered directly to the node.
      * Similar to onMessagePosted().
@@ -62,7 +63,7 @@ public interface INetworkNode {
     public IMessageProcessor getIMessageProcessor();
 
     /**
-     * @return true if you desire to be notified of other messages in the event of overriding or deleting.
+     * @return true if you desire to be notified of other messages being posted.
      * Look at onMessagePosted();
      */
     public boolean registerMessagePostedOverride();

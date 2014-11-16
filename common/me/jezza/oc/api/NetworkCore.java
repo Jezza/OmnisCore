@@ -26,8 +26,8 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
     @Override
     public boolean addNetworkNode(INetworkNode node) {
         boolean flag = graph.addNode(node);
-        for (INetworkNode nearbyNodes : node.getNearbyNodes())
-            graph.addEdge(node, nearbyNodes);
+        for (INetworkNode nearbyNode : node.getNearbyNodes())
+            graph.addEdge(node, nearbyNode);
         node.setIMessageProcessor(this);
         if (node.registerMessagePostedOverride())
             messageNodesOverride.add(node);
@@ -42,18 +42,23 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
     }
 
     @Override
+    public boolean retainAll(Collection<? extends INetworkNode> nodes) {
+        return graph.retainAll(nodes);
+    }
+
+    @Override
     public void mergeNetwork(Map<? extends INetworkNode, ? extends Collection<INetworkNode>> networkNodeMap) {
         graph.addAll(networkNodeMap);
     }
 
     @Override
     public Map<? extends INetworkNode, ? extends Collection<INetworkNode>> getNodeMap() {
-        return graph.asImmutableMap();
+        return graph.asMap();
     }
 
     @Override
     public boolean requiresRegistration() {
-        return true;
+        return false;
     }
 
     @Override
@@ -64,6 +69,11 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
     @Override
     public boolean isEmpty() {
         return graph.isEmpty();
+    }
+
+    @Override
+    public boolean containsNode(INetworkNode node) {
+        return graph.containsNode(node);
     }
 
     @Override

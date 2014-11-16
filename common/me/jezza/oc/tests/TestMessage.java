@@ -16,10 +16,8 @@ public class TestMessage implements INetworkMessage {
 
     @Override
     public void isValidNode(INetworkNode node) {
-        if (respondingNodes.contains(node)) {
-            System.out.println("HOLY SHIT BRA, YOU DUN FAQ'D UP!");
-        }
-        respondingNodes.add(node);
+        if (!respondingNodes.contains(node))
+            respondingNodes.add(node);
     }
 
     @Override
@@ -34,5 +32,6 @@ public class TestMessage implements INetworkMessage {
 
     @Override
     public void resetMessage() {
+        respondingNodes.clear();
     }
 }

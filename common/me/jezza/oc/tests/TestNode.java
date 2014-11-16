@@ -38,13 +38,11 @@ public class TestNode implements INetworkNode {
 
     @Override
     public Collection<INetworkNode> getNearbyNodes() {
-        CoreProperties.logger.info("Getting all nearby nodes.");
         return nearbyNodes;
     }
 
     @Override
     public void setIMessageProcessor(IMessageProcessor messageProcessor) {
-        CoreProperties.logger.info("Setting network core.");
         this.messageProcessor = messageProcessor;
     }
 
