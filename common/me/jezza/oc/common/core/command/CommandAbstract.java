@@ -1,4 +1,4 @@
-package me.jezza.oc.common.core;
+package me.jezza.oc.common.core.command;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandHandler;

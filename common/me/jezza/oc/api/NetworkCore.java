@@ -1,8 +1,9 @@
 package me.jezza.oc.api;
 
-import com.google.common.collect.HashMultimap;
+import com.google.common.collect.LinkedHashMultimap;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import me.jezza.oc.api.NetworkResponse.MessageResponse;
 import me.jezza.oc.api.collect.Graph;
 import me.jezza.oc.api.interfaces.IMessageProcessor;
 import me.jezza.oc.api.interfaces.INetworkMessage;
@@ -13,13 +14,31 @@ import java.util.*;
 
 public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
 
-    private HashMultimap<Phase, INetworkMessage> messageMap;
+    /**
+     * Backing data structure for the network.
+     * This maintains links/connections between nodes.
+     * Something of my own design, will probably change through time.
+     */
     private Graph<INetworkNode> graph;
+
+    /**
+     * Messages that are posted to the network are placed in this map.
+     * Each server tick they are promoted through {@link me.jezza.oc.api.NetworkCore.Phase}
+     * <p/>
+     * O(1) across the board for a lot of actions.
+     * Fastest, but not necessarily the best.
+     */
+    private LinkedHashMultimap<Phase, INetworkMessage> messageMap;
+
+    /**
+     * Used to keep track of what nodes would like to be notified of messages being posted to the system.
+     * Useful if you wish to have a "brain" of the network.
+     */
     private LinkedHashSet<INetworkNode> messageNodesOverride;
 
     public NetworkCore() {
         graph = new Graph<>();
-        messageMap = HashMultimap.create();
+        messageMap = LinkedHashMultimap.create();
         messageNodesOverride = new LinkedHashSet<>();
     }
 
@@ -58,7 +77,7 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
 
     @Override
     public boolean requiresRegistration() {
-        return true;
+        return false;
     }
 
     @Override
@@ -77,8 +96,8 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
     }
 
     @Override
-    public void postMessage(INetworkMessage message) {
-        messageMap.put(Phase.PRE_PROCESSING, message);
+    public boolean postMessage(INetworkMessage message) {
+        return message.getOwner() != null && messageMap.put(Phase.PRE_PROCESSING, message);
     }
 
     @SubscribeEvent
@@ -97,7 +116,7 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
         while (iterator.hasNext()) {
             INetworkMessage message = iterator.next();
 
-            NetworkResponse.MessageResponse messageResponse = message.getOwner().onMessageComplete(message);
+            MessageResponse messageResponse = message.getOwner().onMessageComplete(message);
 
             switch (messageResponse) {
                 case VALID:
@@ -128,8 +147,8 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
             while (!queue.isEmpty()) {
                 INetworkNode node = queue.poll();
                 visited.add(node);
-                NetworkResponse.MessageResponse response = message.isValidNode(node);
-                if (response == NetworkResponse.MessageResponse.INVALID)
+                MessageResponse response = message.isValidNode(node);
+                if (response == MessageResponse.INVALID)
                     continue;
                 for (INetworkNode childNode : graph.adjacentTo(node))
                     if (!visited.contains(childNode))
@@ -154,8 +173,8 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
 
             while (networkNodeIterator.hasNext()) {
                 INetworkNode node = networkNodeIterator.next();
-                NetworkResponse.Override override = node.onMessagePosted(message);
-                switch (override) {
+                NetworkResponse.NetworkOverride networkOverride = node.onMessagePosted(message);
+                switch (networkOverride) {
                     case IGNORE:
                         continue;
                     case DELETE:
@@ -173,8 +192,19 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
     }
 
     private static enum Phase {
+        /**
+         * Messages being posted, this is the stage where intercepts would happen.
+         */
         PRE_PROCESSING,
+        /**
+         * The main function of the message. Gets spread through the network in a Breadth-first search pattern.
+         * Each node will be passed to the message via isValidNode();
+         */
         PROCESSING,
+        /**
+         * The final stage of messages.
+         * This will just call the owner and fired onMessageComplete, along with the message that was processed.
+         */
         POST_PROCESSING;
     }
 

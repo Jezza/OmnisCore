@@ -16,14 +16,26 @@ public class CoordSet {
     // final
     private int x, y, z;
 
+    public CoordSet() {
+        this(0, 0, 0);
+    }
+
     public CoordSet(int x, int y, int z) {
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-    public CoordSet(int[] array) {
+    public CoordSet(int[] array) throws ArrayIndexOutOfBoundsException {
         this(array[0], array[1], array[2]);
+    }
+
+    public CoordSet(String x, String y, String z) throws NumberFormatException {
+        this(Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(z));
+    }
+
+    public CoordSet(TileEntity tile) {
+        this(tile.xCoord, tile.yCoord, tile.zCoord);
     }
 
     /**
@@ -136,6 +148,10 @@ public class CoordSet {
         return world.getTileEntity(x, y, z);
     }
 
+    public TileEntity getTileFromDirection(IBlockAccess world, ForgeDirection direction) {
+        return copy().addForgeDirection(direction).getTileEntity(world);
+    }
+
     public boolean hasTileEntity(IBlockAccess world) {
         return getTileEntity(world) != null;
     }
@@ -209,18 +225,18 @@ public class CoordSet {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (other == null || !(other instanceof CoordSet))
-            return false;
-        return ((CoordSet) other).equals(x, y, z);
-    }
-
-    @Override
     public int hashCode() {
         int hash = this.x;
         hash *= 31 + this.y;
         hash *= 31 + this.z;
         return hash;
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (other == null || !(other instanceof CoordSet))
+            return false;
+        return ((CoordSet) other).equals(x, y, z);
     }
 
     public String toPacketString() {
@@ -234,8 +250,13 @@ public class CoordSet {
 
     /**
      * If x,y, and z are final, this method will be removed.
+     * Clone is faster, however if it fails, which it won't, but if it does, a copy will be made the normal way.
      */
     public CoordSet copy() {
+        try {
+            return (CoordSet) this.clone();
+        } catch (CloneNotSupportedException e) {
+        }
         return new CoordSet(x, y, z);
     }
 

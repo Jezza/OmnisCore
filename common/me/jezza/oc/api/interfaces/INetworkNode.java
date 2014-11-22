@@ -3,7 +3,7 @@ package me.jezza.oc.api.interfaces;
 import java.util.Collection;
 
 import static me.jezza.oc.api.NetworkResponse.MessageResponse;
-import static me.jezza.oc.api.NetworkResponse.Override;
+import static me.jezza.oc.api.NetworkResponse.NetworkOverride;
 
 public interface INetworkNode {
 
@@ -15,20 +15,19 @@ public interface INetworkNode {
      *
      * @param message The message in question that was posted.
      */
-    public Override onMessagePosted(INetworkMessage message);
+    public NetworkOverride onMessagePosted(INetworkMessage message);
 
-    // TODO Undecided if I want the node to also have this method fired upon message propagation.
     /**
      * Received when a message is delivered directly to the node.
      * Similar to onMessagePosted().
      * - IGNORE, The message will continue on it's own path.
-     * - DELETE, The system will remove the instance from it.
+     * - DELETE, The message will be deleted from the system and the owner NOT notified.
      * - INTERCEPT, The system will modify the owner of the message to be the current node.
      *
      * @param message
      * @return
      */
-    public Override onMessageReceived(INetworkMessage message);
+    public NetworkOverride onMessageReceived(INetworkMessage message);
 
     /**
      * Used to determine what the system should do with the message after giving passing it off to this method.
@@ -46,7 +45,7 @@ public interface INetworkNode {
      * This can be done by many methods, do it of your own free will.
      * However that being said, it's probably best to cache it, and update it when a change occurs.
      *
-     * @return all nearby network nodes; Nodes that are also connected to this node.
+     * @return all nearby network nodes; Nodes that are connected to this node.
      */
     public Collection<INetworkNode> getNearbyNodes();
 
@@ -55,7 +54,7 @@ public interface INetworkNode {
      * This allows you to post messages easily from the node without referring to the main NetworkInstance.
      * If you decide, for some stupid reason, to override this value, at least make sure it's an instance of INetworkNodeHandler, or you're going to get an exception thrown at your face, because of your stupidity.
      */
-    public void setIMessageProcessor(IMessageProcessor networkCore);
+    public void setIMessageProcessor(IMessageProcessor messageProcessor);
 
     /**
      * @return the IMessageProcessor instance that is set upon adding a network node to a network.

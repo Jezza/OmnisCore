@@ -1,6 +1,7 @@
 package me.jezza.oc.api;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import me.jezza.oc.api.NetworkResponse.NodeUpdated;
 import me.jezza.oc.api.interfaces.IMessageProcessor;
 import me.jezza.oc.api.interfaces.INetworkNode;
 import me.jezza.oc.api.interfaces.INetworkNodeHandler;
@@ -70,10 +71,6 @@ public class NetworkInstance {
     }
 
     public NodeRemoved removeNetworkNode(INetworkNode node) throws IllegalAccessException, InstantiationException {
-        IMessageProcessor messageProcessor = node.getIMessageProcessor();
-        if (messageProcessor == null)
-            return NodeRemoved.NETWORK_FAILED_TO_REMOVE;
-
         INetworkNodeHandler nodeHandler = null;
         for (INetworkNodeHandler networkNodeHandler : networks)
             if (networkNodeHandler.containsNode(node))
@@ -119,6 +116,37 @@ public class NetworkInstance {
         }
 
         return NodeRemoved.NETWORK_SPLIT;
+    }
+
+    public NodeUpdated updateNetworkNode(INetworkNode node) {
+        INetworkNodeHandler nodeHandler = null;
+        for (INetworkNodeHandler networkNodeHandler : networks)
+            if (networkNodeHandler.containsNode(node))
+                nodeHandler = networkNodeHandler;
+
+        Map<? extends INetworkNode, ? extends Collection<INetworkNode>> nodeMap = nodeHandler.getNodeMap();
+        Collection<INetworkNode> cachedNodes = nodeMap.get(node);
+        Collection<INetworkNode> currentNodes = node.getNearbyNodes();
+
+        if (cachedNodes.equals(currentNodes))
+            return NodeUpdated.NETWORK_NO_DELTA_DETECTED;
+
+        NodeRemoved nodeRemoved;
+        NodeAdded nodeAdded;
+        try {
+            nodeRemoved = removeNetworkNode(node);
+            for (INetworkNode nearbyNode : node.getNearbyNodes())
+                System.out.println(nearbyNode);
+            nodeAdded = addNetworkNode(node);
+        } catch (Exception e) {
+            return NodeUpdated.NETWORK_FAILED_TO_UPDATE;
+        }
+
+        if (nodeRemoved == NodeRemoved.NETWORK_FAILED_TO_REMOVE)
+            return NodeUpdated.NETWORK_FAILED_TO_UPDATE;
+        if (nodeAdded == NodeAdded.NETWORK_FAILED_TO_ADD)
+            return NodeUpdated.NETWORK_FAILED_TO_UPDATE;
+        return NodeUpdated.NETWORK_UPDATED;
     }
 
     private INetworkNodeHandler createNetworkNodeHandler() throws InstantiationException, IllegalAccessException {

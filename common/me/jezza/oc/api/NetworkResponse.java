@@ -17,14 +17,22 @@ public enum NetworkResponse {
         NETWORK_DESTROYED;
     }
 
+    public static enum NodeUpdated {
+        NETWORK_FAILED_TO_UPDATE,
+        NETWORK_NO_DELTA_DETECTED,
+        NETWORK_UPDATED;
+    }
+
+
     public static enum MessageResponse {
         VALID,
         INVALID;
     }
 
-    public static enum Override {
+    public static enum NetworkOverride {
         IGNORE,
         DELETE,
         INTERCEPT;
     }
+
 }

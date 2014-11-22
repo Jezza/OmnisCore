@@ -36,4 +36,5 @@ public class TestMessage implements INetworkMessage {
     public void resetMessage() {
         respondingNodes.clear();
     }
+
 }

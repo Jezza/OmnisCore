@@ -8,7 +8,7 @@ import java.util.Map;
  * Moving the messageProcessor to another class is just going to result in more object references being thrown to and fro classes.
  * It's cleaner.
  * <p/>
- * If you think that my restriction is stupid, or I'm stupid, or other words.
+ * If you think that my restriction is stupid, or I'm stupid, or other words that I can't be bothered thinking of,
  * Find me on #minecraftforge IRC, and tell me to change it to allow other classes to be the messageProcessor.
  */
 public interface INetworkNodeHandler {
@@ -24,6 +24,9 @@ public interface INetworkNodeHandler {
      * @return true if the node was removed.
      */
     public boolean removeNetworkNode(INetworkNode node);
+
+    // TBD
+    // public void updateNetworkNode(INetworkNode node);
 
     /**
      * @param nodes Collection of the nodes to retain.

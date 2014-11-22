@@ -2,6 +2,16 @@ package me.jezza.oc.api.interfaces;
 
 import me.jezza.oc.api.NetworkResponse.MessageResponse;
 
+/**
+ * Used to solely define a message.
+ * Gives a proper interface for the system to pass through simply.
+ * <p/>
+ * The basic idea of a message is the container of information.
+ * Once posted the message will be run through the processing system delivering it to all nearby nodes connected.
+ * This implementation can vary.
+ * For instance, in {@link me.jezza.oc.api.NetworkCore}, I run it through a breadth-first search, resulting in a propagation.
+ * <p/>
+ */
 public interface INetworkMessage {
 
     /**

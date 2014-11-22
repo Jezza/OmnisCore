@@ -6,7 +6,7 @@ import me.jezza.oc.client.gui.components.GuiCycle;
  * Used to toggle between two states.
  * You can override it and get more than 2 states out of it.
  */
-public class GuiToggle extends GuiCycle {
+public class GuiToggle extends GuiCycle<GuiToggle> {
 
     public GuiToggle(int x, int y, int u, int v, int width, int height) {
         super(x, y, u, v, width, height);

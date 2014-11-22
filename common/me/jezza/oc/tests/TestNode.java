@@ -19,15 +19,15 @@ public class TestNode implements INetworkNode {
     }
 
     @Override
-    public NetworkResponse.Override onMessagePosted(INetworkMessage message) {
+    public NetworkResponse.NetworkOverride onMessagePosted(INetworkMessage message) {
         CoreProperties.logger.info("Ignoring...");
-        return NetworkResponse.Override.IGNORE;
+        return NetworkResponse.NetworkOverride.IGNORE;
     }
 
     @Override
-    public NetworkResponse.Override onMessageReceived(INetworkMessage message) {
+    public NetworkResponse.NetworkOverride onMessageReceived(INetworkMessage message) {
         CoreProperties.logger.info("On message received...");
-        return NetworkResponse.Override.IGNORE;
+        return NetworkResponse.NetworkOverride.IGNORE;
     }
 
     @Override

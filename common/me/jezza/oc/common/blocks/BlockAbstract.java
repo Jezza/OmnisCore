@@ -1,6 +1,5 @@
 package me.jezza.oc.common.blocks;
 
-import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -96,7 +95,5 @@ public abstract class BlockAbstract extends Block {
         return null;
     }
 
-    public String getModIdentifier() {
-        return Loader.instance().activeModContainer().getModId() + ":";
-    }
+    public abstract String getModIdentifier();
 }
