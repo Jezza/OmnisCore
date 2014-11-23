@@ -45,8 +45,10 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
     @Override
     public boolean addNetworkNode(INetworkNode node) {
         boolean flag = graph.addNode(node);
-        for (INetworkNode nearbyNode : node.getNearbyNodes())
-            graph.addEdge(node, nearbyNode);
+        Collection<INetworkNode> nearbyNodes = node.getNearbyNodes();
+        if (!nearbyNodes.isEmpty())
+            for (INetworkNode nearbyNode : nearbyNodes)
+                graph.addEdge(node, nearbyNode);
         node.setIMessageProcessor(this);
         if (node.registerMessagePostedOverride())
             messageNodesOverride.add(node);
@@ -68,6 +70,8 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
     @Override
     public void mergeNetwork(Map<? extends INetworkNode, ? extends Collection<INetworkNode>> networkNodeMap) {
         graph.addAll(networkNodeMap);
+        for (INetworkNode node : graph.getNodes())
+            node.setIMessageProcessor(this);
     }
 
     @Override
@@ -77,7 +81,7 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
 
     @Override
     public boolean requiresRegistration() {
-        return false;
+        return true;
     }
 
     @Override
@@ -169,10 +173,8 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
         messageIterator:
         while (iterator.hasNext()) {
             INetworkMessage message = iterator.next();
-            Iterator<INetworkNode> networkNodeIterator = messageNodesOverride.iterator();
 
-            while (networkNodeIterator.hasNext()) {
-                INetworkNode node = networkNodeIterator.next();
+            for (INetworkNode node : messageNodesOverride) {
                 NetworkResponse.NetworkOverride networkOverride = node.onMessagePosted(message);
                 switch (networkOverride) {
                     case IGNORE:
@@ -182,13 +184,17 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
                         continue messageIterator;
                     case INTERCEPT:
                         message.setOwner(node);
-                        continue;
                 }
             }
 
             iterator.remove();
             messageMap.put(Phase.PROCESSING, message);
         }
+    }
+
+    @Override
+    public String toString() {
+        return graph.toString();
     }
 
     private static enum Phase {
@@ -207,5 +213,4 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
          */
         POST_PROCESSING;
     }
-
 }

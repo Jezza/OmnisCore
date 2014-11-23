@@ -37,6 +37,7 @@ public interface INetworkMessage {
     /**
      * Fired for the use of the message.
      * If the message wants to add it to a list, or alter something, you have the ability to.
+     * A node will not be fired with this method more than once.
      *
      * @param node The node being processed.
      */
