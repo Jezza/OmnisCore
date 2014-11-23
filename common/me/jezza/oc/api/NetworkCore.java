@@ -117,21 +117,22 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
             return;
         Iterator<INetworkMessage> iterator = messages.iterator();
 
+        messageIterator:
         while (iterator.hasNext()) {
             INetworkMessage message = iterator.next();
 
-            MessageResponse messageResponse = message.getOwner().onMessageComplete(message);
+            MessageResponse messageResponse = message.onMessageComplete(this);
 
+            iterator.remove();
             switch (messageResponse) {
-                case VALID:
-                    break;
                 case INVALID:
                     message.resetMessage();
                     messageMap.put(Phase.PRE_PROCESSING, message);
-                    break;
+                    continue messageIterator;
+                case VALID:
+                default:
             }
 
-            iterator.remove();
         }
     }
 
@@ -145,7 +146,7 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
             INetworkMessage message = iterator.next();
 
             HashSet<INetworkNode> visited = new HashSet<>();
-            Queue<INetworkNode> queue = new PriorityQueue<>();
+            Queue<INetworkNode> queue = new LinkedList<>();
             queue.offer(message.getOwner());
 
             while (!queue.isEmpty()) {
@@ -166,7 +167,7 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
 
     private void processingPreMessages() {
         Collection<INetworkMessage> messages = messageMap.get(Phase.PRE_PROCESSING);
-        if (messages.isEmpty() || messageNodesOverride.isEmpty())
+        if (messages.isEmpty())
             return;
         Iterator<INetworkMessage> iterator = messages.iterator();
 
@@ -174,18 +175,20 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
         while (iterator.hasNext()) {
             INetworkMessage message = iterator.next();
 
-            for (INetworkNode node : messageNodesOverride) {
-                NetworkResponse.NetworkOverride networkOverride = node.onMessagePosted(message);
-                switch (networkOverride) {
-                    case IGNORE:
-                        continue;
-                    case DELETE:
-                        iterator.remove();
-                        continue messageIterator;
-                    case INTERCEPT:
-                        message.setOwner(node);
+            if (!messageNodesOverride.isEmpty())
+                for (INetworkNode node : messageNodesOverride) {
+                    NetworkResponse.NetworkOverride networkOverride = node.onMessagePosted(message);
+                    switch (networkOverride) {
+                        case IGNORE:
+                        default:
+                            continue;
+                        case DELETE:
+                            iterator.remove();
+                            continue messageIterator;
+                        case INTERCEPT:
+                            message.setOwner(node);
+                    }
                 }
-            }
 
             iterator.remove();
             messageMap.put(Phase.PROCESSING, message);

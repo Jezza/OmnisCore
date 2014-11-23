@@ -40,7 +40,19 @@ public interface INetworkMessage {
      * A node will not be fired with this method more than once.
      *
      * @param node The node being processed.
+     * @return {@code VALID} Will continue to propagate the message down the current path.
+     * {@code INVALID} Will stop the message propagating down the current path.
      */
     public MessageResponse isValidNode(INetworkNode node);
+
+    /**
+     * Used to determine what the system should do with the message after giving passing it off to this method.
+     * This is after the message has been completed.
+     *
+     * @param messageProcessor In case the message wishes to post a second message as a result.
+     * @return - VALID, the system will drop it, as the message is no longer needed.
+     * - INVALID, the system will repost the message again to get re-processed.
+     */
+    public MessageResponse onMessageComplete(IMessageProcessor messageProcessor);
 
 }

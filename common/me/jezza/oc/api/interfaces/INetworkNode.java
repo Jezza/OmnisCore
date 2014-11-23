@@ -2,7 +2,6 @@ package me.jezza.oc.api.interfaces;
 
 import java.util.Collection;
 
-import static me.jezza.oc.api.NetworkResponse.MessageResponse;
 import static me.jezza.oc.api.NetworkResponse.NetworkOverride;
 
 public interface INetworkNode {
@@ -28,18 +27,6 @@ public interface INetworkNode {
      * @return
      */
     public NetworkOverride onMessageReceived(INetworkMessage message);
-
-    /**
-     * Used to determine what the system should do with the message after giving passing it off to this method.
-     * This is after the message has returned and has been completed.
-     * This is only called on the node that posted the message.
-     * - VALID, the system will drop it, as the message is no longer needed.
-     * - INVALID, the system will repost the message again to get re-processed.
-     *
-     * @param message The message in question that has finished being processed.
-     * @return
-     */
-    public MessageResponse onMessageComplete(INetworkMessage message);
 
     /**
      * This can be done by many methods, do it of your own free will.

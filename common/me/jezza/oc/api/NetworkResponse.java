@@ -3,6 +3,12 @@ package me.jezza.oc.api;
 public enum NetworkResponse {
     ;
 
+    public static enum MessageResponse {
+        VALID,
+        INVALID;
+    }
+
+
     public static enum NodeAdded {
         NETWORK_FAILED_TO_ADD,
         NETWORK_JOIN,
@@ -21,12 +27,6 @@ public enum NetworkResponse {
         NETWORK_FAILED_TO_UPDATE,
         NETWORK_NO_DELTA_DETECTED,
         NETWORK_UPDATED;
-    }
-
-
-    public static enum MessageResponse {
-        VALID,
-        INVALID;
     }
 
     public static enum NetworkOverride {

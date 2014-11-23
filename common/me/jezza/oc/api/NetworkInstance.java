@@ -16,7 +16,7 @@ import static me.jezza.oc.api.NetworkResponse.NodeRemoved;
  */
 public class NetworkInstance {
 
-    public LinkedHashSet<INetworkNodeHandler> networks;
+    private LinkedHashSet<INetworkNodeHandler> networks;
     private Class<? extends INetworkNodeHandler> nodeHandlerClazz;
 
     public NetworkInstance() {
