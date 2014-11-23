@@ -1,4 +1,4 @@
 DeusCore
 ========
 
-Core framework on which all my mods build around.
+Core framework on which all of my mods are built around.
