@@ -2,31 +2,7 @@ package me.jezza.oc.api.interfaces;
 
 import java.util.Collection;
 
-import static me.jezza.oc.api.NetworkResponse.NetworkOverride;
-
 public interface INetworkNode {
-
-    /**
-     * If you wish to override a message being posted, if returned with
-     * - IGNORE, should be a default response, means you don't wish for anything to change.
-     * - DELETE, the process will stop there, and the system will no longer do anything with that message.
-     * - INTERCEPT, It will give you full control over the message, and label this node as the handler. It will not be removed from the queue.
-     *
-     * @param message The message in question that was posted.
-     */
-    public NetworkOverride onMessagePosted(INetworkMessage message);
-
-    /**
-     * Received when a message is delivered directly to the node.
-     * Similar to onMessagePosted().
-     * - IGNORE, The message will continue on it's own path.
-     * - DELETE, The message will be deleted from the system and the owner NOT notified.
-     * - INTERCEPT, The system will modify the owner of the message to be the current node.
-     *
-     * @param message
-     * @return
-     */
-    public NetworkOverride onMessageReceived(INetworkMessage message);
 
     /**
      * This can be done by many methods, do it of your own free will.
@@ -47,11 +23,5 @@ public interface INetworkNode {
      * @return the IMessageProcessor instance that is set upon adding a network node to a network.
      */
     public IMessageProcessor getIMessageProcessor();
-
-    /**
-     * @return true if you desire to be notified of other messages being posted.
-     * Look at onMessagePosted();
-     */
-    public boolean registerMessagePostedOverride();
 
 }

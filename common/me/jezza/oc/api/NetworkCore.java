@@ -5,10 +5,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import me.jezza.oc.api.NetworkResponse.MessageResponse;
 import me.jezza.oc.api.collect.Graph;
-import me.jezza.oc.api.interfaces.IMessageProcessor;
-import me.jezza.oc.api.interfaces.INetworkMessage;
-import me.jezza.oc.api.interfaces.INetworkNode;
-import me.jezza.oc.api.interfaces.INetworkNodeHandler;
+import me.jezza.oc.api.interfaces.*;
 
 import java.util.*;
 
@@ -34,7 +31,7 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
      * Used to keep track of what nodes would like to be notified of messages being posted to the system.
      * Useful if you wish to have a "brain" of the network.
      */
-    private LinkedHashSet<INetworkNode> messageNodesOverride;
+    private LinkedHashSet<IMessageNodeOverride> messageNodesOverride;
 
     public NetworkCore() {
         graph = new Graph<>();
@@ -50,14 +47,14 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
             for (INetworkNode nearbyNode : nearbyNodes)
                 graph.addEdge(node, nearbyNode);
         node.setIMessageProcessor(this);
-        if (node.registerMessagePostedOverride())
-            messageNodesOverride.add(node);
+        if (node instanceof IMessageNodeOverride)
+            messageNodesOverride.add((IMessageNodeOverride) node);
         return flag;
     }
 
     @Override
     public boolean removeNetworkNode(INetworkNode node) {
-        if (node.registerMessagePostedOverride())
+        if (node instanceof IMessageNodeOverride)
             messageNodesOverride.remove(node);
         return graph.removeNode(node);
     }
@@ -176,7 +173,7 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
             INetworkMessage message = iterator.next();
 
             if (!messageNodesOverride.isEmpty())
-                for (INetworkNode node : messageNodesOverride) {
+                for (IMessageNodeOverride node : messageNodesOverride) {
                     NetworkResponse.NetworkOverride networkOverride = node.onMessagePosted(message);
                     switch (networkOverride) {
                         case IGNORE:
