@@ -43,6 +43,12 @@ public abstract class BlockAbstract extends Block {
     }
 
     @Override
+    public boolean onBlockEventReceived(World world, int x, int y, int z, int id, int process) {
+        TileEntity tileEntity = world.getTileEntity(x, y, z);
+        return tileEntity != null && tileEntity.receiveClientEvent(id, process);
+    }
+
+    @Override
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entityLiving, ItemStack itemStack) {
         TileEntity tileEntity = world.getTileEntity(x, y, z);
         if (tileEntity instanceof IBlockNotifier)

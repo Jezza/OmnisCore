@@ -17,6 +17,10 @@ public class TimeTicker {
         this(startingAmount, upper, 0);
     }
 
+    public TimeTicker(int upper) {
+        this(0, upper, 0);
+    }
+
     public TimeTicker setStepAmount(int stepAmount) {
         this.stepAmount = stepAmount;
         return this;

@@ -1,6 +1,6 @@
 package me.jezza.oc.api.interfaces;
 
-import me.jezza.oc.api.NetworkResponse;
+import me.jezza.oc.api.network.NetworkResponse;
 
 public interface IMessageNodeOverride extends INetworkNode {
 

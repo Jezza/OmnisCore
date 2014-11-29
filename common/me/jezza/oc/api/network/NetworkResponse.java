@@ -1,4 +1,4 @@
-package me.jezza.oc.api;
+package me.jezza.oc.api.network;
 
 public enum NetworkResponse {
     ;

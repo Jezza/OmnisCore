@@ -1,11 +1,19 @@
 package me.jezza.oc;
 
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.relauncher.Side;
+import me.jezza.oc.api.collect.Graph;
+import me.jezza.oc.api.configuration.ConfigHandler;
+import me.jezza.oc.api.configuration.ConfigTest;
+import me.jezza.oc.api.network.NetworkCore;
+import me.jezza.oc.api.network.NetworkInstance;
+import me.jezza.oc.api.network.NetworkResponse;
 import me.jezza.oc.common.CommonProxy;
 import me.jezza.oc.common.core.CoreProperties;
 import me.jezza.oc.common.core.config.CoreConfig;
@@ -27,6 +35,8 @@ public class OmnisCore {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        for (ModContainer modContainer : Loader.instance().getActiveModList()) {
+        }
         logger.info("-- Pre-Initialising " + MOD_ID + " (" + VERSION + ") --");
         CoreConfig.loadConfiguration(event.getSuggestedConfigurationFile());
 
@@ -34,11 +44,25 @@ public class OmnisCore {
         networkDispatcher = new NetworkDispatcher(MOD_ID);
         networkDispatcher.registerMessage(MessageGuiNotify.class, Side.SERVER);
         logger.info("Success! Network fully integrated.");
+
+        ConfigHandler configHandler = new ConfigHandler();
+        configHandler.register(ConfigTest.class);
+        configHandler.readFrom(event.getSuggestedConfigurationFile());
+
+        logger.fatal(ConfigTest.testInt);
+        logger.fatal(ConfigTest.testBoolean);
     }
 
     @Mod.EventHandler
     public void initialize(FMLInitializationEvent event) {
         logger.info("-- Initialising --");
+
+        logger.info("Preloading Network|API");
+        new NetworkInstance();
+        new NetworkCore();
+        new Graph<>();
+        NetworkResponse.MessageResponse invalid = NetworkResponse.MessageResponse.INVALID;
+        logger.info("Finished Preloading Network|API");
     }
 
     @Mod.EventHandler

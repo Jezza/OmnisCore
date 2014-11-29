@@ -1,9 +1,8 @@
-package me.jezza.oc.api;
+package me.jezza.oc.api.network;
 
 import com.google.common.collect.LinkedHashMultimap;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
-import me.jezza.oc.api.NetworkResponse.MessageResponse;
 import me.jezza.oc.api.collect.Graph;
 import me.jezza.oc.api.interfaces.*;
 
@@ -20,7 +19,7 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
 
     /**
      * Messages that are posted to the network are placed in this map.
-     * Each server tick they are promoted through {@link me.jezza.oc.api.NetworkCore.Phase}
+     * Each server tick they are promoted through {@link NetworkCore.Phase}
      * <p/>
      * O(1) across the board for a lot of actions.
      * Fastest, but not necessarily the best.
@@ -118,7 +117,7 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
         while (iterator.hasNext()) {
             INetworkMessage message = iterator.next();
 
-            MessageResponse messageResponse = message.onMessageComplete(this);
+            NetworkResponse.MessageResponse messageResponse = message.onMessageComplete(this);
 
             iterator.remove();
             switch (messageResponse) {
@@ -149,8 +148,8 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
             while (!queue.isEmpty()) {
                 INetworkNode node = queue.poll();
                 visited.add(node);
-                MessageResponse response = message.isValidNode(node);
-                if (response == MessageResponse.INVALID)
+                NetworkResponse.MessageResponse response = message.isValidNode(node);
+                if (response == NetworkResponse.MessageResponse.INVALID)
                     continue;
                 for (INetworkNode childNode : graph.adjacentTo(node))
                     if (!visited.contains(childNode))

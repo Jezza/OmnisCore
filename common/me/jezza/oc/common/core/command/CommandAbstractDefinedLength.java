@@ -3,12 +3,12 @@ package me.jezza.oc.common.core.command;
 import me.jezza.oc.common.utils.CoordSet;
 import net.minecraft.command.ICommandSender;
 
-public abstract class CommandAbstractArea extends CommandAbstract {
+public abstract class CommandAbstractDefinedLength extends CommandAbstract {
 
     int minimumLength = -1;
     int maximumLength = -1;
 
-    public CommandAbstractArea(String commandName, String commandUsage) {
+    public CommandAbstractDefinedLength(String commandName, String commandUsage) {
         super(commandName, commandUsage);
     }
 
@@ -16,7 +16,7 @@ public abstract class CommandAbstractArea extends CommandAbstract {
      * @param minimumLength Set to -1 to ignore.
      * @param maximumLength Set to -1 to ignore.
      */
-    public CommandAbstractArea(String commandName, String commandUsage, int minimumLength, int maximumLength) {
+    public CommandAbstractDefinedLength(String commandName, String commandUsage, int minimumLength, int maximumLength) {
         super(commandName, commandUsage);
         this.minimumLength = minimumLength;
         this.maximumLength = maximumLength;
@@ -35,10 +35,10 @@ public abstract class CommandAbstractArea extends CommandAbstract {
                 return;
             }
 
-        processAreaCommand(commandSender, args);
+        processValidCommand(commandSender, args);
     }
 
-    public abstract void processAreaCommand(ICommandSender commandSender, String[] args);
+    public abstract void processValidCommand(ICommandSender commandSender, String[] args);
 
     /**
      * After this:
