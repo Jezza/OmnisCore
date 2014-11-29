@@ -13,6 +13,7 @@ import java.util.List;
 
 public abstract class ItemAbstractArmour extends ItemArmor {
     private String textureLocation;
+    private boolean textureReg;
     private int slot;
 
     public ItemAbstractArmour(ArmorMaterial armorMaterial, ArmourRenderIndex renderIndex, ArmourSlotIndex armourIndex, String name, String textureLocation) {
@@ -24,14 +25,19 @@ public abstract class ItemAbstractArmour extends ItemArmor {
         register(name);
     }
 
+    public void setName(String name) {
+        setUnlocalizedName(name);
+        setTextureName(name);
+    }
+
     public ItemAbstractArmour register(String name) {
         GameRegistry.registerItem(this, name);
         return this;
     }
 
-    public void setName(String name) {
-        setUnlocalizedName(name);
-        setTextureName(name);
+    public ItemAbstractArmour setTextureReg(boolean textureReg) {
+        this.textureReg = textureReg;
+        return this;
     }
 
     @Override
@@ -53,12 +59,8 @@ public abstract class ItemAbstractArmour extends ItemArmor {
     @Override
     @SideOnly(Side.CLIENT)
     public void registerIcons(IIconRegister register) {
-        if (requireTextureReg())
+        if (textureReg)
             itemIcon = register.registerIcon(getModIdentifier() + getIconString());
-    }
-
-    public boolean requireTextureReg() {
-        return true;
     }
 
     @Override

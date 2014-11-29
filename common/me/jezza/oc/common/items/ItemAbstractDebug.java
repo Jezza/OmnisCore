@@ -20,7 +20,7 @@ public abstract class ItemAbstractDebug extends ItemAbstract {
     @Override
     public ItemAbstract register(String name) {
 //        if (DeusCore.isDebugMode())
-            return super.register(name);
+        return super.register(name);
 //        return this;
     }
 
@@ -64,12 +64,11 @@ public abstract class ItemAbstractDebug extends ItemAbstract {
         information.addInfoList(getDebugString());
     }
 
-    public void addChatMessage() {
-
+    public void addChatMessage(EntityPlayer player, String string) {
+        player.addChatComponentMessage(new ChatComponentText(string));
     }
 
     public abstract ArrayList<String> getDebugList();
-
 
     /**
      * Called after onItemDebugUseFirst.

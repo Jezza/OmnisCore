@@ -1,4 +1,4 @@
-package me.jezza.oc.api.interfaces;
+package me.jezza.oc.api.network.interfaces;
 
 import me.jezza.oc.api.network.NetworkResponse.MessageResponse;
 

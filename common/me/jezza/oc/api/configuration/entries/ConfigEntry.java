@@ -2,6 +2,7 @@ package me.jezza.oc.api.configuration.entries;
 
 import me.jezza.oc.common.core.CoreProperties;
 import net.minecraftforge.common.config.Configuration;
+import org.apache.logging.log4j.Level;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -29,19 +30,17 @@ public abstract class ConfigEntry<T extends Annotation> {
         for (Map.Entry<Field, T> entry : configMap.entrySet()) {
             Field field = entry.getKey();
             T value = entry.getValue();
+            Object object = processAnnotation(config, field.getName(), value);
             try {
-                processAnnotation(config, field, value);
-            } catch (IllegalAccessException e) {
-                CoreProperties.logger.fatal(createErrorMessage(field, value.annotationType()));
+                field.setAccessible(true);
+                field.set(null, object);
+            } catch (Exception e) {
+                CoreProperties.logger.log(Level.FATAL, String.format("Failed to configure field: %s, with annotated type: %s", field.getName(), value.annotationType().getSimpleName()));
                 e.printStackTrace();
             }
         }
     }
 
-    public abstract void processAnnotation(Configuration config, Field field, T annotation) throws IllegalAccessException;
-
-    public String createErrorMessage(Field field, Class<? extends Annotation> annotationType) {
-        return "Failed to configure field: " + field.getName() + ", with annotated type: " + annotationType.getSimpleName();
-    }
+    public abstract Object processAnnotation(Configuration config, String fieldName, T annotation);
 
 }

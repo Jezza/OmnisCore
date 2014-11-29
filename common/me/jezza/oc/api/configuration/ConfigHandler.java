@@ -14,7 +14,7 @@ public class ConfigHandler {
 
     private final LinkedHashMap<Class<? extends Annotation>, ConfigEntry<? extends Annotation>> configMap;
 
-    public ConfigHandler() {
+    {
         configMap = new LinkedHashMap<>();
         configMap.put(ConfigBoolean.class, new ConfigEntryBoolean());
         configMap.put(ConfigBooleanArray.class, new ConfigEntryBooleanArray());
@@ -27,7 +27,10 @@ public class ConfigHandler {
         configMap.put(ConfigStringArray.class, new ConfigEntryBoolean());
     }
 
-    public final void registerAnnotation(final Class<? extends Annotation> clazz, final ConfigEntry<? extends Annotation> configEntry) {
+    public ConfigHandler() {
+    }
+
+    public void registerAnnotation(final Class<? extends Annotation> clazz, final ConfigEntry<? extends Annotation> configEntry) {
         configMap.put(clazz, configEntry);
     }
 
@@ -36,14 +39,11 @@ public class ConfigHandler {
             processAnnotations(field);
     }
 
+    @SuppressWarnings("unchecked")
     private void processAnnotations(final Field field) {
-        for (Class<? extends Annotation> clazz : configMap.keySet()) {
-            if (field.isAnnotationPresent(clazz)) {
-                ConfigEntry<Annotation> configEntry = (ConfigEntry<Annotation>) configMap.get(clazz);
-                if (!configEntry.containsField(field))
-                    configEntry.add(field, clazz.cast(field.getAnnotation(clazz)));
-            }
-        }
+        for (Class<? extends Annotation> clazz : configMap.keySet())
+            if (field.isAnnotationPresent(clazz))
+                ((ConfigEntry<Annotation>) configMap.get(clazz)).add(field, clazz.cast(field.getAnnotation(clazz)));
     }
 
     public void readFrom(File file) {

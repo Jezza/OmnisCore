@@ -17,6 +17,8 @@ import net.minecraft.world.World;
 
 public abstract class BlockAbstract extends Block {
 
+    private boolean textureReg = true;
+
     public BlockAbstract(Material material, String name) {
         super(material);
         setName(name);
@@ -28,6 +30,12 @@ public abstract class BlockAbstract extends Block {
         setBlockTextureName(name);
         return this;
     }
+
+    public BlockAbstract setTextureReg(boolean textureReg) {
+        this.textureReg = textureReg;
+        return this;
+    }
+
 
     public BlockAbstract register(String name) {
         GameRegistry.registerBlock(this, name);
@@ -76,12 +84,8 @@ public abstract class BlockAbstract extends Block {
     @Override
     @SideOnly(Side.CLIENT)
     public void registerBlockIcons(IIconRegister iconRegister) {
-        if (requiresTextureReg())
+        if (textureReg)
             blockIcon = iconRegister.registerIcon(getModIdentifier() + getTextureName());
-    }
-
-    public boolean requiresTextureReg() {
-        return true;
     }
 
     @Override

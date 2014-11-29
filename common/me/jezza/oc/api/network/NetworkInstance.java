@@ -1,8 +1,8 @@
 package me.jezza.oc.api.network;
 
 import cpw.mods.fml.common.FMLCommonHandler;
-import me.jezza.oc.api.interfaces.INetworkNode;
-import me.jezza.oc.api.interfaces.INetworkNodeHandler;
+import me.jezza.oc.api.network.interfaces.INetworkNode;
+import me.jezza.oc.api.network.interfaces.INetworkNodeHandler;
 
 import java.util.*;
 

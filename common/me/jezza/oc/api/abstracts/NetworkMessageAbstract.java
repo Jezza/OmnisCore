@@ -1,7 +1,7 @@
 package me.jezza.oc.api.abstracts;
 
-import me.jezza.oc.api.interfaces.INetworkMessage;
-import me.jezza.oc.api.interfaces.INetworkNode;
+import me.jezza.oc.api.network.interfaces.INetworkMessage;
+import me.jezza.oc.api.network.interfaces.INetworkNode;
 
 public abstract class NetworkMessageAbstract implements INetworkMessage {
 

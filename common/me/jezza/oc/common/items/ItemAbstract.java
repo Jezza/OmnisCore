@@ -20,6 +20,7 @@ public abstract class ItemAbstract extends Item {
     private String donator = "";
     private boolean isDonatorItem = false;
 
+    private boolean textureReg = true;
     private boolean notifyRightClick = false;
     private boolean notifyLeftClick = false;
 
@@ -39,6 +40,11 @@ public abstract class ItemAbstract extends Item {
         return this;
     }
 
+    public ItemAbstract setTextureReg(boolean textureReg) {
+        this.textureReg = textureReg;
+        return this;
+    }
+
     public ItemAbstract setRightClickable() {
         notifyRightClick = true;
         return this;
@@ -49,6 +55,7 @@ public abstract class ItemAbstract extends Item {
         return this;
     }
 
+    // TODO Move this to ES2
     public ItemAbstract setDonatorItem(String donator) {
         this.donator = donator;
         isDonatorItem = true;
@@ -108,12 +115,8 @@ public abstract class ItemAbstract extends Item {
     @Override
     @SideOnly(Side.CLIENT)
     public void registerIcons(IIconRegister iconRegister) {
-        if (requireIconReg())
+        if (textureReg)
             itemIcon = iconRegister.registerIcon(getModIdentifier() + getIconString());
-    }
-
-    public boolean requireIconReg() {
-        return true;
     }
 
     @Override

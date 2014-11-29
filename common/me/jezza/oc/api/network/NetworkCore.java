@@ -4,7 +4,7 @@ import com.google.common.collect.LinkedHashMultimap;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import me.jezza.oc.api.collect.Graph;
-import me.jezza.oc.api.interfaces.*;
+import me.jezza.oc.api.network.interfaces.*;
 
 import java.util.*;
 
