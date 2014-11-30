@@ -40,8 +40,8 @@ public abstract class ItemAbstract extends Item {
         return this;
     }
 
-    public ItemAbstract setTextureReg(boolean textureReg) {
-        this.textureReg = textureReg;
+    public ItemAbstract setTextureless() {
+        this.textureReg = false;
         return this;
     }
 

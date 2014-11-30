@@ -1,4 +1,4 @@
-package me.jezza.oc.api.abstracts;
+package me.jezza.oc.api.network;
 
 import me.jezza.oc.api.network.interfaces.INetworkMessage;
 import me.jezza.oc.api.network.interfaces.INetworkNode;

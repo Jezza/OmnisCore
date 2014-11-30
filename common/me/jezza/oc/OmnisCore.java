@@ -12,7 +12,7 @@ import me.jezza.oc.api.network.NetworkCore;
 import me.jezza.oc.api.network.NetworkInstance;
 import me.jezza.oc.api.network.NetworkResponse;
 import me.jezza.oc.common.CommonProxy;
-import me.jezza.oc.common.core.config.DebugHelper;
+import me.jezza.oc.common.core.DebugHelper;
 import me.jezza.oc.common.core.network.MessageGuiNotify;
 import me.jezza.oc.common.core.network.NetworkDispatcher;
 
@@ -28,6 +28,21 @@ public class OmnisCore {
     public static CommonProxy proxy;
 
     public static NetworkDispatcher networkDispatcher;
+
+//    @Mod.EventHandler
+//    public void onConstructionEvent(FMLConstructionEvent event) {
+//        logger = LogManager.getLogger(MOD_ID);
+//        ASMDataTable asmHarvestedData = event.getASMHarvestedData();
+//        SetMultimap<String, ASMDataTable.ASMData> annotationsFor = asmHarvestedData.getAnnotationsFor(Loader.instance().activeModContainer());
+//        for (Map.Entry<String, ASMDataTable.ASMData> entry : annotationsFor.entries()) {
+//            CoreProperties.logger.info(String.format("Annotation: %s", entry.getKey()));
+//            for (Map.Entry<String, Object> mapEntry : entry.getValue().getAnnotationInfo().entrySet()) {
+//                CoreProperties.logger.info(String.format("Key: %s, Object: %s", mapEntry.getKey(), mapEntry.getValue()));
+//            }
+//            CoreProperties.logger.info("");
+//        }
+//
+//    }
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
