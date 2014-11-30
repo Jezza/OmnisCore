@@ -7,6 +7,7 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.relauncher.Side;
 import me.jezza.oc.api.collect.Graph;
+import me.jezza.oc.api.configuration.Config;
 import me.jezza.oc.api.configuration.ConfigHandler;
 import me.jezza.oc.api.network.NetworkCore;
 import me.jezza.oc.api.network.NetworkInstance;
@@ -18,6 +19,7 @@ import me.jezza.oc.common.core.network.NetworkDispatcher;
 
 import static me.jezza.oc.common.core.CoreProperties.*;
 
+@Config.Controller()
 @Mod(modid = MOD_ID, name = MOD_NAME, version = VERSION, dependencies = DEPENDENCIES)
 public class OmnisCore {
 
@@ -29,34 +31,19 @@ public class OmnisCore {
 
     public static NetworkDispatcher networkDispatcher;
 
-//    @Mod.EventHandler
-//    public void onConstructionEvent(FMLConstructionEvent event) {
-//        logger = LogManager.getLogger(MOD_ID);
-//        ASMDataTable asmHarvestedData = event.getASMHarvestedData();
-//        SetMultimap<String, ASMDataTable.ASMData> annotationsFor = asmHarvestedData.getAnnotationsFor(Loader.instance().activeModContainer());
-//        for (Map.Entry<String, ASMDataTable.ASMData> entry : annotationsFor.entries()) {
-//            CoreProperties.logger.info(String.format("Annotation: %s", entry.getKey()));
-//            for (Map.Entry<String, Object> mapEntry : entry.getValue().getAnnotationInfo().entrySet()) {
-//                CoreProperties.logger.info(String.format("Key: %s, Object: %s", mapEntry.getKey(), mapEntry.getValue()));
-//            }
-//            CoreProperties.logger.info("");
-//        }
-//
-//    }
-
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         logger = event.getModLog();
         logger.info("-- Pre-Initialising " + MOD_ID + " (" + VERSION + ") --");
 
-        // ConfigHandler.initConfig();
+        ConfigHandler.initConfigHandler(event);
         // - activeModContainer
         // - Stores the modID, along with registered classes and annotations?
         // ConfigHandler.register(event.getSuggestedConfigurationFile());
 
-        ConfigHandler configHandler = new ConfigHandler();
-        configHandler.register(DebugHelper.class);
-        configHandler.readFrom(event.getSuggestedConfigurationFile());
+//        ConfigHandler configHandler = new ConfigHandler();
+//        configHandler.register(DebugHelper.class);
+//        configHandler.readFrom(event.getSuggestedConfigurationFile());
 
         DebugHelper.checkSysOverrides();
 

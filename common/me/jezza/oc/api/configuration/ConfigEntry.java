@@ -36,8 +36,7 @@ public abstract class ConfigEntry<T extends Annotation, D> {
                 Object object = processAnnotation(config, field.getName().toLowerCase(), value, (D) field.get(null));
                 field.set(null, object);
             } catch (Exception e) {
-                CoreProperties.logger.log(Level.FATAL, String.format("Failed to configure field: %s, with annotated type: %s", field.getName(), value.annotationType().getSimpleName()));
-                e.printStackTrace();
+                CoreProperties.logger.log(Level.FATAL, String.format("Failed to configure field: %s, with annotated type: %s", field.getName(), value.annotationType().getSimpleName()), e);
             }
         }
     }

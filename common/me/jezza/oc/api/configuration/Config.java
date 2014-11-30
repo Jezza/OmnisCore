@@ -7,6 +7,28 @@ import java.lang.annotation.Target;
 
 public class Config {
 
+    /**
+     * If you have a custom config file location, override configFile() with the location.
+     * NOTE: That ANY string that configFile returns WILL be pushed on the end of the default config directory.
+     * EG, configFile() return "AwesomeMod/awesomeMod.cfg";
+     * ConfigHandler will try locating the config file as such "config/AwesomeMod/awesomeMod.cfg"
+     * If it fails, it will generate a default config, with the modID.
+     */
+    @Retention(RetentionPolicy.RUNTIME)
+    @Target(ElementType.TYPE)
+    public @interface Controller {
+        String configFile() default "";
+    }
+
+    /**
+     * If the main mod class has implemented this, then the method will be fired before the config annotations are read.
+     * This way you have the ability to add any custom annotations.
+     * NOTE: THIS MUST BE IMPLEMENTED ON THE MAIN MOD CLASS
+     */
+    public static interface IConfigRegistrar {
+        public void registerCustomAnnotations();
+    }
+
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     public static @interface ConfigBoolean {
