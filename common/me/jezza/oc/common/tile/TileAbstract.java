@@ -1,4 +1,4 @@
-package me.jezza.oc.common.tileentity;
+package me.jezza.oc.common.tile;
 
 import me.jezza.oc.common.utils.CoordSet;
 import net.minecraft.nbt.NBTTagCompound;
@@ -19,6 +19,15 @@ public abstract class TileAbstract extends TileEntity {
         NBTTagCompound tag = new NBTTagCompound();
         writeToNBT(tag);
         return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, tag);
+    }
+
+    public void fireEvent(int id, int process) {
+        worldObj.addBlockEvent(xCoord, yCoord, zCoord, getBlockType(), id, process);
+    }
+
+    @Override
+    public boolean receiveClientEvent(int id, int process) {
+        return false;
     }
 
     public CoordSet getCoordSet() {

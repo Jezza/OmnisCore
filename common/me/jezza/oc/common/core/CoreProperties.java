@@ -1,6 +1,5 @@
 package me.jezza.oc.common.core;
 
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class CoreProperties {
@@ -24,5 +23,5 @@ public class CoreProperties {
     public static final String SERVER_PROXY = "me.jezza.oc.common.CommonProxy";
     public static final String CLIENT_PROXY = "me.jezza.oc.client.ClientProxy";
 
-    public static final Logger logger = LogManager.getLogger(MOD_ID);
+    public static Logger logger; //  = LogManager.getLogger(MOD_ID)
 }

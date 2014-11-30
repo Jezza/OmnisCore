@@ -12,8 +12,6 @@ public class Config {
     public static @interface ConfigBoolean {
         String category();
 
-        boolean defaultValue();
-
         String comment() default "";
     }
 
@@ -21,8 +19,6 @@ public class Config {
     @Target(ElementType.FIELD)
     public static @interface ConfigBooleanArray {
         String category();
-
-        boolean[] defaultArray();
 
         boolean isListLengthFixed() default false;
 
@@ -36,8 +32,6 @@ public class Config {
     public static @interface ConfigInteger {
         String category();
 
-        int defaultValue();
-
         int minValue() default Integer.MIN_VALUE;
 
         int maxValue() default Integer.MAX_VALUE;
@@ -49,8 +43,6 @@ public class Config {
     @Target(ElementType.FIELD)
     public static @interface ConfigIntegerArray {
         String category();
-
-        int[] defaultArray();
 
         int minValue() default Integer.MIN_VALUE;
 
@@ -68,8 +60,6 @@ public class Config {
     public static @interface ConfigFloat {
         String category();
 
-        float defaultValue();
-
         float minValue() default Float.MIN_VALUE;
 
         float maxValue() default Float.MAX_VALUE;
@@ -82,8 +72,6 @@ public class Config {
     public static @interface ConfigDouble {
         String category();
 
-        double defaultValue();
-
         double minValue() default Double.MIN_VALUE;
 
         double maxValue() default Double.MAX_VALUE;
@@ -95,8 +83,6 @@ public class Config {
     @Target(ElementType.FIELD)
     public static @interface ConfigDoubleArray {
         String category();
-
-        double[] defaultArray();
 
         double minValue() default Double.MIN_VALUE;
 
@@ -114,8 +100,6 @@ public class Config {
     public static @interface ConfigString {
         String category();
 
-        String defaultValue();
-
         String[] validValues() default {};
 
         String comment() default "";
@@ -126,15 +110,8 @@ public class Config {
     public static @interface ConfigStringArray {
         String category();
 
-        String[] defaultArray();
-
         String[] validValues() default {};
-
-        boolean isListLengthFixed() default false;
-
-        int maxListLength() default -1;
 
         String comment() default "";
     }
-
 }

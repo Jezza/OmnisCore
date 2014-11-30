@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.common.interfaces.IBlockInteract;
 import me.jezza.oc.common.interfaces.IBlockNotifier;
+import me.jezza.oc.common.interfaces.ITileProvider;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -18,6 +19,7 @@ import net.minecraft.world.World;
 public abstract class BlockAbstract extends Block {
 
     private boolean textureReg = true;
+    public final boolean isTileProvider = this instanceof ITileProvider;
 
     public BlockAbstract(Material material, String name) {
         super(material);
@@ -31,8 +33,8 @@ public abstract class BlockAbstract extends Block {
         return this;
     }
 
-    public BlockAbstract setTextureReg(boolean textureReg) {
-        this.textureReg = textureReg;
+    public BlockAbstract setTextureless() {
+        this.textureReg = false;
         return this;
     }
 
@@ -90,19 +92,12 @@ public abstract class BlockAbstract extends Block {
 
     @Override
     public TileEntity createTileEntity(World world, int metadata) {
-        return getTileEntity(metadata);
+        return !isTileProvider ? null : ((ITileProvider) this).createNewTileEntity(world, metadata);
     }
 
     @Override
     public boolean hasTileEntity(int metadata) {
-        return getTileEntity(metadata) != null;
-    }
-
-    /**
-     * This is the one to override if you wish to create a TileEntity.
-     */
-    public TileEntity getTileEntity(int metadata) {
-        return null;
+        return isTileProvider;
     }
 
     public abstract String getModIdentifier();

@@ -1,11 +1,12 @@
 package me.jezza.oc.api.configuration.entries;
 
 import me.jezza.oc.api.configuration.Config.ConfigBoolean;
+import me.jezza.oc.api.configuration.ConfigEntry;
 import net.minecraftforge.common.config.Configuration;
 
-public class ConfigEntryBoolean extends ConfigEntry<ConfigBoolean> {
+public class ConfigEntryBoolean extends ConfigEntry<ConfigBoolean, Boolean> {
     @Override
-    public Object processAnnotation(Configuration config, String fieldName, ConfigBoolean annotation) {
-        return config.getBoolean(fieldName, annotation.category(), annotation.defaultValue(), annotation.comment());
+    public Object processAnnotation(Configuration config, String fieldName, ConfigBoolean annotation, Boolean defaultValue) {
+        return config.getBoolean(fieldName, annotation.category(), defaultValue, annotation.comment());
     }
 }

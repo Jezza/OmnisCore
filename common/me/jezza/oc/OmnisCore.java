@@ -31,7 +31,13 @@ public class OmnisCore {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
+        logger = event.getModLog();
         logger.info("-- Pre-Initialising " + MOD_ID + " (" + VERSION + ") --");
+
+        // ConfigHandler.initConfig();
+        // - activeModContainer
+        // - Stores the modID, along with registered classes and annotations?
+        // ConfigHandler.register(event.getSuggestedConfigurationFile());
 
         ConfigHandler configHandler = new ConfigHandler();
         configHandler.register(DebugHelper.class);

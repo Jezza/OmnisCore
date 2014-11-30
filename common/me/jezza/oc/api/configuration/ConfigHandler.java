@@ -12,7 +12,7 @@ import static me.jezza.oc.api.configuration.Config.*;
 
 public class ConfigHandler {
 
-    private final LinkedHashMap<Class<? extends Annotation>, ConfigEntry<? extends Annotation>> configMap;
+    private final LinkedHashMap<Class<? extends Annotation>, ConfigEntry<? extends Annotation, ?>> configMap;
 
     {
         configMap = new LinkedHashMap<>();
@@ -30,20 +30,17 @@ public class ConfigHandler {
     public ConfigHandler() {
     }
 
-    public void registerAnnotation(final Class<? extends Annotation> clazz, final ConfigEntry<? extends Annotation> configEntry) {
-        configMap.put(clazz, configEntry);
-    }
-
-    public void register(Class<?> clazz) {
-        for (Field field : clazz.getDeclaredFields())
-            processAnnotations(field);
+    public void registerAnnotation(final Class<? extends Annotation> clazz, final ConfigEntry<? extends Annotation, ?> configEntry) {
+        if (!configMap.containsKey(clazz))
+            configMap.put(clazz, configEntry);
     }
 
     @SuppressWarnings("unchecked")
-    private void processAnnotations(final Field field) {
-        for (Class<? extends Annotation> clazz : configMap.keySet())
-            if (field.isAnnotationPresent(clazz))
-                ((ConfigEntry<Annotation>) configMap.get(clazz)).add(field, clazz.cast(field.getAnnotation(clazz)));
+    public void register(Class<?> clazz) {
+        for (final Field field : clazz.getDeclaredFields())
+            for (Class<? extends Annotation> annotationClazz : configMap.keySet())
+                if (field.isAnnotationPresent(annotationClazz))
+                    ((ConfigEntry<Annotation, Object>) configMap.get(annotationClazz)).add(field, annotationClazz.cast(field.getAnnotation(annotationClazz)));
     }
 
     public void readFrom(File file) {
@@ -54,7 +51,7 @@ public class ConfigHandler {
     }
 
     public void processAllCurrentAnnotations(Configuration config) {
-        for (ConfigEntry<? extends Annotation> configEntry : configMap.values())
+        for (ConfigEntry<? extends Annotation, ?> configEntry : configMap.values())
             configEntry.processCurrentEntries(config);
     }
 
