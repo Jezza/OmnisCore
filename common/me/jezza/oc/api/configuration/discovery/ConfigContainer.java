@@ -31,10 +31,6 @@ public class ConfigContainer {
         this.childClasses = childPackages;
     }
 
-    public Configuration getConfig() {
-        return config;
-    }
-
     public void processAllClasses(LinkedHashMap<Class<? extends Annotation>, Class<? extends ConfigEntry<? extends Annotation, ?>>> staticMap) {
         for (Map.Entry<Class<? extends Annotation>, Class<? extends ConfigEntry<? extends Annotation, ?>>> entry : staticMap.entrySet()) {
             try {

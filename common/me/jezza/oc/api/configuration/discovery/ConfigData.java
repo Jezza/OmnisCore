@@ -39,8 +39,8 @@ public class ConfigData {
             CoreProperties.logger.info("Setting config: {}", defaultConfig);
             treeSet.put(packageName, new ConfigContainer(defaultConfig));
         } else {
-            CoreProperties.logger.warn("Config controller discovered in the same root: {}. ", packageName);
             CoreProperties.logger.warn("THIS IS AN ERROR! Ignoring {}", className);
+            CoreProperties.logger.warn("Config controller discovered in the same root: {}. ", packageName);
         }
     }
 

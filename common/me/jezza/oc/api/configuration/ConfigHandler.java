@@ -68,16 +68,21 @@ public class ConfigHandler {
             if (configValue.isRegistrar)
                 configValue.processIConfigRegistrar();
         }
+        processed = true;
 
         // Organise all sub-packages.
         for (int i = 0; i < configValues.length; i++)
             configValues[i].processAllRoots();
 
-        processed = true;
+        // Process all current classes associated with the ConfigContainer.
         for (int i = 0; i < configValues.length; i++)
             configValues[i].processConfigContainers(annotationMap);
     }
 
+    /**
+     * To use this, implement {@link me.jezza.oc.api.configuration.Config.IConfigRegistrar} on your main mod file.
+     * Only call this when you've had the chance from the interface.
+     */
     public static boolean registerAnnotation(final Class<? extends Annotation> clazz, final Class<? extends ConfigEntry<? extends Annotation, ?>> configEntry) {
         if (processed)
             return false;

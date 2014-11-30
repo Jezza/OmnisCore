@@ -5,6 +5,7 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -258,6 +259,46 @@ public class CoordSet {
         } catch (CloneNotSupportedException e) {
         }
         return new CoordSet(x, y, z);
+    }
+
+    public CoordSet asChunkCoords() {
+        x = x >> 4;
+        y = y >> 4;
+        z = z >> 4;
+
+        return this;
+    }
+
+    public CoordSet toChunkCoords() {
+        return copy().asChunkCoords();
+    }
+
+    public CoordSet asBlockCoords() {
+        x *= 16;
+        y *= 16;
+        z *= 16;
+
+        return this;
+    }
+
+    public CoordSet toBlockCoords() {
+        return copy().asBlockCoords();
+    }
+
+    public CoordSet asSpawnPoint() {
+        x = x % 16;
+        y = y % 16;
+        z = z % 16;
+
+        return this;
+    }
+
+    public CoordSet toSpawnPoint() {
+        return copy().asSpawnPoint();
+    }
+
+    public static CoordSet fromChunkCoordinates(ChunkCoordinates coordinates) {
+        return new CoordSet(coordinates.posX, coordinates.posY, coordinates.posZ);
     }
 
 }

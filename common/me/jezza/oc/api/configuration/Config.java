@@ -23,7 +23,7 @@ public class Config {
     /**
      * If the main mod class has implemented this, then the method will be fired before the config annotations are read.
      * This way you have the ability to add any custom annotations.
-     * NOTE: THIS MUST BE IMPLEMENTED ON THE MAIN MOD CLASS
+     * NOTE: THIS MUST BE IMPLEMENTED ON THE MAIN MOD CLASS TO TAKE EFFECT
      */
     public static interface IConfigRegistrar {
         public void registerCustomAnnotations();

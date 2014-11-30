@@ -1,8 +1,6 @@
 package me.jezza.oc.common.core.command;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandHandler;
-import net.minecraft.command.ICommandSender;
+import net.minecraft.command.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
@@ -107,6 +105,23 @@ public abstract class CommandAbstract extends CommandBase {
      */
     public static double parseRelativePosition(ICommandSender sender, double position, String argument, int lowerBound, int upperBound) {
         return CommandBase.func_110665_a(sender, position, argument, lowerBound, upperBound);
+    }
+
+    public static int parseInt(String number) {
+        try {
+            return Integer.parseInt(number);
+        } catch (NumberFormatException numberformatexception) {
+            throw new NumberInvalidException("commands.generic.num.invalid", number);
+        }
+    }
+
+    public static boolean parseBoolean(String booleanValue) {
+        if (!booleanValue.equals("true") && !booleanValue.equals("1")) {
+            if (!booleanValue.equals("false") && !booleanValue.equals("0"))
+                throw new CommandException("commands.generic.boolean.invalid", booleanValue);
+            return false;
+        }
+        return true;
     }
 
 }
