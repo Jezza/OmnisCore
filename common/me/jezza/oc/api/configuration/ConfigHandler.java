@@ -76,7 +76,7 @@ public class ConfigHandler {
 
         // Process all current classes associated with the ConfigContainer.
         for (int i = 0; i < configValues.length; i++)
-            configValues[i].processConfigContainers(annotationMap);
+            configValues[i].processConfigContainers(asmDataTable, annotationMap);
     }
 
     /**
@@ -88,6 +88,16 @@ public class ConfigHandler {
             return false;
         if (!annotationMap.containsKey(clazz))
             annotationMap.put(clazz, configEntry);
+        return true;
+    }
+
+    /**
+     * Don't use this unless you know what you're doing...
+     */
+    public static boolean registerAnnotationOverride(final Class<? extends Annotation> clazz, final Class<? extends ConfigEntry<? extends Annotation, ?>> configEntry) {
+        if (processed)
+            return false;
+        annotationMap.put(clazz, configEntry);
         return true;
     }
 

@@ -1,7 +1,7 @@
 package me.jezza.oc.api.configuration.discovery;
 
-import com.google.common.collect.Lists;
 import cpw.mods.fml.common.ModContainer;
+import cpw.mods.fml.common.discovery.ASMDataTable;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import me.jezza.oc.api.configuration.Config.IConfigRegistrar;
 import me.jezza.oc.api.configuration.ConfigEntry;
@@ -19,11 +19,19 @@ public class ConfigData {
     private ModContainer modContainer;
     public final boolean isRegistrar;
 
-    public ConfigData(ModContainer modContainer, Set<String> ownedClasses) {
+    public ConfigData(ModContainer modContainer, Collection<String> ownedClasses) {
         this.modContainer = modContainer;
-        this.ownedClasses = Lists.newArrayList(ownedClasses);
+        copyOwnedClasses(ownedClasses);
         isRegistrar = modContainer.getMod() instanceof IConfigRegistrar;
         treeSet = new TreeMap<>(dataComparator);
+    }
+
+    private void copyOwnedClasses(Collection<String> ownedClasses) {
+        ArrayList<String> sortedClasses = new ArrayList<>();
+        for (String s : ownedClasses)
+            if (!sortedClasses.contains(s))
+                sortedClasses.add(s);
+        this.ownedClasses = sortedClasses;
     }
 
     public void addRoot(ASMData asmData) {
@@ -53,9 +61,9 @@ public class ConfigData {
             treeSet.get(rootPackage).setChildClasses(getAllChildClasses(rootPackage));
     }
 
-    public void processConfigContainers(LinkedHashMap<Class<? extends Annotation>, Class<? extends ConfigEntry<? extends Annotation, ?>>> annotationMap) {
+    public void processConfigContainers(ASMDataTable asmDataTable, LinkedHashMap<Class<? extends Annotation>, Class<? extends ConfigEntry<? extends Annotation, ?>>> annotationMap) {
         for (ConfigContainer configContainer : treeSet.values())
-            configContainer.processAllClasses(annotationMap);
+            configContainer.processAllClasses(asmDataTable, annotationMap);
     }
 
     private File getConfigDirForPackage(ASMData asmData) {
@@ -67,27 +75,25 @@ public class ConfigData {
     }
 
     private Collection<String> getAllChildClasses(String rootPackage) {
-        ArrayList<String> classes = new ArrayList<>();
+        ArrayList<String> children = new ArrayList<>();
         Iterator<String> iterator = ownedClasses.iterator();
         while (iterator.hasNext()) {
             String s = iterator.next();
             if (s.startsWith(rootPackage)) {
                 iterator.remove();
-                classes.add(s.replace("/", "."));
+                children.add(s.replace("/", "."));
             }
         }
-        return classes;
+        return children;
     }
 
+    /**
+     * Go from largest to smallest, that way when the childClasses get processed it can pull them out of the pool, without them already belonging to a more generic package.
+     */
     private static Comparator<String> dataComparator = new Comparator<String>() {
         @Override
         public int compare(String data1, String data2) {
             return data2.length() - data1.length();
         }
     };
-
-    @Override
-    public String toString() {
-        return modContainer.getModId() + ": " + treeSet.toString();
-    }
 }

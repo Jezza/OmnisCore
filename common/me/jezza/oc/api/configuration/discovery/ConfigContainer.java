@@ -1,5 +1,7 @@
 package me.jezza.oc.api.configuration.discovery;
 
+import cpw.mods.fml.common.discovery.ASMDataTable;
+import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import me.jezza.oc.api.configuration.ConfigEntry;
 import me.jezza.oc.common.core.CoreProperties;
 import net.minecraftforge.common.config.Configuration;
@@ -7,9 +9,7 @@ import net.minecraftforge.common.config.Configuration;
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A main config container for all the config annotations.
@@ -17,21 +17,39 @@ import java.util.Map;
  */
 public class ConfigContainer {
 
-    private LinkedHashMap<Class<? extends Annotation>, ConfigEntry<? extends Annotation, ?>> annotationMap;
+    private Map<Class<? extends Annotation>, ConfigEntry<? extends Annotation, ?>> annotationMap;
 
     private Collection<String> childClasses;
     private Configuration config;
 
     public ConfigContainer(File config) {
-        annotationMap = new LinkedHashMap<>();
         this.config = new Configuration(config);
+        annotationMap = new LinkedHashMap<>();
     }
 
-    public void setChildClasses(Collection<String> childPackages) {
-        this.childClasses = childPackages;
+    public void setChildClasses(Collection<String> childClasses) {
+        this.childClasses = childClasses;
     }
 
-    public void processAllClasses(LinkedHashMap<Class<? extends Annotation>, Class<? extends ConfigEntry<? extends Annotation, ?>>> staticMap) {
+    public void processAllClasses(ASMDataTable dataTable, Map<Class<? extends Annotation>, Class<? extends ConfigEntry<? extends Annotation, ?>>> staticMap) {
+        instantiateAnnotationMap(staticMap);
+
+        ArrayList<String> processedClasses = new ArrayList<>();
+        for (Class<? extends Annotation> clazz : annotationMap.keySet()) {
+            Set<ASMData> data = dataTable.getAll(clazz.getName());
+            for (ASMData asmData : data) {
+                String className = asmData.getClassName();
+                if (childClasses.contains(className) && !processedClasses.contains(className)) {
+                    processedClasses.add(className);
+                    processClass(className);
+                }
+            }
+        }
+
+        loadFromConfig();
+    }
+
+    private void instantiateAnnotationMap(Map<Class<? extends Annotation>, Class<? extends ConfigEntry<? extends Annotation, ?>>> staticMap) {
         for (Map.Entry<Class<? extends Annotation>, Class<? extends ConfigEntry<? extends Annotation, ?>>> entry : staticMap.entrySet()) {
             try {
                 annotationMap.put(entry.getKey(), entry.getValue().newInstance());
@@ -40,20 +58,20 @@ public class ConfigContainer {
                 CoreProperties.logger.fatal("Failed to create instance for ConfigEntry!", e);
             }
         }
-
-        for (String childClass : childClasses) {
-            try {
-                processClass(Class.forName(childClass));
-            } catch (ClassNotFoundException e) {
-                // TODO ERROR MESSAGES
-                CoreProperties.logger.fatal("FAILED TO FIND CLASS!", e);
-            }
-        }
-        loadFromConfig();
     }
 
     @SuppressWarnings("unchecked")
-    private void processClass(Class<?> clazz) {
+    private void processClass(String className) {
+        Class<?> clazz;
+        try {
+            clazz = Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            CoreProperties.logger.fatal("Failed to find class!", e);
+            return;
+        }
+
+        CoreProperties.logger.fatal("Processing className: {}", className);
+
         for (final Field field : clazz.getDeclaredFields())
             for (Class<? extends Annotation> annotationClazz : annotationMap.keySet())
                 if (field.isAnnotationPresent(annotationClazz))
