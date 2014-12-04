@@ -7,6 +7,7 @@ import net.minecraftforge.common.config.Configuration;
 public class ConfigEntryDouble extends ConfigEntry<ConfigDouble, Double> {
     @Override
     public Object processAnnotation(Configuration config, String fieldName, ConfigDouble annotation, Double defaultValue) {
-        return config.get(annotation.category(), fieldName, defaultValue, annotation.comment(), annotation.minValue(), annotation.maxValue()).getDouble();
+        String comment = processComment(annotation.comment());
+        return config.get(annotation.category(), fieldName, defaultValue, comment, annotation.minValue(), annotation.maxValue()).getDouble();
     }
 }

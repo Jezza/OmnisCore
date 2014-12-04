@@ -14,7 +14,7 @@ import java.util.List;
 
 public abstract class GuiWidget<T extends GuiWidget> extends Gui {
 
-    public FontRenderer fontRendererObj = Minecraft.getMinecraft().fontRenderer;
+    public final FontRenderer fontRendererObj = Minecraft.getMinecraft().fontRenderer;
     protected static RenderItem itemRender = new RenderItem();
 
     private IGuiRenderHandler renderHandler;

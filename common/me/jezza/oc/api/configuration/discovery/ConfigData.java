@@ -11,11 +11,14 @@ import java.io.File;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
+/**
+ * The config data manager for any given ModContainer.
+ */
 public class ConfigData {
     private static final File CONFIG_DIR = new File(".", "config");
 
     private Collection<String> ownedClasses;
-    TreeMap<String, ConfigContainer> treeSet;
+    TreeMap<String, ConfigContainer> configSet;
     private ModContainer modContainer;
     public final boolean isRegistrar;
 
@@ -23,7 +26,7 @@ public class ConfigData {
         this.modContainer = modContainer;
         copyOwnedClasses(ownedClasses);
         isRegistrar = modContainer.getMod() instanceof IConfigRegistrar;
-        treeSet = new TreeMap<>(dataComparator);
+        configSet = new TreeMap<>(dataComparator);
     }
 
     private void copyOwnedClasses(Collection<String> ownedClasses) {
@@ -41,11 +44,11 @@ public class ConfigData {
         if (pkgIndex > -1)
             packageName = packageName.substring(0, pkgIndex);
         packageName = packageName.replace(".", "/");
-        if (!treeSet.containsKey(packageName)) {
+        if (!configSet.containsKey(packageName)) {
             CoreProperties.logger.info("Discovered config controller inside: {}", packageName);
             File defaultConfig = getConfigDirForPackage(asmData);
             CoreProperties.logger.info("Setting config: {}", defaultConfig);
-            treeSet.put(packageName, new ConfigContainer(defaultConfig));
+            configSet.put(packageName, new ConfigContainer(defaultConfig));
         } else {
             CoreProperties.logger.warn("THIS IS AN ERROR! Ignoring {}", className);
             CoreProperties.logger.warn("Config controller discovered in the same root: {}. ", packageName);
@@ -57,12 +60,12 @@ public class ConfigData {
     }
 
     public void processAllRoots() {
-        for (String rootPackage : treeSet.keySet())
-            treeSet.get(rootPackage).setChildClasses(getAllChildClasses(rootPackage));
+        for (String rootPackage : configSet.keySet())
+            configSet.get(rootPackage).setChildClasses(getAllChildClasses(rootPackage));
     }
 
     public void processConfigContainers(ASMDataTable asmDataTable, LinkedHashMap<Class<? extends Annotation>, Class<? extends ConfigEntry<? extends Annotation, ?>>> annotationMap) {
-        for (ConfigContainer configContainer : treeSet.values())
+        for (ConfigContainer configContainer : configSet.values())
             configContainer.processAllClasses(asmDataTable, annotationMap);
     }
 
@@ -87,10 +90,24 @@ public class ConfigData {
         return children;
     }
 
+    public boolean requiresSelection() {
+        return configSet.size() > 1;
+    }
+
+    public void populateList(List<ConfigContainer> containerList) {
+        for (ConfigContainer configContainer : configSet.values())
+            containerList.add(configContainer);
+    }
+
+    public ConfigContainer getFirstContainer() {
+        Iterator<ConfigContainer> iterator = configSet.values().iterator();
+        return iterator.hasNext() ? iterator.next() : null;
+    }
+
     /**
      * Go from largest to smallest, that way when the childClasses get processed it can pull them out of the pool, without them already belonging to a more generic package.
      */
-    private static Comparator<String> dataComparator = new Comparator<String>() {
+    public static final Comparator<String> dataComparator = new Comparator<String>() {
         @Override
         public int compare(String data1, String data2) {
             return data2.length() - data1.length();

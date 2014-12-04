@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @SideOnly(Side.CLIENT)
-public abstract class GuiAbstract extends GuiContainer implements IGuiRenderHandler {
+public abstract class GuiContainerAbstract extends GuiContainer implements IGuiRenderHandler {
     public EntityPlayer player;
     public int middleX, middleY;
     public ResourceLocation mainTexture;
@@ -29,7 +29,7 @@ public abstract class GuiAbstract extends GuiContainer implements IGuiRenderHand
     private ArrayList<GuiWidget> buttonList;
     private int id = 0;
 
-    protected GuiAbstract(EntityPlayer player) {
+    protected GuiContainerAbstract(EntityPlayer player) {
         this(player, new Container() {
             @Override
             public boolean canInteractWith(EntityPlayer player) {
@@ -38,13 +38,13 @@ public abstract class GuiAbstract extends GuiContainer implements IGuiRenderHand
         });
     }
 
-    public GuiAbstract(EntityPlayer player, Container container) {
+    public GuiContainerAbstract(EntityPlayer player, Container container) {
         super(container);
         this.player = player;
-        buttonList = new ArrayList<GuiWidget>();
+        buttonList = new ArrayList<>();
     }
 
-    public GuiAbstract setMainTexture(ResourceLocation mainTexture) {
+    public GuiContainerAbstract setMainTexture(ResourceLocation mainTexture) {
         this.mainTexture = mainTexture;
         return this;
     }
@@ -91,16 +91,16 @@ public abstract class GuiAbstract extends GuiContainer implements IGuiRenderHand
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float var1, int mouseX, int mouseY) {
-        bindTexture();
         for (GuiWidget widget : buttonList)
             widget.renderBackground(mouseX, mouseY);
+        bindTexture();
     }
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        bindTexture();
         for (GuiWidget widget : buttonList)
             widget.renderForeground(mouseX, mouseY);
+        bindTexture();
     }
 
     @Override

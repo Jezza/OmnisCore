@@ -7,6 +7,7 @@ import net.minecraftforge.common.config.Configuration;
 public class ConfigEntryFloat extends ConfigEntry<ConfigFloat, Float> {
     @Override
     public Object processAnnotation(Configuration config, String fieldName, ConfigFloat annotation, Float defaultValue) {
-        return config.getFloat(fieldName, annotation.category(), defaultValue, annotation.minValue(), annotation.maxValue(), annotation.comment());
+        String comment = processComment(annotation.comment());
+        return config.getFloat(fieldName, annotation.category(), defaultValue, annotation.minValue(), annotation.maxValue(), comment);
     }
 }

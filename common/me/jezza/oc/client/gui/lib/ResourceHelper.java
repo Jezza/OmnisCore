@@ -9,12 +9,12 @@ public class ResourceHelper {
         return new ResourceLocation(texture);
     }
 
-    public static ResourceLocation getDCResource(String texture) {
-        return getModResource(CoreProperties.MOD_ID, texture);
+    public static ResourceLocation getOCTexture(String texture) {
+        return getOCResource("textures/" + texture);
     }
 
-    public static ResourceLocation getDCTexture(String texture) {
-        return getDCResource("textures/" + texture);
+    public static ResourceLocation getOCResource(String texture) {
+        return getModResource(CoreProperties.MOD_ID, texture);
     }
 
     public static ResourceLocation getModResource(String modID, String texture) {

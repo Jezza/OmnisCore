@@ -7,6 +7,7 @@ import net.minecraftforge.common.config.Configuration;
 public class ConfigEntryDoubleArray extends ConfigEntry<ConfigDoubleArray, double[]> {
     @Override
     public Object processAnnotation(Configuration config, String fieldName, ConfigDoubleArray annotation, double[] defaultValues) {
-        return config.get(annotation.category(), fieldName, defaultValues, annotation.comment(), annotation.minValue(), annotation.maxValue(), annotation.isListLengthFixed(), annotation.maxListLength()).getDoubleList();
+        String comment = processComment(annotation.comment());
+        return config.get(annotation.category(), fieldName, defaultValues, comment, annotation.minValue(), annotation.maxValue(), annotation.isListLengthFixed(), annotation.maxListLength()).getDoubleList();
     }
 }

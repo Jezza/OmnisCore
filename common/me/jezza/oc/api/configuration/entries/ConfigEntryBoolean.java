@@ -7,6 +7,7 @@ import net.minecraftforge.common.config.Configuration;
 public class ConfigEntryBoolean extends ConfigEntry<ConfigBoolean, Boolean> {
     @Override
     public Object processAnnotation(Configuration config, String fieldName, ConfigBoolean annotation, Boolean defaultValue) {
-        return config.getBoolean(fieldName, annotation.category(), defaultValue, annotation.comment());
+        String comment = processComment(annotation.comment());
+        return config.getBoolean(fieldName, annotation.category(), defaultValue, comment);
     }
 }

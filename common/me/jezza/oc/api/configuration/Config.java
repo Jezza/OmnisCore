@@ -7,6 +7,8 @@ import java.lang.annotation.Target;
 
 public class Config {
 
+    public static final String DEFAULT_GUI_FACTORY = "me.jezza.oc.api.configuration.construction.DefaultModGuiFactory";
+
     /**
      * If you have a custom config file location, override configFile() with the location.
      * NOTE: That ANY string that configFile returns WILL be pushed on the end of the default config directory.
@@ -34,7 +36,7 @@ public class Config {
     public static @interface ConfigBoolean {
         String category();
 
-        String comment() default "";
+        String[] comment() default {};
     }
 
     @Retention(RetentionPolicy.RUNTIME)
@@ -46,7 +48,7 @@ public class Config {
 
         int maxListLength() default -1;
 
-        String comment() default "";
+        String[] comment() default {};
     }
 
     @Retention(RetentionPolicy.RUNTIME)
@@ -58,7 +60,7 @@ public class Config {
 
         int maxValue() default Integer.MAX_VALUE;
 
-        String comment() default "";
+        String[] comment() default {};
     }
 
     @Retention(RetentionPolicy.RUNTIME)
@@ -74,7 +76,7 @@ public class Config {
 
         int maxListLength() default -1;
 
-        String comment() default "";
+        String[] comment() default {};
     }
 
     @Retention(RetentionPolicy.RUNTIME)
@@ -86,7 +88,7 @@ public class Config {
 
         float maxValue() default Float.MAX_VALUE;
 
-        String comment() default "";
+        String[] comment() default {};
     }
 
     @Retention(RetentionPolicy.RUNTIME)
@@ -98,7 +100,7 @@ public class Config {
 
         double maxValue() default Double.MAX_VALUE;
 
-        String comment() default "";
+        String[] comment() default {};
     }
 
     @Retention(RetentionPolicy.RUNTIME)
@@ -114,7 +116,7 @@ public class Config {
 
         int maxListLength() default -1;
 
-        String comment() default "";
+        String[] comment() default {};
     }
 
     @Retention(RetentionPolicy.RUNTIME)
@@ -124,7 +126,7 @@ public class Config {
 
         String[] validValues() default {};
 
-        String comment() default "";
+        String[] comment() default {};
     }
 
     @Retention(RetentionPolicy.RUNTIME)
@@ -134,6 +136,6 @@ public class Config {
 
         String[] validValues() default {};
 
-        String comment() default "";
+        String[] comment() default {};
     }
 }

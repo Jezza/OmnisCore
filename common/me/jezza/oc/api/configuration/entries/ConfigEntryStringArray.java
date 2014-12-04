@@ -7,9 +7,10 @@ import net.minecraftforge.common.config.Configuration;
 public class ConfigEntryStringArray extends ConfigEntry<ConfigStringArray, String[]> {
     @Override
     public Object processAnnotation(Configuration config, String fieldName, ConfigStringArray annotation, String[] defaultValues) {
+        String comment = processComment(annotation.comment());
         String[] validValues = annotation.validValues();
         if (validValues.length == 0)
-            return config.getStringList(fieldName, annotation.category(), defaultValues, annotation.comment());
-        return config.getStringList(fieldName, annotation.category(), defaultValues, annotation.comment(), validValues);
+            return config.getStringList(fieldName, annotation.category(), defaultValues, comment);
+        return config.getStringList(fieldName, annotation.category(), defaultValues, comment, validValues);
     }
 }

@@ -1,9 +1,12 @@
 package me.jezza.oc.client.gui.lib;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.client.gui.interfaces.ITextAlignment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.MathHelper;
 
+@SideOnly(Side.CLIENT)
 public enum TextAlignment implements ITextAlignment {
     TOP_LEFT(0, 0),
     TOP_CENTRE(1, 0),
@@ -25,7 +28,7 @@ public enum TextAlignment implements ITextAlignment {
     @Override
     public int translateX(int width, String text) {
         int stringWidth = Minecraft.getMinecraft().fontRenderer.getStringWidth(text);
-        return  MathHelper.floor_double(((width * xOffset) / 2)) -  MathHelper.floor_double((stringWidth * xOffset) / 2);
+        return MathHelper.floor_double(((width * xOffset) / 2)) - MathHelper.floor_double((stringWidth * xOffset) / 2);
     }
 
     @Override

@@ -7,6 +7,7 @@ import net.minecraftforge.common.config.Configuration;
 public class ConfigEntryInteger extends ConfigEntry<ConfigInteger, Integer> {
     @Override
     public Object processAnnotation(Configuration config, String fieldName, ConfigInteger annotation, Integer defaultValue) {
-        return config.getInt(fieldName, annotation.category(), defaultValue, annotation.minValue(), annotation.maxValue(), annotation.comment());
+        String comment = processComment(annotation.comment());
+        return config.getInt(fieldName, annotation.category(), defaultValue, annotation.minValue(), annotation.maxValue(), comment);
     }
 }

@@ -37,14 +37,6 @@ public class OmnisCore {
         logger.info("-- Pre-Initialising " + MOD_ID + " (" + VERSION + ") --");
 
         ConfigHandler.initConfigHandler(event);
-        // - activeModContainer
-        // - Stores the modID, along with registered classes and annotations?
-        // ConfigHandler.register(event.getSuggestedConfigurationFile());
-
-//        ConfigHandler configHandler = new ConfigHandler();
-//        configHandler.register(DebugHelper.class);
-//        configHandler.readFrom(event.getSuggestedConfigurationFile());
-
         DebugHelper.checkSysOverrides();
 
         logger.info("Setting up internal network - Channel ID: " + MOD_ID);
@@ -68,6 +60,7 @@ public class OmnisCore {
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         logger.info("-- Post-Initialising --");
+//        ConfigHandler.initGuiFactories();
     }
 
 }

@@ -19,13 +19,14 @@ public class ConfigHandler {
 
     // Once this is true, no more registering annotations.
     private static boolean processed = false;
-
+    private static boolean postProcessed = false;
     private static boolean init = false;
 
-    private static final LinkedHashMap<Class<? extends Annotation>, Class<? extends ConfigEntry<? extends Annotation, ?>>> annotationMap;
+    private static final LinkedHashMap<ModContainer, ConfigData> configMap = new LinkedHashMap<>();
+
+    private static final LinkedHashMap<Class<? extends Annotation>, Class<? extends ConfigEntry<? extends Annotation, ?>>> annotationMap = new LinkedHashMap<>();
 
     static {
-        annotationMap = new LinkedHashMap<>();
         annotationMap.put(ConfigBoolean.class, ConfigEntryBoolean.class);
         annotationMap.put(ConfigBooleanArray.class, ConfigEntryBooleanArray.class);
         annotationMap.put(ConfigInteger.class, ConfigEntryInteger.class);
@@ -45,7 +46,6 @@ public class ConfigHandler {
             return;
         init = true;
 
-        LinkedHashMap<ModContainer, ConfigData> configMap = new LinkedHashMap<>();
         ASMDataTable asmDataTable = event.getAsmData();
         Set<ASMData> asmDataSet = asmDataTable.getAll(Controller.class.getName());
 
@@ -77,11 +77,12 @@ public class ConfigHandler {
         // Process all current classes associated with the ConfigContainer.
         for (int i = 0; i < configValues.length; i++)
             configValues[i].processConfigContainers(asmDataTable, annotationMap);
+        postProcessed = true;
     }
 
     /**
-     * To use this, implement {@link me.jezza.oc.api.configuration.Config.IConfigRegistrar} on your main mod file.
      * Only call this when you've had the chance from the interface.
+     * To use this, implement {@link me.jezza.oc.api.configuration.Config.IConfigRegistrar} on your main mod file.
      */
     public static boolean registerAnnotation(final Class<? extends Annotation> clazz, final Class<? extends ConfigEntry<? extends Annotation, ?>> configEntry) {
         if (processed)
@@ -91,14 +92,10 @@ public class ConfigHandler {
         return true;
     }
 
-    /**
-     * Don't use this unless you know what you're doing...
-     */
-    public static boolean registerAnnotationOverride(final Class<? extends Annotation> clazz, final Class<? extends ConfigEntry<? extends Annotation, ?>> configEntry) {
-        if (processed)
-            return false;
-        annotationMap.put(clazz, configEntry);
-        return true;
+    public static ConfigData getConfigData(ModContainer modContainer) {
+        if (!postProcessed)
+            return null;
+        return configMap.get(modContainer);
     }
 
     @Override

@@ -14,6 +14,7 @@ import java.util.*;
 /**
  * A main config container for all the config annotations.
  * This includes all sub-packages.
+ * These are all contained within a certain ModContainer.
  */
 public class ConfigContainer {
 
@@ -25,6 +26,10 @@ public class ConfigContainer {
     public ConfigContainer(File config) {
         this.config = new Configuration(config);
         annotationMap = new LinkedHashMap<>();
+    }
+
+    public boolean hasConfigChanged() {
+        return config.hasChanged();
     }
 
     public void setChildClasses(Collection<String> childClasses) {
@@ -70,15 +75,15 @@ public class ConfigContainer {
             return;
         }
 
-        CoreProperties.logger.fatal("Processing className: {}", className);
-
         for (final Field field : clazz.getDeclaredFields())
             for (Class<? extends Annotation> annotationClazz : annotationMap.keySet())
-                if (field.isAnnotationPresent(annotationClazz))
+                if (field.isAnnotationPresent(annotationClazz)) {
                     ((ConfigEntry<Annotation, Object>) annotationMap.get(annotationClazz)).add(field, annotationClazz.cast(field.getAnnotation(annotationClazz)));
+                    break;
+                }
     }
 
-    private void loadFromConfig() {
+    public void loadFromConfig() {
         config.load();
         for (ConfigEntry<? extends Annotation, ?> configEntry : annotationMap.values())
             configEntry.processCurrentEntries(config);
