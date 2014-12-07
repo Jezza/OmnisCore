@@ -1,6 +1,7 @@
 package me.jezza.oc.api.configuration;
 
 import me.jezza.oc.common.core.CoreProperties;
+import net.minecraft.client.resources.I18n;
 import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.Level;
 
@@ -48,7 +49,12 @@ public abstract class ConfigEntry<T extends Annotation, D> {
             return "";
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < comments.length; i++) {
-            stringBuilder.append(comments[i]);
+            String comment = comments[i];
+            String localised = I18n.format(comment);
+            // protects against language keys that are not defined in the .lang file
+            if (!localised.equals(comment))
+                comment = localised;
+            stringBuilder.append(comment);
             if (i != comments.length - 1)
                 stringBuilder.append(System.lineSeparator());
         }
