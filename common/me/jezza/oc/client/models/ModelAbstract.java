@@ -12,7 +12,7 @@ import net.minecraftforge.client.model.IModelCustom;
 @SideOnly(Side.CLIENT)
 public abstract class ModelAbstract {
 
-    private IModelCustom customModel;
+    protected IModelCustom customModel;
 
     public ModelAbstract(ResourceLocation customModelLocation) {
         this.customModel = AdvancedModelLoader.loadModel(customModelLocation);

@@ -11,7 +11,7 @@ public abstract class CommandAbstract extends CommandBase {
     private String commandUsage = "";
 
     public CommandAbstract(String commandName, String commandUsage) {
-        this.commandName = commandName;
+        this.commandName = commandName.toLowerCase();
         this.commandUsage = commandUsage;
     }
 

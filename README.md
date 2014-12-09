@@ -1,4 +1,6 @@
 OmnisCore
 ========
 
-Core framework on which all of my mods are built around.
+A Java library built on MinecraftForge to provide an API for easy implementation of Minecraft mods.
+
+Provides
