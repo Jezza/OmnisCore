@@ -20,16 +20,20 @@ public class ConfigContainer {
 
     private Map<Class<? extends Annotation>, ConfigEntry<? extends Annotation, ?>> annotationMap;
 
+    private String rootPackage;
     private Collection<String> childClasses;
     private Configuration config;
+    private String configPath;
 
-    public ConfigContainer(File config) {
+    public ConfigContainer(String rootPackage, File config) {
         this.config = new Configuration(config);
+        this.configPath = config.getPath().replaceAll("\\\\", "/");
         annotationMap = new LinkedHashMap<>();
+        this.rootPackage = rootPackage;
     }
 
-    public boolean hasConfigChanged() {
-        return config.hasChanged();
+    public Configuration getConfig() {
+        return config;
     }
 
     public void setChildClasses(Collection<String> childClasses) {
@@ -59,7 +63,6 @@ public class ConfigContainer {
             try {
                 annotationMap.put(entry.getKey(), entry.getValue().newInstance());
             } catch (InstantiationException | IllegalAccessException e) {
-                // TODO ERROR MESSAGES
                 CoreProperties.logger.fatal("Failed to create instance for ConfigEntry!", e);
             }
         }
@@ -88,6 +91,14 @@ public class ConfigContainer {
         for (ConfigEntry<? extends Annotation, ?> configEntry : annotationMap.values())
             configEntry.processCurrentEntries(config);
         config.save();
+    }
+
+    public String getRootPackage() {
+        return rootPackage;
+    }
+
+    public String getConfigPath() {
+        return configPath;
     }
 
 }

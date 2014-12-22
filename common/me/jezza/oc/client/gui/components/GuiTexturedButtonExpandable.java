@@ -1,7 +1,5 @@
 package me.jezza.oc.client.gui.components;
 
-import me.jezza.oc.common.core.CoreProperties;
-
 public abstract class GuiTexturedButtonExpandable<T extends GuiTexturedButtonExpandable> extends GuiTexturedButton<T> {
 
     protected final int textureWidth, textureHeight,
@@ -34,9 +32,6 @@ public abstract class GuiTexturedButtonExpandable<T extends GuiTexturedButtonExp
 
         this.xPasses = borderDiffWidth == 0 ? 0 : internalWidth / borderDiffWidth;
         this.yPasses = borderDiffHeight == 0 ? 0 : internalHeight / borderDiffHeight;
-
-        CoreProperties.logger.fatal(xPasses);
-        CoreProperties.logger.fatal(yPasses);
 
         this.xRemainder = internalWidth - (xPasses * borderDiffWidth);
         this.yRemainder = internalHeight - (yPasses * borderDiffHeight);

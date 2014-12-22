@@ -36,17 +36,13 @@ public class Graph<T> {
     }
 
     public boolean isAdjacent(T from, T to) {
-        if (!(containsNode(from) && containsNode(to)))
-            return false;
-        return nodeMap.get(from).contains(to);
+        return containsNode(from) && containsNode(to) && nodeMap.get(from).contains(to);
     }
 
     /**
      * Add a connection/edge between two nodes.
      * The graph has to contain both.
      *
-     * @param from
-     * @param to
      * @return true if the edge was added.
      */
     public boolean addEdge(T from, T to) {
@@ -86,13 +82,11 @@ public class Graph<T> {
      * @return The number of adjacent nodes.
      */
     public int connectionSize(T node) {
-        if (!containsNode(node))
-            return 0;
-        return nodeMap.get(node).size();
+        return !containsNode(node) ? 0 : nodeMap.get(node).size();
     }
 
     /**
-     * @return size == 0;........
+     * @return keySize == 0;
      */
     public boolean isEmpty() {
         return keySize == 0;

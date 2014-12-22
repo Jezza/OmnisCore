@@ -6,10 +6,7 @@ import me.jezza.oc.client.gui.lib.Colour;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.item.ItemStack;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,23 +53,12 @@ public abstract class GuiScreenAbstract extends GuiScreen implements IGuiRenderH
      */
     public void drawScreen(int mouseX, int mouseY, float tick) {
         this.drawDefaultBackground();
+
         drawGuiBackgroundLayer(mouseX, mouseY, tick);
 
-        // Revisit this shit.
-        GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-        RenderHelper.disableStandardItemLighting();
-
-        GL11.glDisable(GL11.GL_LIGHTING);
-        GL11.glDisable(GL11.GL_DEPTH_TEST);
         super.drawScreen(mouseX, mouseY, tick);
 
-        RenderHelper.enableGUIStandardItemLighting();
-
-        GL11.glDisable(GL11.GL_LIGHTING);
         drawGuiForegroundLayer(mouseX, mouseY);
-        GL11.glEnable(GL11.GL_LIGHTING);
-        GL11.glEnable(GL11.GL_DEPTH_TEST);
-        RenderHelper.enableStandardItemLighting();
     }
 
     public void drawGuiBackgroundLayer(int mouseX, int mouseY, float tick) {
@@ -100,10 +86,12 @@ public abstract class GuiScreenAbstract extends GuiScreen implements IGuiRenderH
         return this;
     }
 
+    /**
+     * NOPES, you shouldn't be drawing ItemStacks in menus.
+     */
     @Override
     public void renderTooltip(ItemStack itemStack, int x, int y) {
-        if (itemStack != null)
-            renderTooltip(itemStack, x, y);
+        throw new UnsupportedOperationException("Shouldn't be drawing ItemStacks in menus.");
     }
 
     @Override

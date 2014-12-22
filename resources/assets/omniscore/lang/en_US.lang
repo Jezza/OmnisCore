@@ -1,2 +1,5 @@
 oc.config.gui.selector.title.1=Multiple Configuration Containers have been discovered for the selected mod.
 oc.config.gui.selector.title.2=Please select one.
+
+debug_enablechat=[Debug] Enable Chat
+debug_enableconsole=[Debug] Enable Console

@@ -1,5 +1,6 @@
 package me.jezza.oc.api.configuration.discovery;
 
+import com.google.common.base.Strings;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.discovery.ASMDataTable;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
@@ -46,9 +47,9 @@ public class ConfigData {
         packageName = packageName.replace(".", "/");
         if (!configSet.containsKey(packageName)) {
             CoreProperties.logger.info("Discovered config controller inside: {}", packageName);
-            File defaultConfig = getConfigDirForPackage(asmData);
+            File defaultConfig = getConfigForPackage(asmData);
             CoreProperties.logger.info("Setting config: {}", defaultConfig);
-            configSet.put(packageName, new ConfigContainer(defaultConfig));
+            configSet.put(packageName, new ConfigContainer(packageName, defaultConfig));
         } else {
             CoreProperties.logger.warn("THIS IS AN ERROR! Ignoring {}", className);
             CoreProperties.logger.warn("Config controller discovered in the same root: {}. ", packageName);
@@ -69,10 +70,10 @@ public class ConfigData {
             configContainer.processAllClasses(asmDataTable, annotationMap);
     }
 
-    private File getConfigDirForPackage(ASMData asmData) {
+    private File getConfigForPackage(ASMData asmData) {
         Map<String, Object> annotationInfo = asmData.getAnnotationInfo();
         String configFile = (String) annotationInfo.get("configFile");
-        if (configFile == null || configFile.equals(""))
+        if (Strings.isNullOrEmpty(configFile))
             return new File(CONFIG_DIR, modContainer.getModId() + ".cfg");
         return new File(CONFIG_DIR, configFile);
     }

@@ -1,7 +1,7 @@
 package me.jezza.oc.api.configuration;
 
 import me.jezza.oc.common.core.CoreProperties;
-import net.minecraft.client.resources.I18n;
+import me.jezza.oc.common.utils.Localise;
 import net.minecraftforge.common.config.Configuration;
 import org.apache.logging.log4j.Level;
 
@@ -44,17 +44,19 @@ public abstract class ConfigEntry<T extends Annotation, D> {
         }
     }
 
+    /**
+     * For your use.
+     * It processes all strings, attempts to localise each one, and puts in all in one string.
+     *
+     * @param comments - The comments in question.
+     * @return - The coherent "fully localised"* string. *Unless it fails... :/
+     */
     public String processComment(String... comments) {
         if (comments.length == 0)
             return "";
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < comments.length; i++) {
-            String comment = comments[i];
-            String localised = I18n.format(comment);
-            // protects against language keys that are not defined in the .lang file
-            if (!localised.equals(comment))
-                comment = localised;
-            stringBuilder.append(comment);
+            stringBuilder.append(Localise.formatSafe(comments[i]));
             if (i != comments.length - 1)
                 stringBuilder.append(System.lineSeparator());
         }

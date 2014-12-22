@@ -20,7 +20,7 @@ import me.jezza.oc.common.core.network.NetworkDispatcher;
 import static me.jezza.oc.common.core.CoreProperties.*;
 
 @Config.Controller()
-@Mod(modid = MOD_ID, name = MOD_NAME, version = VERSION, dependencies = DEPENDENCIES)
+@Mod(modid = MOD_ID, name = MOD_NAME, version = VERSION, dependencies = DEPENDENCIES, guiFactory = Config.DEFAULT_GUI_FACTORY)
 public class OmnisCore {
 
     @Mod.Instance(MOD_ID)

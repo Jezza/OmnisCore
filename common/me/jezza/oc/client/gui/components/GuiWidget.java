@@ -25,6 +25,7 @@ public abstract class GuiWidget<T extends GuiWidget> extends Gui {
     public long timeClicked = 0;
     public boolean clicked = false;
     private boolean visible = true;
+    private boolean enabled = true;
 
     public GuiWidget(int x, int y, int width, int height) {
         this.x = x;
@@ -64,11 +65,21 @@ public abstract class GuiWidget<T extends GuiWidget> extends Gui {
         return (T) this;
     }
 
+    public T setEnabled() {
+        this.enabled = true;
+        return (T) this;
+    }
+
+    public T setDisabled() {
+        this.enabled = false;
+        return (T) this;
+    }
+
     public int getId() {
         return id;
     }
 
-    public void toggleVisiblity() {
+    public void toggleVisibility() {
         visible = !visible;
     }
 
@@ -80,18 +91,26 @@ public abstract class GuiWidget<T extends GuiWidget> extends Gui {
         return visible;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
     public boolean onClick(int mouseX, int mouseY, int mouseClick) {
         clicked = canClick(mouseX, mouseY);
         if (clicked) {
             timeClicked = System.currentTimeMillis();
+            onClickAction(mouseClick);
             if (shouldPlaySoundOnClick())
                 playButtonClick();
         }
         return clicked;
     }
 
+    public void onClickAction(int mouseClick) {
+    }
+
     public boolean canClick(int mouseX, int mouseY) {
-        return visible && isWithinBounds(mouseX, mouseY);
+        return visible && enabled && isWithinBounds(mouseX, mouseY);
     }
 
     public boolean isWithinBounds(int mouseX, int mouseY) {

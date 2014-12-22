@@ -7,7 +7,8 @@ import me.jezza.oc.client.gui.lib.ResourceHelper;
 import me.jezza.oc.client.gui.lib.TextAlignment;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
+
+import static org.lwjgl.opengl.GL11.*;
 
 public class GuiDefaultButton extends GuiTexturedButtonExpandable<GuiDefaultButton> {
     public static final ResourceLocation BUTTON_TEXTURE = ResourceHelper.getOCTexture("gui/defaultButtons.png");
@@ -16,7 +17,7 @@ public class GuiDefaultButton extends GuiTexturedButtonExpandable<GuiDefaultButt
     protected int textStartX, textStartY, colour;
 
     public GuiDefaultButton(int x, int y, int width, int height, String text) {
-        super(x, y, 0, 20, width, height, 200, 20, 2, 3, 2, 2);
+        super(x, y, 0, 0, width, height, 200, 20, 2, 3, 2, 2);
         setTexture(BUTTON_TEXTURE);
         this.text = text;
         setTextAlignment(TextAlignment.CENTRE);
@@ -40,15 +41,28 @@ public class GuiDefaultButton extends GuiTexturedButtonExpandable<GuiDefaultButt
     }
 
     @Override
+    public GuiDefaultButton setDisabled() {
+        colour = Colour.GREY.getInt();
+        return super.setDisabled();
+    }
+
+    @Override
+    public GuiDefaultButton setEnabled() {
+        colour = Colour.WHITE.getInt();
+        return super.setEnabled();
+    }
+
+    @Override
     public void renderBackground(int mouseX, int mouseY) {
-        GL11.glEnable(GL11.GL_BLEND);
+        glEnable(GL_BLEND);
         OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-        GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         super.renderBackground(mouseX, mouseY);
         Colour.resetToWhite();
 
         drawText();
+        Colour.resetToWhite();
     }
 
     protected void drawText() {
@@ -57,7 +71,7 @@ public class GuiDefaultButton extends GuiTexturedButtonExpandable<GuiDefaultButt
 
     @Override
     public int getPassLevel(int mouseX, int mouseY) {
-        return !isVisible() ? 0 : isWithinBounds(mouseX, mouseY) ? 2 : 1;
+        return isEnabled() ? isWithinBounds(mouseX, mouseY) ? 2 : 1 : 0;
     }
 
     @Override

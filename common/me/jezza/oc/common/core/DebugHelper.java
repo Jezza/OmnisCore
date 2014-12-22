@@ -6,10 +6,10 @@ import static me.jezza.oc.common.core.CoreProperties.logger;
 
 public class DebugHelper {
 
-    @ConfigBoolean(category = "DebugHelpers", comment = "Testing comments")
+    @ConfigBoolean(category = "DebugHelpers")
     private static boolean debug_enableConsole = false;
 
-    @ConfigBoolean(category = "DebugHelpers", comment = {"Making sure", "Multiple lines work."})
+    @ConfigBoolean(category = "DebugHelpers")
     private static boolean debug_enableChat = false;
 
     /**
