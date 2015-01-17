@@ -2,22 +2,30 @@ package me.jezza.oc.api.collect;
 
 import java.util.*;
 
+/**
+ * Built around a linkedHashMap, this data structure exists as an non-intrusive, unweighted, undirected graph.
+ *
+ * non-intrusive: Without relying on the nodes to track their connections.
+ *  Note: I don't create an object to represent a node, but LinkedHashMap does.
+ *
+ *
+ *
+ * @param <T>
+ */
 public class Graph<T> {
 
-    private final LinkedHashSet<T> CACHE = new LinkedHashSet<T>();
-
-    private LinkedHashMap<T, Collection<T>> nodeMap;
-    private int keySize = 0;
+    protected LinkedHashMap<T, Collection<T>> nodeMap;
+    protected int keySize = 0;
 
     public Graph() {
-        nodeMap = new LinkedHashMap();
+        nodeMap = new LinkedHashMap<>();
     }
 
     public boolean addNode(T node) {
         if (containsNode(node))
             return false;
         keySize++;
-        nodeMap.put(node, cloneNewHashSet());
+        nodeMap.put(node, new ArrayList<T>());
         return containsNode(node);
     }
 
@@ -32,7 +40,7 @@ public class Graph<T> {
     }
 
     public boolean containsNode(T node) {
-        return nodeMap.containsKey(node);
+        return node != null && nodeMap.containsKey(node);
     }
 
     public boolean isAdjacent(T from, T to) {
@@ -59,10 +67,6 @@ public class Graph<T> {
         if (!toCollection.contains(from))
             toCollection.add(from);
         return true;
-    }
-
-    private LinkedHashSet<T> cloneNewHashSet() {
-        return (LinkedHashSet<T>) CACHE.clone();
     }
 
     public void clear() {
@@ -100,22 +104,32 @@ public class Graph<T> {
         keySize = nodeMap.keySet().size();
     }
 
+    /**
+     * @param nodes Collection of nodes to remove.
+     * @return true if the data structure was altered.
+     */
     public boolean removeAll(Collection<? extends T> nodes) {
         return batchRemove(nodes, false);
     }
 
+    /**
+     * @param nodes Collection of nodes to retain.
+     * @return true if the data structure was changed.
+     */
     public boolean retainAll(Collection<? extends T> nodes) {
         return batchRemove(nodes, true);
     }
 
-    private boolean batchRemove(Collection<? extends T> nodes, boolean compliment) {
+    protected boolean batchRemove(Collection<? extends T> nodes, boolean compliment) {
         Collection<T> keySet = nodeMap.keySet();
         Iterator<T> iterator = keySet.iterator();
         boolean modified = false;
         while (iterator.hasNext()) {
             T t = iterator.next();
-            if (nodes.contains(t) != compliment)
+            if (nodes.contains(t) != compliment) {
                 iterator.remove();
+                modified = true;
+            }
         }
         keySize = keySet.size();
         return modified;
@@ -132,18 +146,16 @@ public class Graph<T> {
      * @return an iterable for the adjacent nodes.
      */
     public Collection<T> adjacentTo(T node) {
-        if (!containsNode(node))
-            return cloneNewHashSet();
-        return nodeMap.get(node);
+        return !containsNode(node) ? Collections.<T>emptyList() : nodeMap.get(node);
     }
 
     /**
-     * Changes will NOT reflect.
+     * Changes will NOT reflect, but the objects are references to the objects within this graph.
      *
-     * @return A clone of the map.
+     * @return A mutable shallow copy of the map.
      */
     public Map<T, Collection<T>> asMap() {
-        return (Map<T, Collection<T>>) nodeMap.clone();
+        return new HashMap<>(nodeMap);
     }
 
     @Override

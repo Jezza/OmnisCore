@@ -1,38 +1,44 @@
 package me.jezza.oc.api.network;
 
-public enum NetworkResponse {
-    ;
+public class NetworkResponse {
 
     public static enum MessageResponse {
         VALID,
         INVALID;
     }
 
-
     public static enum NodeAdded {
-        NETWORK_FAILED_TO_ADD,
         NETWORK_JOIN,
         NETWORK_MERGE,
-        NETWORK_CREATION;
+        NETWORK_CREATION,
+
+        // Not used internally. Just here to for you to replace the response if an exception is thrown.
+        NETWORK_FAILED_TO_ADD;
     }
 
     public static enum NodeRemoved {
-        NETWORK_FAILED_TO_REMOVE,
+        NETWORK_NOT_FOUND,
         NETWORK_LEAVE,
         NETWORK_SPLIT,
-        NETWORK_DESTROYED;
+        NETWORK_DESTROYED,
+
+        // Not used internally. Just here to for you to replace the response if an exception is thrown.
+        NETWORK_FAILED_TO_REMOVE;
     }
 
     public static enum NodeUpdated {
-        NETWORK_FAILED_TO_UPDATE,
+        NETWORK_NOT_FOUND,
         NETWORK_NO_DELTA_DETECTED,
-        NETWORK_UPDATED;
+        NETWORK_UPDATED,
+
+        // Not used internally. Just here to for you to replace the response if an exception is thrown.
+        NETWORK_FAILED_TO_UPDATE;
     }
 
     public static enum NetworkOverride {
         IGNORE,
-        DELETE,
-        INTERCEPT;
+        INTERCEPT,
+        INJECT,
+        DELETE;
     }
-
 }

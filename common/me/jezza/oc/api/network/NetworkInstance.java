@@ -1,10 +1,16 @@
 package me.jezza.oc.api.network;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import me.jezza.oc.api.network.exceptions.NetworkAddException;
+import me.jezza.oc.api.network.exceptions.NetworkCreationException;
+import me.jezza.oc.api.network.exceptions.NetworkException;
+import me.jezza.oc.api.network.exceptions.NetworkRemoveException;
 import me.jezza.oc.api.network.interfaces.INetworkNode;
 import me.jezza.oc.api.network.interfaces.INetworkNodeHandler;
 
 import java.util.*;
+
+import static me.jezza.oc.api.network.NetworkResponse.*;
 
 /**
  * This is the master instance.
@@ -12,7 +18,7 @@ import java.util.*;
  */
 public class NetworkInstance {
 
-    private LinkedHashSet<INetworkNodeHandler> networks;
+    private ArrayList<INetworkNodeHandler> networks;
     private Class<? extends INetworkNodeHandler> nodeHandlerClazz;
 
     public NetworkInstance() {
@@ -20,14 +26,13 @@ public class NetworkInstance {
     }
 
     public NetworkInstance(Class<? extends INetworkNodeHandler> nodeHandlerClazz) {
-        this.networks = new LinkedHashSet<>();
+        this.networks = new ArrayList<>();
         this.nodeHandlerClazz = nodeHandlerClazz;
     }
 
-    public NetworkResponse.NodeAdded addNetworkNode(INetworkNode node) throws IllegalAccessException, InstantiationException {
-        List<INetworkNodeHandler> networksFound = new LinkedList<>();
-        Collection<INetworkNode> nearbyNodes;
-        nearbyNodes = node.getNearbyNodes();
+    public NodeAdded addNetworkNode(INetworkNode node) throws NetworkException {
+        List<INetworkNodeHandler> networksFound = new ArrayList<>();
+        Collection<INetworkNode> nearbyNodes = node.getNearbyNodes();
 
         if (!nearbyNodes.isEmpty())
             nodeIterator:
@@ -40,18 +45,18 @@ public class NetworkInstance {
                                 }
 
         INetworkNodeHandler networkNodeHandler;
-        NetworkResponse.NodeAdded response;
+        NodeAdded response;
         switch (networksFound.size()) {
             case 0:
-                response = NetworkResponse.NodeAdded.NETWORK_CREATION;
+                response = NodeAdded.NETWORK_CREATION;
                 networkNodeHandler = createNetworkNodeHandler();
                 break;
             case 1:
-                response = NetworkResponse.NodeAdded.NETWORK_JOIN;
+                response = NodeAdded.NETWORK_JOIN;
                 networkNodeHandler = networksFound.get(0);
                 break;
             default:
-                response = NetworkResponse.NodeAdded.NETWORK_MERGE;
+                response = NodeAdded.NETWORK_MERGE;
                 networkNodeHandler = networksFound.get(0);
                 List<INetworkNodeHandler> nodes = networksFound.subList(1, networksFound.size());
                 for (INetworkNodeHandler networkFound : nodes) {
@@ -62,14 +67,14 @@ public class NetworkInstance {
 
         boolean flag = networkNodeHandler.addNetworkNode(node);
         if (!flag) {
-            if (response == NetworkResponse.NodeAdded.NETWORK_CREATION)
+            if (response == NodeAdded.NETWORK_CREATION)
                 removeNetworkNodeHandler(networkNodeHandler);
-            response = NetworkResponse.NodeAdded.NETWORK_FAILED_TO_ADD;
+            throw new NetworkAddException("Failed to add node to network. Node: %s", node.getClass());
         }
         return response;
     }
 
-    public NetworkResponse.NodeRemoved removeNetworkNode(INetworkNode node) throws IllegalAccessException, InstantiationException {
+    public NodeRemoved removeNetworkNode(INetworkNode node) throws NetworkException {
         INetworkNodeHandler nodeHandler = null;
         for (INetworkNodeHandler networkNodeHandler : networks) {
             if (networkNodeHandler.containsNode(node)) {
@@ -79,21 +84,21 @@ public class NetworkInstance {
         }
 
         if (nodeHandler == null)
-            return NetworkResponse.NodeRemoved.NETWORK_FAILED_TO_REMOVE;
+            return NodeRemoved.NETWORK_NOT_FOUND;
 
         Map<? extends INetworkNode, ? extends Collection<INetworkNode>> nodeMap = nodeHandler.getNodeMap();
 
         boolean removed = nodeHandler.removeNetworkNode(node);
         if (!removed)
-            return NetworkResponse.NodeRemoved.NETWORK_FAILED_TO_REMOVE;
+            throw new NetworkRemoveException("Failed to remove node from network. Node: %s", node.getClass());
 
         Collection<INetworkNode> nearbyNodes = nodeMap.get(node);
         switch (nearbyNodes.size()) {
             case 0:
                 removeNetworkNodeHandler(nodeHandler);
-                return NetworkResponse.NodeRemoved.NETWORK_DESTROYED;
+                return NodeRemoved.NETWORK_DESTROYED;
             case 1:
-                return NetworkResponse.NodeRemoved.NETWORK_LEAVE;
+                return NodeRemoved.NETWORK_LEAVE;
             default:
                 Iterator<INetworkNode> nextNode = nearbyNodes.iterator();
 
@@ -102,14 +107,14 @@ public class NetworkInstance {
 
                 int nodeHandlerSize = nodeHandler.size();
                 if (connectedNodes.size() == nodeHandlerSize)
-                    return NetworkResponse.NodeRemoved.NETWORK_LEAVE;
+                    return NodeRemoved.NETWORK_LEAVE;
 
                 HashSet<INetworkNode> visited = new HashSet<>(connectedNodes);
                 visited.add(node);
                 nodeHandler.retainAll(connectedNodes);
 
                 Set<? extends INetworkNode> keySet = nodeMap.keySet();
-                while (!visited.containsAll(keySet)) {
+                while (visited.size() != keySet.size()) {
                     if (!nextNode.hasNext())
                         break;
                     networkNode = nextNode.next();
@@ -121,48 +126,82 @@ public class NetworkInstance {
                 }
         }
 
-        return NetworkResponse.NodeRemoved.NETWORK_SPLIT;
+        return NodeRemoved.NETWORK_SPLIT;
     }
 
-    public NetworkResponse.NodeUpdated updateNetworkNode(INetworkNode node) {
+    public NodeUpdated updateNetworkNode(INetworkNode node) throws NetworkException {
         INetworkNodeHandler nodeHandler = null;
         for (INetworkNodeHandler networkNodeHandler : networks)
-            if (networkNodeHandler.containsNode(node))
+            if (networkNodeHandler.containsNode(node)) {
                 nodeHandler = networkNodeHandler;
+                break;
+            }
 
         if (nodeHandler == null)
-            return NetworkResponse.NodeUpdated.NETWORK_FAILED_TO_UPDATE;
+            return NodeUpdated.NETWORK_NOT_FOUND;
 
         Map<? extends INetworkNode, ? extends Collection<INetworkNode>> nodeMap = nodeHandler.getNodeMap();
         Collection<INetworkNode> cachedNodes = nodeMap.get(node);
         Collection<INetworkNode> currentNodes = node.getNearbyNodes();
 
         if (cachedNodes.equals(currentNodes))
-            return NetworkResponse.NodeUpdated.NETWORK_NO_DELTA_DETECTED;
+            return NodeUpdated.NETWORK_NO_DELTA_DETECTED;
 
-        NetworkResponse.NodeRemoved nodeRemoved;
-        NetworkResponse.NodeAdded nodeAdded;
-        try {
-            nodeRemoved = removeNetworkNode(node);
-            nodeAdded = addNetworkNode(node);
-        } catch (Exception e) {
-            return NetworkResponse.NodeUpdated.NETWORK_FAILED_TO_UPDATE;
+        boolean removed = nodeHandler.removeNetworkNode(node);
+        if (!removed)
+            throw new NetworkRemoveException("Failed to remove node from network. Node: %s", node.getClass());
+
+        Collection<INetworkNode> nearbyNodes = nodeMap.get(node);
+        switch (nearbyNodes.size()) {
+            case 0:
+                removeNetworkNodeHandler(nodeHandler);
+            case 1:
+                break;
+            default:
+                Iterator<INetworkNode> nextNode = nearbyNodes.iterator();
+
+                INetworkNode networkNode = nextNode.next();
+                Collection<INetworkNode> connectedNodes = breadthFirstSearchSpread(networkNode, nodeMap);
+
+                int nodeHandlerSize = nodeHandler.size();
+                if (connectedNodes.size() == nodeHandlerSize)
+                    break;
+
+                HashSet<INetworkNode> visited = new HashSet<>(connectedNodes);
+                visited.add(node);
+                nodeHandler.retainAll(connectedNodes);
+
+                Set<? extends INetworkNode> keySet = nodeMap.keySet();
+                while (visited.size() != keySet.size()) {
+                    if (!nextNode.hasNext())
+                        break;
+                    networkNode = nextNode.next();
+                    if (visited.contains(networkNode))
+                        continue;
+                    connectedNodes = breadthFirstSearchSpread(networkNode, nodeMap);
+                    visited.addAll(connectedNodes);
+                    createNetworkNodeHandlerAndFill(connectedNodes);
+                }
         }
 
-        if (nodeRemoved == NetworkResponse.NodeRemoved.NETWORK_FAILED_TO_REMOVE || nodeAdded == NetworkResponse.NodeAdded.NETWORK_FAILED_TO_ADD)
-            return NetworkResponse.NodeUpdated.NETWORK_FAILED_TO_UPDATE;
-        return NetworkResponse.NodeUpdated.NETWORK_UPDATED;
+        addNetworkNode(node);
+        return NodeUpdated.NETWORK_UPDATED;
     }
 
-    private INetworkNodeHandler createNetworkNodeHandler() throws InstantiationException, IllegalAccessException {
-        INetworkNodeHandler nodeHandler = nodeHandlerClazz.newInstance();
+    private INetworkNodeHandler createNetworkNodeHandler() throws NetworkCreationException {
+        INetworkNodeHandler nodeHandler = null;
+        try {
+            nodeHandler = nodeHandlerClazz.newInstance();
+        } catch (Exception e) {
+            throw new NetworkCreationException(e, "Failed to created INetworkNodeHandler. Class %s", nodeHandlerClazz);
+        }
         if (nodeHandler.requiresRegistration())
             FMLCommonHandler.instance().bus().register(nodeHandler);
         networks.add(nodeHandler);
         return nodeHandler;
     }
 
-    private INetworkNodeHandler createNetworkNodeHandlerAndFill(Collection<INetworkNode> collection) throws InstantiationException, IllegalAccessException {
+    private INetworkNodeHandler createNetworkNodeHandlerAndFill(Collection<INetworkNode> collection) throws NetworkCreationException {
         INetworkNodeHandler nodeHandler = createNetworkNodeHandler();
         for (INetworkNode node : collection)
             nodeHandler.addNetworkNode(node);
@@ -170,6 +209,7 @@ public class NetworkInstance {
     }
 
     private void removeNetworkNodeHandler(INetworkNodeHandler networkCore) {
+        networkCore.destroy();
         if (networkCore.requiresRegistration())
             FMLCommonHandler.instance().bus().unregister(networkCore);
         networks.remove(networkCore);

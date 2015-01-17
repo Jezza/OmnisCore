@@ -1,9 +1,11 @@
 package me.jezza.oc.api.network;
 
 import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Lists;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import me.jezza.oc.api.collect.Graph;
+import me.jezza.oc.api.network.NetworkResponse.MessageResponse;
 import me.jezza.oc.api.network.interfaces.*;
 
 import java.util.*;
@@ -30,12 +32,12 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
      * Used to keep track of what nodes would like to be notified of messages being posted to the system.
      * Useful if you wish to have a "brain" of the network.
      */
-    private LinkedHashSet<IMessageNodeOverride> messageNodesOverride;
+    private ArrayList<IMessageNodeOverride> messageNodesOverride;
 
     public NetworkCore() {
         graph = new Graph<>();
         messageMap = LinkedHashMultimap.create();
-        messageNodesOverride = new LinkedHashSet<>();
+        messageNodesOverride = new ArrayList<>();
     }
 
     @Override
@@ -91,6 +93,13 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
     }
 
     @Override
+    public void destroy() {
+        graph.clear();
+        messageMap.clear();
+        messageNodesOverride.clear();
+    }
+
+    @Override
     public boolean containsNode(INetworkNode node) {
         return graph.containsNode(node);
     }
@@ -100,8 +109,40 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
         return message.getOwner() != null && messageMap.put(Phase.PRE_PROCESSING, message);
     }
 
+    @Override
+    public List<INetworkNode> getPathFrom(INetworkNode from, INetworkNode to) {
+        if (!(graph.containsNode(from) && graph.containsNode(to)))
+            return Collections.<INetworkNode>emptyList();
+
+        Deque<ArrayList<INetworkNode>> deque = new ArrayDeque<>();
+        deque.push(Lists.newArrayList(from));
+        HashSet<INetworkNode> visited = new HashSet<>();
+
+        while (!deque.isEmpty()) {
+            ArrayList<INetworkNode> path = deque.pop();
+            INetworkNode networkNode = path.get(path.size() - 1);
+
+            if (networkNode.equals(to))
+                return path;
+
+            Collection<INetworkNode> networkNodes = graph.adjacentTo(networkNode);
+            for (INetworkNode childNode : networkNodes) {
+                if (visited.contains(childNode))
+                    continue;
+                visited.add(childNode);
+
+                ArrayList<INetworkNode> newPath = new ArrayList<>(path);
+                newPath.add(childNode);
+                deque.addLast(newPath);
+            }
+        }
+        return Collections.<INetworkNode>emptyList();
+    }
+
     @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent event) {
+        if (event.phase != TickEvent.Phase.START)
+            return;
         processingPostMessages();
         processingMessages();
         processingPreMessages();
@@ -117,7 +158,7 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
         while (iterator.hasNext()) {
             INetworkMessage message = iterator.next();
 
-            NetworkResponse.MessageResponse messageResponse = message.onMessageComplete(this);
+            MessageResponse messageResponse = message.onMessageComplete(this);
 
             iterator.remove();
             switch (messageResponse) {
@@ -128,7 +169,6 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
                 case VALID:
                 default:
             }
-
         }
     }
 
@@ -142,14 +182,14 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
             INetworkMessage message = iterator.next();
 
             HashSet<INetworkNode> visited = new HashSet<>();
-            Queue<INetworkNode> queue = new LinkedList<>();
+            Queue<INetworkNode> queue = new ArrayDeque<>(graph.size());
             queue.offer(message.getOwner());
 
             while (!queue.isEmpty()) {
                 INetworkNode node = queue.poll();
                 visited.add(node);
-                NetworkResponse.MessageResponse response = message.isValidNode(node);
-                if (response == NetworkResponse.MessageResponse.INVALID)
+//                Here's where the messages get processed.
+                if (message.isValidNode(node) == MessageResponse.INVALID)
                     continue;
                 for (INetworkNode childNode : graph.adjacentTo(node))
                     if (!visited.contains(childNode))
@@ -175,14 +215,16 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
                 for (IMessageNodeOverride node : messageNodesOverride) {
                     NetworkResponse.NetworkOverride networkOverride = node.onMessagePosted(message);
                     switch (networkOverride) {
-                        case IGNORE:
-                        default:
-                            continue;
                         case DELETE:
                             iterator.remove();
                             continue messageIterator;
                         case INTERCEPT:
                             message.setOwner(node);
+                            continue messageIterator;
+                        case INJECT:
+                            message.dataChanged(node);
+                            continue messageIterator;
+                        case IGNORE:
                     }
                 }
 
@@ -202,13 +244,13 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
          */
         PRE_PROCESSING,
         /**
-         * The main function of the message. Gets spread through the network in a Breadth-first search pattern.
-         * Each node will be passed to the message via isValidNode();
+         * The main phase of the message.
+         * What happens during this phase of the message is up to the implementation.
          */
         PROCESSING,
         /**
          * The final stage of messages.
-         * This will just call the owner and fired onMessageComplete, along with the message that was processed.
+         * Finalising all the message properties to allow the message to act one last time before deletion.
          */
         POST_PROCESSING;
     }

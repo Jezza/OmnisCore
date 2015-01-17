@@ -35,6 +35,12 @@ public interface INetworkMessage {
     public void resetMessage();
 
     /**
+     * The contents of this message were changed in some way.
+     * @param node The node that returned the INJECT state.
+     */
+    public void dataChanged(INetworkNode node);
+
+    /**
      * Fired for the use of the message.
      * If the message wants to add it to a list, or alter something, you have the ability to.
      * A node will not be fired with this method more than once.

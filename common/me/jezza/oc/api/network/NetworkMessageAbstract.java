@@ -3,6 +3,9 @@ package me.jezza.oc.api.network;
 import me.jezza.oc.api.network.interfaces.INetworkMessage;
 import me.jezza.oc.api.network.interfaces.INetworkNode;
 
+/**
+ * Just a simple abstract class to remove the monotony of setting and getting owners
+ */
 public abstract class NetworkMessageAbstract implements INetworkMessage {
 
     private INetworkNode owner;

@@ -25,9 +25,6 @@ public interface INetworkNodeHandler {
      */
     public boolean removeNetworkNode(INetworkNode node);
 
-    // TBD
-    // public void updateNetworkNode(INetworkNode node);
-
     /**
      * @param nodes Collection of the nodes to retain.
      * @return true if the data structure was modified.
@@ -69,8 +66,14 @@ public interface INetworkNodeHandler {
     public int size();
 
     /**
-     * @return true if there is no nodes currently in the network.
+     * @return true if there is no nodes currently in the network. (size() == 0;)
      */
     public boolean isEmpty();
+
+    /**
+     * Called when the instance is about to be deleted.
+     * To be safe, it's probably best to clear any data structures and messaging systems that are running, so that garbage collection can grab it.
+     */
+    public void destroy();
 
 }
