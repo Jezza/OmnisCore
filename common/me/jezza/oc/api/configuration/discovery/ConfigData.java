@@ -75,6 +75,8 @@ public class ConfigData {
         String configFile = (String) annotationInfo.get("configFile");
         if (Strings.isNullOrEmpty(configFile))
             return new File(CONFIG_DIR, modContainer.getModId() + ".cfg");
+        if (!configFile.endsWith(".cfg"))
+            configFile += ".cfg";
         return new File(CONFIG_DIR, configFile);
     }
 

@@ -8,6 +8,7 @@ public class ConfigEntryInteger extends ConfigEntry<ConfigInteger, Integer> {
     @Override
     public Object processAnnotation(Configuration config, String fieldName, ConfigInteger annotation, Integer defaultValue) {
         String comment = processComment(annotation.comment());
+        
         return config.getInt(fieldName, annotation.category(), defaultValue, annotation.minValue(), annotation.maxValue(), comment);
     }
 }

@@ -66,31 +66,37 @@ public class CoordSet {
         }
     }
 
-    public void setX(int x) {
+    public CoordSet setX(int x) {
 //        return new CoordSet(x, y, z);
         this.x = x;
+        return this;
     }
 
-    public void setY(int y) {
+    public CoordSet setY(int y) {
 //        return new CoordSet(x, y, z);
         this.y = y;
+        return this;
     }
 
-    public void setZ(int z) {
+    public CoordSet setZ(int z) {
 //        return new CoordSet(x, y, z);
         this.z = z;
+        return this;
     }
 
-    public void addX(int x) {
+    public CoordSet addX(int x) {
         this.x += x;
+        return this;
     }
 
-    public void addY(int y) {
+    public CoordSet addY(int y) {
         this.y += y;
+        return this;
     }
 
-    public void addZ(int z) {
+    public CoordSet addZ(int z) {
         this.z += z;
+        return this;
     }
 
     /**
@@ -129,6 +135,10 @@ public class CoordSet {
         return net.minecraft.util.MathHelper.sqrt_double(getDistanceSq(tempSet));
     }
 
+    public CoordSet addCoordSet(CoordSet coordSet) {
+        return addX(coordSet.x).addY(coordSet.y).addZ(coordSet.z);
+    }
+    
     public CoordSet addForgeDirection(ForgeDirection direction) {
         x += direction.offsetX;
         y += direction.offsetY;

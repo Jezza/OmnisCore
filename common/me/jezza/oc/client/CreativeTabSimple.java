@@ -2,6 +2,7 @@ package me.jezza.oc.client;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -31,6 +32,10 @@ public class CreativeTabSimple extends CreativeTabs {
         this.icon = itemStack.getItem();
         this.damage = itemStack.getItemDamage();
         return this;
+    }
+
+    public CreativeTabSimple setIcon(Block block) {
+        return setIcon(Item.getItemFromBlock(block));
     }
 
     @Override
