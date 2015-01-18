@@ -68,7 +68,7 @@ public abstract class GuiScreenAbstract extends GuiScreen implements IGuiRenderH
 
     public void drawGuiForegroundLayer(int mouseX, int mouseY) {
         for (GuiWidget widget : buttonList)
-            widget.renderForeground(mouseX, mouseY);
+            widget.renderForeground(mouseX, mouseY, mouseX, mouseY);
     }
 
     @Override

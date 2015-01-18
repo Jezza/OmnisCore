@@ -52,7 +52,8 @@ public abstract class GuiTexturedButton<T extends GuiTexturedButton> extends Gui
     }
 
     public void bindTexture() {
-        bindTexture(texture);
+        if (texture != null)
+            bindTexture(texture);
     }
 
     public int getPassLevel(int mouseX, int mouseY) {
@@ -73,6 +74,6 @@ public abstract class GuiTexturedButton<T extends GuiTexturedButton> extends Gui
     }
 
     @Override
-    public void renderForeground(int mouseX, int mouseY) {
+    public void renderForeground(int mouseX, int mouseY, int translatedX, int translatedY) {
     }
 }

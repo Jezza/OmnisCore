@@ -137,7 +137,7 @@ public abstract class GuiWidget<T extends GuiWidget> extends Gui {
 
     public abstract void renderBackground(int mouseX, int mouseY);
 
-    public abstract void renderForeground(int mouseX, int mouseY);
+    public abstract void renderForeground(int mouseX, int mouseY, int translatedX, int translatedY);
 
     public boolean isAltKeyDown() {
         return Keyboard.isKeyDown(Keyboard.KEY_LMENU) || Keyboard.isKeyDown(Keyboard.KEY_RMENU);

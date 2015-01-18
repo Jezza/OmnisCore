@@ -91,6 +91,7 @@ public abstract class GuiContainerAbstract extends GuiContainer implements IGuiR
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float var1, int mouseX, int mouseY) {
+        bindTexture();
         for (GuiWidget widget : buttonList)
             widget.renderBackground(mouseX, mouseY);
         bindTexture();
@@ -98,8 +99,11 @@ public abstract class GuiContainerAbstract extends GuiContainer implements IGuiR
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+        bindTexture();
+        int transX = mouseX - guiLeft;
+        int transY = mouseY - guiTop;
         for (GuiWidget widget : buttonList)
-            widget.renderForeground(mouseX, mouseY);
+            widget.renderForeground(mouseX, mouseY, transX, transY);
         bindTexture();
     }
 
@@ -144,7 +148,8 @@ public abstract class GuiContainerAbstract extends GuiContainer implements IGuiR
      * Then {@code onClientClick} will be called with the same ID and process that you sent, the only difference, of course, is that it's on the server, as GUIs are on the client.
      * This should give you an easy way to transport simple data based on what the client has done.
      * Be warned, this could be exploited, so keep that in mind, but then so can the entire Minecraft GUI system.
-     * @param ID ID of the message.
+     *
+     * @param ID      ID of the message.
      * @param process ID of the process.
      */
     public void sendMessage(int ID, int process) {

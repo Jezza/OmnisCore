@@ -17,9 +17,9 @@ public class GuiTitleHover extends GuiUntexturedButton {
     }
 
     @Override
-    public void renderForeground(int mouseX, int mouseY) {
+    public void renderForeground(int mouseX, int mouseY, int translatedX, int translatedY) {
         if (canClick(mouseX, mouseY)){
-            renderHoveringText(hoverText, mouseX, mouseY, fontRendererObj);
+            renderHoveringText(hoverText, translatedX, translatedY, fontRendererObj);
             glDisable(GL_LIGHTING);
         }
     }

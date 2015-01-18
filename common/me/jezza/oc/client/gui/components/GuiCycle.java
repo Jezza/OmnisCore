@@ -40,6 +40,11 @@ public abstract class GuiCycle<T extends GuiCycle> extends GuiTexturedButton<T> 
         return isClicked;
     }
 
+    public int getCurrentTypeState() {
+        return typeState;
+
+    }
+
     /**
      * Will wrap the int afterwards, but not continuously.
      * EG: typeState = 5, but can only exist as a 0 or a 1.
