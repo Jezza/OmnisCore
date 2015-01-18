@@ -285,7 +285,7 @@ public class CoordSet {
         return copy().asBlockCoords();
     }
 
-    public CoordSet asSpawnPoint() {
+    public CoordSet asChunkOffset() {
         x = x % 16;
         y = y % 16;
         z = z % 16;
@@ -293,8 +293,8 @@ public class CoordSet {
         return this;
     }
 
-    public CoordSet toSpawnPoint() {
-        return copy().asSpawnPoint();
+    public CoordSet toChunkOffset() {
+        return copy().asChunkOffset();
     }
 
     public static CoordSet fromChunkCoordinates(ChunkCoordinates coordinates) {
