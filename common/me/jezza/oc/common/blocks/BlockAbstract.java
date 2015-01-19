@@ -14,6 +14,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.Explosion;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public abstract class BlockAbstract extends Block {
@@ -62,7 +63,7 @@ public abstract class BlockAbstract extends Block {
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entityLiving, ItemStack itemStack) {
         TileEntity tileEntity = world.getTileEntity(x, y, z);
         if (tileEntity instanceof IBlockNotifier)
-            ((IBlockNotifier) tileEntity).onBlockAdded(world, x, y, z);
+            ((IBlockNotifier) tileEntity).onBlockAdded(entityLiving, world, x, y, z, itemStack);
     }
 
     @Override
@@ -81,6 +82,20 @@ public abstract class BlockAbstract extends Block {
         TileEntity tileEntity = world.getTileEntity(x, y, z);
         if (tileEntity instanceof IBlockNotifier)
             ((IBlockNotifier) tileEntity).onBlockRemoval(world, x, y, z);
+    }
+
+    @Override
+    public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
+        TileEntity tileEntity = world.getTileEntity(x, y, z);
+        if (tileEntity instanceof IBlockNotifier)
+            ((IBlockNotifier) tileEntity).onNeighbourBlockChanged(world, x, y, z, block);
+    }
+
+    @Override
+    public void onNeighborChange(IBlockAccess world, int x, int y, int z, int tileX, int tileY, int tileZ) {
+        TileEntity tileEntity = world.getTileEntity(x, y, z);
+        if (tileEntity instanceof IBlockNotifier)
+            ((IBlockNotifier) tileEntity).onNeighbourTileChanged(world, x, y, z, tileX, tileY, tileZ);
     }
 
     @Override
