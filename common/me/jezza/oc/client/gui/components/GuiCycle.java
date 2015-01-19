@@ -26,20 +26,6 @@ public abstract class GuiCycle<T extends GuiCycle> extends GuiTexturedButton<T> 
         return (T) this;
     }
 
-    @Override
-    public boolean onClick(int mouseX, int mouseY, int mouseClick) {
-        super.onClick(mouseX, mouseY, mouseClick);
-        boolean isClicked = isClicked();
-        if (isClicked) {
-            processMouseClick(mouseClick);
-            typeState = MathHelper.wrapInt(typeState, getNumberOfStates() - 1);
-        }
-
-        u = srcX + getShiftedX(typeState);
-        v = srcY + getShiftedY(typeState);
-        return isClicked;
-    }
-
     public int getCurrentTypeState() {
         return typeState;
 
@@ -56,11 +42,18 @@ public abstract class GuiCycle<T extends GuiCycle> extends GuiTexturedButton<T> 
         switch (mouseClick) {
             case 0:
                 typeState++;
+                break;
             case 1:
                 typeState--;
+                break;
             case 2:
                 typeState = 0;
+                break;
         }
+        typeState = MathHelper.wrapInt(typeState, getNumberOfStates() - 1);
+
+        u = srcX + getShiftedX(typeState);
+        v = srcY + getShiftedY(typeState);
     }
 
     public abstract int getNumberOfStates();
