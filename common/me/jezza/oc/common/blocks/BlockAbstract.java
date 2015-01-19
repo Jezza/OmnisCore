@@ -19,7 +19,7 @@ import net.minecraft.world.World;
 
 public abstract class BlockAbstract extends Block {
 
-    private boolean textureReg = true;
+    protected boolean textureReg = true;
     public final boolean isTileProvider = this instanceof ITileProvider;
 
     public BlockAbstract(Material material, String name) {
