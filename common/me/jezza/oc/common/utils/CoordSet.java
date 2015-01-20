@@ -184,7 +184,11 @@ public class CoordSet {
     }
 
     public static CoordSet readFromNBT(NBTTagCompound tag) {
-        return new CoordSet(tag.getIntArray("coordSet"));
+    	int[] coords = tag.getIntArray("coordSet");
+    	if (coords.length == 3)
+    		return new CoordSet(coords);
+    	
+		return null;
     }
 
     public static CoordSet createFromMinecraftTag(NBTTagCompound tag) {
@@ -267,6 +271,7 @@ public class CoordSet {
         try {
             return (CoordSet) this.clone();
         } catch (CloneNotSupportedException e) {
+        	// should not happen
         }
         return new CoordSet(x, y, z);
     }
