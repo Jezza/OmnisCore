@@ -1,10 +1,12 @@
 package me.jezza.oc.client.renderer;
 
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.EntityRenderer;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.IIcon;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IBlockAccess;
 import org.lwjgl.opengl.GL11;
 
@@ -26,6 +28,10 @@ public class BlockRenderer {
     public static float OFFSET_15 = 0.9375F;
 
     public BlockRenderer() {
+    }
+
+    public static void bindTexture(ResourceLocation texture) {
+        Minecraft.getMinecraft().renderEngine.bindTexture(texture);
     }
 
     public static void drawFaces(RenderBlocks renderblocks, Block block, IIcon icon, boolean st) {
