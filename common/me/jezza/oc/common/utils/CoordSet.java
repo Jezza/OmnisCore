@@ -180,7 +180,11 @@ public class CoordSet {
     }
 
     public void writeToNBT(NBTTagCompound tag) {
-        tag.setIntArray("coordSet", asArray());
+        writeToNBT(tag, "coordSet");
+    }
+    
+    public void writeToNBT(NBTTagCompound tag, String key) {
+        tag.setIntArray(key, asArray());
     }
 
     public static CoordSet readFromNBT(NBTTagCompound tag) {
