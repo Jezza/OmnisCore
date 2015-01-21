@@ -188,11 +188,15 @@ public class CoordSet {
     }
 
     public static CoordSet readFromNBT(NBTTagCompound tag) {
-    	int[] coords = tag.getIntArray("coordSet");
-    	if (coords.length == 3)
-    		return new CoordSet(coords);
-    	
-		return null;
+    	return readFromNBT(tag, "coordSet");
+    }
+    
+    public static CoordSet readFromNBT(NBTTagCompound tag, String key) {
+        int[] coords = tag.getIntArray(key);
+        if (coords.length == 3)
+            return new CoordSet(coords);
+        
+        return null;
     }
 
     public static CoordSet createFromMinecraftTag(NBTTagCompound tag) {
