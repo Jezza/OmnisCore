@@ -2,7 +2,7 @@
 {
   "modid": "OmnisCore",
   "name": "Omnis Core",
-  "description": "Common and core code for all Jezza's mods.",
+  "description": "Common and core code for all Jezza's and NPException's mods.",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "logoFile": "/assets/omniscore/textures/logo.png",
