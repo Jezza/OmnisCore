@@ -51,6 +51,10 @@ public class Colour {
         this.g = (colour >> 8 & 255) / 255.0F;
         this.b = (colour & 255) / 255.0F;
     }
+    
+    public Colour copy() {
+        return new Colour(r, g, b, a);
+    }
 
     public int getInt() {
         return getInt(r, g, b, a);
