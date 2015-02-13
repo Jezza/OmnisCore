@@ -155,7 +155,7 @@ public class Graph<T> {
      * @return A mutable shallow copy of the map.
      */
     public Map<T, Collection<T>> asMap() {
-        return new HashMap<>(nodeMap);
+        return new LinkedHashMap<>(nodeMap);
     }
 
     @Override

@@ -14,7 +14,7 @@ public class Config {
      * NOTE: That ANY string that configFile returns WILL be pushed on the end of the default config directory.
      * EG, configFile() return "AwesomeMod/awesomeMod.cfg";
      * ConfigHandler will try locating the config file as such "config/AwesomeMod/awesomeMod.cfg"
-     * If it fails, it will generate a default config, with the modID.
+     * If it fails, it will generate it.
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
@@ -23,7 +23,7 @@ public class Config {
     }
 
     /**
-     * If the main mod class has implemented this, then the method will be fired before the config annotations are read.
+     * If the main mod class has implemented this, then the method will be fired before ANY config annotations are read on any mod.
      * This way you have the ability to add any custom annotations.
      * NOTE: THIS MUST BE IMPLEMENTED ON THE MAIN MOD CLASS TO TAKE EFFECT
      */

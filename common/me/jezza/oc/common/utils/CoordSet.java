@@ -138,7 +138,7 @@ public class CoordSet {
     public CoordSet addCoordSet(CoordSet coordSet) {
         return addX(coordSet.x).addY(coordSet.y).addZ(coordSet.z);
     }
-    
+
     public CoordSet addForgeDirection(ForgeDirection direction) {
         x += direction.offsetX;
         y += direction.offsetY;
@@ -182,20 +182,20 @@ public class CoordSet {
     public void writeToNBT(NBTTagCompound tag) {
         writeToNBT(tag, "coordSet");
     }
-    
+
     public void writeToNBT(NBTTagCompound tag, String key) {
         tag.setIntArray(key, asArray());
     }
 
     public static CoordSet readFromNBT(NBTTagCompound tag) {
-    	return readFromNBT(tag, "coordSet");
+        return readFromNBT(tag, "coordSet");
     }
-    
+
     public static CoordSet readFromNBT(NBTTagCompound tag, String key) {
         int[] coords = tag.getIntArray(key);
         if (coords.length == 3)
             return new CoordSet(coords);
-        
+
         return null;
     }
 
@@ -279,7 +279,7 @@ public class CoordSet {
         try {
             return (CoordSet) this.clone();
         } catch (CloneNotSupportedException e) {
-        	// should not happen
+            // should not happen
         }
         return new CoordSet(x, y, z);
     }
@@ -309,10 +309,9 @@ public class CoordSet {
     }
 
     public CoordSet asChunkOffset() {
-        x = x % 16;
-        y = y % 16;
-        z = z % 16;
-
+        x = x < 0 ? -(-x % 16) : (x % 16);
+        y = y < 0 ? -(-y % 16) : (y % 16);
+        z = z < 0 ? -(-z % 16) : (z % 16);
         return this;
     }
 

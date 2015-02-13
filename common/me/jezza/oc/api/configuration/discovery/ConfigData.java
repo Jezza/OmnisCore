@@ -39,9 +39,8 @@ public class ConfigData {
     }
 
     public void addRoot(ASMData asmData) {
-        String className = asmData.getClassName();
-        int pkgIndex = className.lastIndexOf('.');
-        String packageName = className;
+        String packageName = asmData.getClassName();
+        int pkgIndex = packageName.lastIndexOf('.');
         if (pkgIndex > -1)
             packageName = packageName.substring(0, pkgIndex);
         packageName = packageName.replace(".", "/");
@@ -51,7 +50,7 @@ public class ConfigData {
             CoreProperties.logger.info("Setting config: {}", defaultConfig);
             configSet.put(packageName, new ConfigContainer(packageName, defaultConfig));
         } else {
-            CoreProperties.logger.warn("THIS IS AN ERROR! Ignoring {}", className);
+            CoreProperties.logger.warn("THIS IS AN ERROR! Ignoring {}", asmData.getClassName());
             CoreProperties.logger.warn("Config controller discovered in the same root: {}. ", packageName);
         }
     }

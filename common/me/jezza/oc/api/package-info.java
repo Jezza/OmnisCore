@@ -1,5 +1,4 @@
-@API(owner = CoreProperties.MOD_ID, apiVersion = CoreProperties.API_VERSION, provides = "OmnisCore|API")
+@API(owner = "OmnisCore", apiVersion = APIProperties.API_VERSION, provides = "OmnisCore|API")
 package me.jezza.oc.api;
 
 import cpw.mods.fml.common.API;
-import me.jezza.oc.common.core.CoreProperties;

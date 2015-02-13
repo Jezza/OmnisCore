@@ -8,8 +8,6 @@ public class CoreProperties {
     public static final String MOD_NAME = "Omnis Core";
     public static final String VERSION = "0.0.5";
 
-    public static final String API_VERSION = "0.0.5";
-
     private static final String BUILD = "1217";
 
     public static final String FML_REQ = "7.10.84." + BUILD;
