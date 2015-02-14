@@ -98,7 +98,22 @@ public class CoordSet {
         this.z += z;
         return this;
     }
+    
+    public CoordSet multiplyX(int x){
+        this.x *= x;
+        return this;
+    }
 
+    public CoordSet multiplyY(int y){
+        this.y *= y;
+        return this;
+    }
+
+    public CoordSet multiplyZ(int z){
+        this.z *= z;
+        return this;
+    }
+    
     /**
      * If x is final, this will be removed and x made public.
      */
