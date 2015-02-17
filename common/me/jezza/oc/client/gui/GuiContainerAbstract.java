@@ -94,16 +94,8 @@ public abstract class GuiContainerAbstract extends GuiContainer implements IGuiR
         bindTexture();
         for (GuiWidget widget : buttonList)
             widget.renderBackground(mouseX, mouseY);
-        bindTexture();
-    }
-
-    @Override
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        bindTexture();
-        int transX = mouseX - guiLeft;
-        int transY = mouseY - guiTop;
         for (GuiWidget widget : buttonList)
-            widget.renderForeground(mouseX, mouseY, transX, transY);
+            widget.renderForeground(mouseX, mouseY);
         bindTexture();
     }
 

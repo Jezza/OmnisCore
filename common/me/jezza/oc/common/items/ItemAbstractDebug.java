@@ -1,6 +1,7 @@
 package me.jezza.oc.common.items;
 
 import cpw.mods.fml.relauncher.Side;
+import me.jezza.oc.common.interfaces.IItemTooltip;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
@@ -59,9 +60,9 @@ public abstract class ItemAbstractDebug extends ItemAbstract {
     }
 
     @Override
-    protected void addInformation(ItemStack stack, EntityPlayer player, ItemInformation information) {
-        information.addInfoList("Debug Mode: " + debugMode);
-        information.addInfoList(getDebugString());
+    protected void addInformation(ItemStack stack, EntityPlayer player, IItemTooltip information) {
+        information.addToInfoList("Debug Mode: " + debugMode);
+        information.addToInfoList(getDebugString());
     }
 
     public void addChatMessage(EntityPlayer player, String string) {

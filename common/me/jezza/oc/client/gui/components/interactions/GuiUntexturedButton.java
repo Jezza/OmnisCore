@@ -13,6 +13,6 @@ public class GuiUntexturedButton extends GuiWidget<GuiUntexturedButton> {
     }
 
     @Override
-    public void renderForeground(int mouseX, int mouseY, int translatedX, int translatedY) {
+    public void renderForeground(int mouseX, int mouseY) {
     }
 }

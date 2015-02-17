@@ -109,6 +109,10 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
         return message.getOwner() != null && messageMap.put(Phase.PRE_PROCESSING, message);
     }
 
+    /**
+     * Don't even ask...
+     * This is going to be rewritten or destroyed...
+     */
     @Override
     public List<INetworkNode> getPathFrom(INetworkNode from, INetworkNode to) {
         if (!(graph.containsNode(from) && graph.containsNode(to)))

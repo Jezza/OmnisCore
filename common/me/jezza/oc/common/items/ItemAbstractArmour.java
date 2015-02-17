@@ -68,7 +68,7 @@ public abstract class ItemAbstractArmour extends ItemArmor {
     public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean par4) {
         ItemInformation information = new ItemInformation();
         addInformation(information);
-        information.addToList(list);
+        information.populateList(list);
     }
 
     public void addInformation(ItemInformation information) {

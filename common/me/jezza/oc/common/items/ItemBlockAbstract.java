@@ -38,7 +38,7 @@ public class ItemBlockAbstract extends ItemBlock {
     public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean par4) {
         ItemInformation information = new ItemInformation();
         addInformation(stack, player, information);
-        information.addToList(list);
+        information.populateList(list);
     }
 
     protected void addInformation(ItemStack stack, EntityPlayer player, ItemInformation information) {

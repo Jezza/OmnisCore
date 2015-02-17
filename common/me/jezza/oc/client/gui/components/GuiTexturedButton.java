@@ -74,6 +74,6 @@ public abstract class GuiTexturedButton<T extends GuiTexturedButton> extends Gui
     }
 
     @Override
-    public void renderForeground(int mouseX, int mouseY, int translatedX, int translatedY) {
+    public void renderForeground(int mouseX, int mouseY) {
     }
 }

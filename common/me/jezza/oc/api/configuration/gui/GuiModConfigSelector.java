@@ -86,8 +86,8 @@ public class GuiModConfigSelector extends GuiScreenAbstract {
         configData.populateList(containerList);
 
         modName = modContainer.getName();
-        title = Localise.format("oc.config.gui.selector.title.1");
-        subTitle = Localise.format("oc.config.gui.selector.title.2");
+        title = Localise.translate("oc.config.gui.selector.title.1", false);
+        subTitle = Localise.translate("oc.config.gui.selector.title.2", false);
     }
 
     @Override

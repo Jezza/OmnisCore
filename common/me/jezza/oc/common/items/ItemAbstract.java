@@ -3,7 +3,7 @@ package me.jezza.oc.common.items;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import me.jezza.oc.client.ClientUtil;
+import me.jezza.oc.common.interfaces.IItemTooltip;
 import me.jezza.oc.common.utils.MovingObjectPositionHelper;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
@@ -12,17 +12,12 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.world.World;
 
 import java.util.List;
 
 public abstract class ItemAbstract extends Item {
-    private String donator = "";
-    private boolean isDonatorItem = false;
-
-    private boolean textureReg = true;
-    private boolean notifyRightClick = false;
-    private boolean notifyLeftClick = false;
+    protected boolean textureReg = true;
+    protected boolean hasEffect = false;
 
     public ItemAbstract(String name) {
         setName(name);
@@ -45,20 +40,8 @@ public abstract class ItemAbstract extends Item {
         return this;
     }
 
-    public ItemAbstract setRightClickable() {
-        notifyRightClick = true;
-        return this;
-    }
-
-    public ItemAbstract setLeftClickable() {
-        notifyLeftClick = true;
-        return this;
-    }
-
-    // TODO Move this to ES2
-    public ItemAbstract setDonatorItem(String donator) {
-        this.donator = donator;
-        isDonatorItem = true;
+    public ItemAbstract setEffect() {
+        this.hasEffect = true;
         return this;
     }
 
@@ -75,41 +58,14 @@ public abstract class ItemAbstract extends Item {
         return this;
     }
 
+    public MovingObjectPosition getMOP(EntityLivingBase entity) {
+        return MovingObjectPositionHelper.getCurrentMovingObjectPosition(entity);
+    }
+
+    @Override
     @SideOnly(Side.CLIENT)
-    public boolean isDonator() {
-        return isDonatorItem && ClientUtil.isPlayer(donator);
-    }
-
-    @Override
-    public ItemStack onItemRightClick(ItemStack itemStack, World world, EntityPlayer player) {
-        if (notifyRightClick) {
-            MovingObjectPosition mop = MovingObjectPositionHelper.getCurrentMovingObjectPosition(player);
-            return onItemRightClick(itemStack, world, player, mop);
-        }
-        return super.onItemRightClick(itemStack, world, player);
-    }
-
-    @Override
-    public boolean onEntitySwing(EntityLivingBase entity, ItemStack itemStack) {
-        if (notifyLeftClick) {
-            MovingObjectPosition mop = MovingObjectPositionHelper.getCurrentMovingObjectPosition(entity);
-            return onItemLeftClick(itemStack, entity.worldObj, entity, mop);
-        }
-        return super.onEntitySwing(entity, itemStack);
-    }
-
-    /**
-     * Called whenever the item is right clicked.
-     */
-    public ItemStack onItemRightClick(ItemStack itemStack, World world, EntityPlayer player, MovingObjectPosition mop) {
-        return itemStack;
-    }
-
-    /**
-     * Return true to stop all further processing.
-     */
-    public boolean onItemLeftClick(ItemStack itemStack, World world, EntityLivingBase player, MovingObjectPosition mop) {
-        return false;
+    public boolean hasEffect(ItemStack itemStack) {
+        return itemStack.isItemEnchanted() || hasEffect;
     }
 
     @Override
@@ -124,12 +80,10 @@ public abstract class ItemAbstract extends Item {
     public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean par4) {
         ItemInformation information = new ItemInformation();
         addInformation(stack, player, information);
-        if (isDonator())
-            information.addShiftList("This item was made thanks to you.");
-        information.addToList(list);
+        information.populateList(list);
     }
 
-    protected void addInformation(ItemStack stack, EntityPlayer player, ItemInformation information) {
+    protected void addInformation(ItemStack stack, EntityPlayer player, IItemTooltip tooltip) {
     }
 
     public abstract String getModIdentifier();

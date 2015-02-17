@@ -1,6 +1,5 @@
 package me.jezza.oc.api.configuration;
 
-import me.jezza.oc.OmnisCore;
 import me.jezza.oc.common.core.CoreProperties;
 import me.jezza.oc.common.utils.Localise;
 import net.minecraftforge.common.config.Configuration;
@@ -15,11 +14,9 @@ import java.util.Map;
 public abstract class ConfigEntry<T extends Annotation, D> {
 
     private LinkedHashMap<Field, T> configMap;
-    private boolean isClientSide;
 
     public ConfigEntry() {
         configMap = new LinkedHashMap<>();
-        isClientSide = OmnisCore.proxy.isClient();
     }
 
     public boolean containsField(Field field) {
@@ -60,7 +57,7 @@ public abstract class ConfigEntry<T extends Annotation, D> {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < comments.length; i++) {
             String comment = comments[i];
-            stringBuilder.append(isClientSide ? Localise.formatSafe(comment) : comment);
+            stringBuilder.append(Localise.safeTranslate(comment));
             if (i != comments.length - 1)
                 stringBuilder.append(System.lineSeparator());
         }
