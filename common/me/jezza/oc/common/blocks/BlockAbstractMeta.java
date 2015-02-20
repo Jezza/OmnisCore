@@ -45,9 +45,11 @@ public abstract class BlockAbstractMeta extends BlockAbstract {
         List<String> names = getNames();
         icons = new IIcon[names.size()];
 
-        StringBuilder registryBuilder = new StringBuilder(getModIdentifier());
-        if (usesTextureSubDirectory())
-            registryBuilder.append(getTextureSubDirectory() + "/");
+        StringBuilder registryBuilder = new StringBuilder(modIdentifier);
+        if (usesTextureSubDirectory()){
+            registryBuilder.append(getTextureSubDirectory());
+            registryBuilder.append("/");
+        }
 
         String registerString = registryBuilder.toString();
         for (int i = 0; i < icons.length; i++)

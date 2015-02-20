@@ -1,6 +1,5 @@
 package me.jezza.oc.common.items;
 
-import cpw.mods.fml.relauncher.Side;
 import me.jezza.oc.common.interfaces.IItemTooltip;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -50,14 +49,10 @@ public abstract class ItemAbstractDebug extends ItemAbstract {
     }
 
     @Override
-    public boolean onItemUse(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int sideHit, float hitVecX, float hitVecY, float hitVecZ) {
-        return onItemDebugUse(itemStack, player, world, x, y, z, sideHit, hitVecX, hitVecY, hitVecZ, world.isRemote ? Side.CLIENT : Side.SERVER);
-    }
+    public abstract boolean onItemUse(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int sideHit, float hitVecX, float hitVecY, float hitVecZ);
 
     @Override
-    public boolean onItemUseFirst(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int sideHit, float hitVecX, float hitVecY, float hitVecZ) {
-        return onItemDebugUseFirst(itemStack, player, world, x, y, z, sideHit, hitVecX, hitVecY, hitVecZ, world.isRemote ? Side.CLIENT : Side.SERVER);
-    }
+    public abstract boolean onItemUseFirst(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int sideHit, float hitVecX, float hitVecY, float hitVecZ);
 
     @Override
     protected void addInformation(ItemStack stack, EntityPlayer player, IItemTooltip information) {
@@ -70,16 +65,4 @@ public abstract class ItemAbstractDebug extends ItemAbstract {
     }
 
     public abstract ArrayList<String> getDebugList();
-
-    /**
-     * Called after onItemDebugUseFirst.
-     * Return true to stop all processing.
-     */
-    public abstract boolean onItemDebugUse(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int sideHit, float hitVecX, float hitVecY, float hitVecZ, Side side);
-
-    /**
-     * Called before anything else on the item when used.
-     * Return true to stop processing.
-     */
-    public abstract boolean onItemDebugUseFirst(ItemStack itemStack, EntityPlayer player, World world, int x, int y, int z, int sideHit, float hitVecX, float hitVecY, float hitVecZ, Side side);
 }

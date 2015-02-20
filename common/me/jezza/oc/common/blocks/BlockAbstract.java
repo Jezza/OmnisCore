@@ -1,5 +1,6 @@
 package me.jezza.oc.common.blocks;
 
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -21,9 +22,11 @@ public abstract class BlockAbstract extends Block {
 
     protected boolean textureReg = true;
     public final boolean isTileProvider = this instanceof ITileProvider;
+    public final String modIdentifier;
 
     public BlockAbstract(Material material, String name) {
         super(material);
+        modIdentifier = Loader.instance().activeModContainer().getModId() + ":";
         setName(name);
         register(name);
     }
@@ -102,7 +105,7 @@ public abstract class BlockAbstract extends Block {
     @SideOnly(Side.CLIENT)
     public void registerBlockIcons(IIconRegister iconRegister) {
         if (textureReg)
-            blockIcon = iconRegister.registerIcon(getModIdentifier() + getTextureName());
+            blockIcon = iconRegister.registerIcon(modIdentifier + getTextureName());
     }
 
     @Override
@@ -114,6 +117,4 @@ public abstract class BlockAbstract extends Block {
     public boolean hasTileEntity(int metadata) {
         return isTileProvider;
     }
-
-    public abstract String getModIdentifier();
 }

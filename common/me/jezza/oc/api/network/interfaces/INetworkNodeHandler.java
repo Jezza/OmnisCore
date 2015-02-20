@@ -36,12 +36,12 @@ public interface INetworkNodeHandler {
      * A map of the nodes and they're connections.
      * Think of this as an addAll for a data structure.
      *
-     * @param networkNodeMap
+     * @param networkNodeMap the adjacency map
      */
     public void mergeNetwork(Map<? extends INetworkNode, ? extends Collection<INetworkNode>> networkNodeMap);
 
     /**
-     * @return A map of all nodes and their connections.
+     * @return A map of all nodes and their connections. (the adjacency map)
      */
     public Map<? extends INetworkNode, ? extends Collection<INetworkNode>> getNodeMap();
 

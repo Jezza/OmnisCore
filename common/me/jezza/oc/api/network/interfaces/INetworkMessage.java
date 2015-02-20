@@ -27,38 +27,50 @@ public interface INetworkMessage {
     public INetworkNode getOwner();
 
     /**
-     * Called when the message gets reposted upon an invalid network traversal.
-     * This is determined by the owner node.
+     * Called when the message gets reposted upon completion and requires reposting.
      * <p/>
-     * Use this to reset any values before the repost.
+     * Use this to reset any values (if you want to reset anything) before the repost.
      */
     public void resetMessage();
 
     /**
      * The contents of this message were changed in some way.
+     *
      * @param node The node that returned the INJECT state.
      */
-    public void dataChanged(INetworkNode node);
+    public void onDataChanged(INetworkNode node);
 
     /**
-     * Fired for the use of the message.
+     * Fired during the preProcessing Phase.
+     * Can be used to setup/(wait for) data.
+     * Such as a path to a node, or waiting for another messages execution.
+     *
+     * @param messageProcessor - The IMessageProcessor that handles this message.
+     * @return Take a look at {@link me.jezza.oc.api.network.NetworkResponse.MessageResponse}
+     */
+    public MessageResponse preProcessing(IMessageProcessor messageProcessor);
+
+    /**
+     * Fired during the processing Phase.
+     *
      * If the message wants to add it to a list, or alter something, you have the ability to.
      * A node will not be fired with this method more than once.
      *
-     * @param node The node being processed.
-     * @return {@code VALID} Will continue to propagate the message down the current path.
-     * {@code INVALID} Will stop the message propagating down the current path.
+     * @param messageProcessor - The IMessageProcessor that handles this message.
+     * @param node - A node that exists as a part of the network.
+     * @return Take a look at {@link me.jezza.oc.api.network.NetworkResponse.MessageResponse}
      */
-    public MessageResponse isValidNode(INetworkNode node);
+    public MessageResponse processNode(IMessageProcessor messageProcessor, INetworkNode node);
 
     /**
+     * Fired during the postProcessing Phase.
+     *
      * Used to determine what the system should do with the message after giving passing it off to this method.
      * This is after the message has been completed.
      *
-     * @param messageProcessor In case the message wishes to post a second message as a result.
-     * @return - VALID, the system will drop it, as the message is no longer needed.
-     * - INVALID, the system will repost the message again to get re-processed.
+     * @param messageProcessor - The IMessageProcessor that handles this message.
+     * @return Take a look at {@link me.jezza.oc.api.network.NetworkResponse.MessageResponse}
      */
-    public MessageResponse onMessageComplete(IMessageProcessor messageProcessor);
+    public MessageResponse postProcessing(IMessageProcessor messageProcessor);
 
 }

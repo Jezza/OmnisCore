@@ -1,14 +1,15 @@
 package me.jezza.oc.api.network;
 
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Lists;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import me.jezza.oc.api.collect.Graph;
 import me.jezza.oc.api.network.NetworkResponse.MessageResponse;
 import me.jezza.oc.api.network.interfaces.*;
+import me.jezza.oc.api.network.search.SearchThread;
 
 import java.util.*;
+
+import static me.jezza.oc.api.network.NetworkResponse.ListenerResponse;
 
 public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
 
@@ -26,37 +27,43 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
      * O(1) across the board for a lot of actions.
      * Fastest, but not necessarily the best.
      */
-    private LinkedHashMultimap<Phase, INetworkMessage> messageMap;
+    private EnumMap<Phase, Collection<INetworkMessage>> messageMap;
 
     /**
      * Used to keep track of what nodes would like to be notified of messages being posted to the system.
      * Useful if you wish to have a "brain" of the network.
      */
-    private ArrayList<IMessageNodeOverride> messageNodesOverride;
+    private ArrayList<IMessageListener> messageListeners;
 
     public NetworkCore() {
         graph = new Graph<>();
-        messageMap = LinkedHashMultimap.create();
-        messageNodesOverride = new ArrayList<>();
+        messageListeners = new ArrayList<>();
+
+        messageMap = new EnumMap<>(Phase.class);
+        messageMap.put(Phase.PRE_PROCESSING, new ArrayList<INetworkMessage>());
+        messageMap.put(Phase.PROCESSING, new ArrayList<INetworkMessage>());
+        messageMap.put(Phase.POST_PROCESSING, new ArrayList<INetworkMessage>());
     }
 
     @Override
     public boolean addNetworkNode(INetworkNode node) {
         boolean flag = graph.addNode(node);
         Collection<INetworkNode> nearbyNodes = node.getNearbyNodes();
+        if (nearbyNodes == null)
+            throw new RuntimeException(node.getType() + " returned a null set of nodes!");
         if (!nearbyNodes.isEmpty())
             for (INetworkNode nearbyNode : nearbyNodes)
                 graph.addEdge(node, nearbyNode);
         node.setIMessageProcessor(this);
-        if (node instanceof IMessageNodeOverride)
-            messageNodesOverride.add((IMessageNodeOverride) node);
+        if (node instanceof IMessageListener)
+            messageListeners.add((IMessageListener) node);
         return flag;
     }
 
     @Override
     public boolean removeNetworkNode(INetworkNode node) {
-        if (node instanceof IMessageNodeOverride)
-            messageNodesOverride.remove(node);
+        if (node instanceof IMessageListener)
+            messageListeners.remove(node);
         return graph.removeNode(node);
     }
 
@@ -96,7 +103,7 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
     public void destroy() {
         graph.clear();
         messageMap.clear();
-        messageNodesOverride.clear();
+        messageListeners.clear();
     }
 
     @Override
@@ -106,7 +113,32 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
 
     @Override
     public boolean postMessage(INetworkMessage message) {
-        return message.getOwner() != null && messageMap.put(Phase.PRE_PROCESSING, message);
+        if (message.getOwner() == null)
+            return false;
+        Collection<INetworkMessage> messages = messageMap.get(Phase.PRE_PROCESSING);
+
+        if (!messageListeners.isEmpty()) {
+            for (IMessageListener node : messageListeners) {
+                ListenerResponse response = node.onMessagePosted(message);
+
+                if (response == null)
+                    throw new RuntimeException(node.getClass() + " returned a null response from onMessagePosted()");
+
+                switch (response) {
+                    case DELETE:
+                        return false;
+                    case INTERCEPT:
+                        message.setOwner(node);
+                    case INJECT:
+                        message.onDataChanged(node);
+                    default:
+                    case IGNORE:
+                }
+            }
+        }
+
+        messages.add(message);
+        return messages.contains(message);
     }
 
     /**
@@ -114,33 +146,10 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
      * This is going to be rewritten or destroyed...
      */
     @Override
-    public List<INetworkNode> getPathFrom(INetworkNode from, INetworkNode to) {
-        if (!(graph.containsNode(from) && graph.containsNode(to)))
-            return Collections.<INetworkNode>emptyList();
-
-        Deque<ArrayList<INetworkNode>> deque = new ArrayDeque<>();
-        deque.push(Lists.newArrayList(from));
-        HashSet<INetworkNode> visited = new HashSet<>();
-
-        while (!deque.isEmpty()) {
-            ArrayList<INetworkNode> path = deque.pop();
-            INetworkNode networkNode = path.get(path.size() - 1);
-
-            if (networkNode.equals(to))
-                return path;
-
-            Collection<INetworkNode> networkNodes = graph.adjacentTo(networkNode);
-            for (INetworkNode childNode : networkNodes) {
-                if (visited.contains(childNode))
-                    continue;
-                visited.add(childNode);
-
-                ArrayList<INetworkNode> newPath = new ArrayList<>(path);
-                newPath.add(childNode);
-                deque.addLast(newPath);
-            }
-        }
-        return Collections.<INetworkNode>emptyList();
+    public ISearchResult getPathFrom(INetworkNode startNode, INetworkNode endNode) {
+        if (!(graph.containsNode(startNode) && graph.containsNode(endNode)))
+            return null;
+        return SearchThread.addSearchPattern(startNode, endNode, getNodeMap());
     }
 
     @SubscribeEvent
@@ -162,16 +171,22 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
         while (iterator.hasNext()) {
             INetworkMessage message = iterator.next();
 
-            MessageResponse messageResponse = message.onMessageComplete(this);
+            MessageResponse response = message.postProcessing(this);
 
-            iterator.remove();
-            switch (messageResponse) {
+            if (response == null)
+                throw new RuntimeException(message.getClass() + " returned a null response from postProcessing()");
+
+            switch (response) {
                 case INVALID:
+                    iterator.remove();
                     message.resetMessage();
-                    messageMap.put(Phase.PRE_PROCESSING, message);
+                    messageMap.get(Phase.PRE_PROCESSING).add(message);
                     continue messageIterator;
-                case VALID:
+                case WAIT:
+                    break;
                 default:
+                case VALID:
+                    iterator.remove();
             }
         }
     }
@@ -182,26 +197,39 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
             return;
         Iterator<INetworkMessage> iterator = messages.iterator();
 
+        messageIterator:
         while (iterator.hasNext()) {
             INetworkMessage message = iterator.next();
 
-            HashSet<INetworkNode> visited = new HashSet<>();
+            HashSet<INetworkNode> visited = new HashSet<>(graph.size());
             Queue<INetworkNode> queue = new ArrayDeque<>(graph.size());
             queue.offer(message.getOwner());
 
             while (!queue.isEmpty()) {
                 INetworkNode node = queue.poll();
                 visited.add(node);
-//                Here's where the messages get processed.
-                if (message.isValidNode(node) == MessageResponse.INVALID)
-                    continue;
-                for (INetworkNode childNode : graph.adjacentTo(node))
-                    if (!visited.contains(childNode))
-                        queue.offer(childNode);
+
+                MessageResponse response = message.processNode(this, node);
+
+                if (response == null)
+                    throw new RuntimeException(message.getClass() + " returned a null response from processNode()");
+
+                switch (response) {
+                    case VALID:
+                        for (INetworkNode childNode : graph.adjacentTo(node))
+                            if (!visited.contains(childNode)) {
+                                if (childNode.getType().equals(message.getOwner().getType()))
+                                    queue.offer(childNode);
+                            }
+                        break;
+                    case WAIT:
+                        continue messageIterator;
+                    case INVALID:
+                }
             }
 
             iterator.remove();
-            messageMap.put(Phase.POST_PROCESSING, message);
+            messageMap.get(Phase.POST_PROCESSING).add(message);
         }
     }
 
@@ -211,29 +239,24 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
             return;
         Iterator<INetworkMessage> iterator = messages.iterator();
 
-        messageIterator:
         while (iterator.hasNext()) {
             INetworkMessage message = iterator.next();
+            MessageResponse response = message.preProcessing(this);
 
-            if (!messageNodesOverride.isEmpty())
-                for (IMessageNodeOverride node : messageNodesOverride) {
-                    NetworkResponse.NetworkOverride networkOverride = node.onMessagePosted(message);
-                    switch (networkOverride) {
-                        case DELETE:
-                            iterator.remove();
-                            continue messageIterator;
-                        case INTERCEPT:
-                            message.setOwner(node);
-                            continue messageIterator;
-                        case INJECT:
-                            message.dataChanged(node);
-                            continue messageIterator;
-                        case IGNORE:
-                    }
-                }
+            if (response == null)
+                throw new RuntimeException(message.getClass() + " returned a null response from preProcessing()");
+
+            switch (response) {
+                case INVALID:
+                    iterator.remove();
+                    break;
+                case WAIT:
+                    continue;
+                case VALID:
+            }
 
             iterator.remove();
-            messageMap.put(Phase.PROCESSING, message);
+            messageMap.get(Phase.PROCESSING).add(message);
         }
     }
 

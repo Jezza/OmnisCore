@@ -1,8 +1,10 @@
 package me.jezza.oc.common.items;
 
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import me.jezza.oc.common.interfaces.IItemTooltip;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,10 +17,16 @@ public abstract class ItemAbstractArmour extends ItemArmor {
     private String textureLocation;
     private boolean textureReg;
     private int slot;
+    public final String modIdentifier;
 
     public ItemAbstractArmour(ArmorMaterial armorMaterial, ArmourRenderIndex renderIndex, ArmourSlotIndex armourIndex, String name, String textureLocation) {
-        super(armorMaterial, renderIndex.ordinal(), armourIndex.ordinal());
-        slot = armourIndex.ordinal();
+        this(armorMaterial, renderIndex.ordinal(), armourIndex.ordinal(), name, textureLocation);
+    }
+
+    public ItemAbstractArmour(ArmorMaterial armorMaterial, int renderIndex, int armourIndex, String name, String textureLocation) {
+        super(armorMaterial, renderIndex, armourIndex);
+        modIdentifier = Loader.instance().activeModContainer().getModId() + ":";
+        slot = armourIndex;
         this.textureLocation = textureLocation;
         setMaxDamage(0);
         setName(name);
@@ -60,18 +68,18 @@ public abstract class ItemAbstractArmour extends ItemArmor {
     @SideOnly(Side.CLIENT)
     public void registerIcons(IIconRegister register) {
         if (textureReg)
-            itemIcon = register.registerIcon(getModIdentifier() + getIconString());
+            itemIcon = register.registerIcon(modIdentifier + getIconString());
     }
 
     @Override
     @SideOnly(Side.CLIENT)
     public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean par4) {
         ItemInformation information = new ItemInformation();
-        addInformation(information);
+        addInformation(stack, player, information);
         information.populateList(list);
     }
 
-    public void addInformation(ItemInformation information) {
+    public void addInformation(ItemStack stack, EntityPlayer player, IItemTooltip tooltip) {
     }
 
     public enum ArmourSlotIndex {
@@ -81,6 +89,4 @@ public abstract class ItemAbstractArmour extends ItemArmor {
     public enum ArmourRenderIndex {
         CLOTH, CHAIN, IRON, DIAMOND, GOLD
     }
-
-    public abstract String getModIdentifier();
 }

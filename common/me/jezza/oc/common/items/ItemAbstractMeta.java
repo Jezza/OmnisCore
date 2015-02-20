@@ -35,7 +35,7 @@ public abstract class ItemAbstractMeta extends ItemAbstract {
         List<String> names = getNames();
         icons = new IIcon[names.size()];
         for (int i = 0; i < icons.length; i++)
-            icons[i] = iconRegister.registerIcon(getModIdentifier() + names.get(i));
+            icons[i] = iconRegister.registerIcon(modIdentifier + names.get(i));
     }
 
     @Override

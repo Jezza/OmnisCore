@@ -12,6 +12,7 @@ import me.jezza.oc.api.configuration.ConfigHandler;
 import me.jezza.oc.api.network.NetworkCore;
 import me.jezza.oc.api.network.NetworkInstance;
 import me.jezza.oc.api.network.NetworkResponse;
+import me.jezza.oc.api.network.search.SearchThread;
 import me.jezza.oc.common.CommonProxy;
 import me.jezza.oc.common.core.DebugHelper;
 import me.jezza.oc.common.core.network.MessageGuiNotify;
@@ -48,6 +49,9 @@ public class OmnisCore {
     @Mod.EventHandler
     public void initialize(FMLInitializationEvent event) {
         logger.info("-- Initialising --");
+
+        logger.info("Starting OmnisCore|NST");
+        SearchThread.getInstance().start();
 
         logger.info("Preloading Network|API");
         new NetworkInstance();

@@ -2,6 +2,7 @@ package me.jezza.oc.common.items;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
+import me.jezza.oc.common.interfaces.IItemTooltip;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
@@ -41,6 +42,6 @@ public class ItemBlockAbstract extends ItemBlock {
         information.populateList(list);
     }
 
-    protected void addInformation(ItemStack stack, EntityPlayer player, ItemInformation information) {
+    protected void addInformation(ItemStack stack, EntityPlayer player, IItemTooltip information) {
     }
 }

@@ -82,18 +82,18 @@ public class Graph<T> {
     }
 
     /**
+     * @return keySize == 0;
+     */
+    public boolean isEmpty() {
+        return keySize == 0;
+    }
+
+    /**
      * @param node The node in question.
      * @return The number of adjacent nodes.
      */
     public int connectionSize(T node) {
         return !containsNode(node) ? 0 : nodeMap.get(node).size();
-    }
-
-    /**
-     * @return keySize == 0;
-     */
-    public boolean isEmpty() {
-        return keySize == 0;
     }
 
     /**

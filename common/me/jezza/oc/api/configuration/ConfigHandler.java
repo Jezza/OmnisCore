@@ -9,6 +9,7 @@ import me.jezza.oc.api.configuration.discovery.ConfigData;
 import me.jezza.oc.api.configuration.entries.*;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Set;
@@ -60,23 +61,20 @@ public class ConfigHandler {
         }
 
         Collection<ConfigData> values = configMap.values();
-        ConfigData[] configValues = values.toArray(new ConfigData[values.size()]);
 
         // Process all potential registrars first.
-        for (int i = 0; i < configValues.length; i++) {
-            ConfigData configValue = configValues[i];
+        for (ConfigData configValue : values)
             if (configValue.isRegistrar)
                 configValue.processIConfigRegistrar();
-        }
         processed = true;
 
-        // Organise all sub-packages.
-        for (int i = 0; i < configValues.length; i++)
-            configValues[i].processAllRoots();
+        for (ConfigData configData : values) {
+            // Organise all sub-packages.
+            configData.processAllRoots();
 
-        // Process all current classes associated with the ConfigContainer.
-        for (int i = 0; i < configValues.length; i++)
-            configValues[i].processConfigContainers(asmDataTable, annotationMap);
+            // Process all current classes associated with the ConfigContainer.
+            configData.processConfigContainers(asmDataTable, annotationMap);
+        }
         postProcessed = true;
     }
 
@@ -86,6 +84,8 @@ public class ConfigHandler {
      */
     public static boolean registerAnnotation(final Class<? extends Annotation> clazz, final Class<? extends ConfigEntry<? extends Annotation, ?>> configEntry) {
         if (processed)
+            return false;
+        if (Modifier.isAbstract(configEntry.getModifiers()))
             return false;
         if (!annotationMap.containsKey(clazz))
             annotationMap.put(clazz, configEntry);

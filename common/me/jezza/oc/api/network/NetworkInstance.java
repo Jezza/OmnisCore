@@ -216,7 +216,7 @@ public class NetworkInstance {
     }
 
     /**
-     * @param startingNode
+     * @param startingNode - Starting node.
      * @return A collection of all connected nodes.
      */
     public Collection<INetworkNode> breadthFirstSearchSpread(INetworkNode startingNode, Map<? extends INetworkNode, ? extends Collection<INetworkNode>> nodeMap) {
@@ -236,5 +236,4 @@ public class NetworkInstance {
         }
         return visited;
     }
-
 }

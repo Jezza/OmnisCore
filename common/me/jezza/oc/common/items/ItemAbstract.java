@@ -1,5 +1,6 @@
 package me.jezza.oc.common.items;
 
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -18,8 +19,10 @@ import java.util.List;
 public abstract class ItemAbstract extends Item {
     protected boolean textureReg = true;
     protected boolean hasEffect = false;
+    public final String modIdentifier;
 
     public ItemAbstract(String name) {
+        modIdentifier = Loader.instance().activeModContainer().getModId() + ":";
         setName(name);
         register(name);
     }
@@ -72,7 +75,7 @@ public abstract class ItemAbstract extends Item {
     @SideOnly(Side.CLIENT)
     public void registerIcons(IIconRegister iconRegister) {
         if (textureReg)
-            itemIcon = iconRegister.registerIcon(getModIdentifier() + getIconString());
+            itemIcon = iconRegister.registerIcon(modIdentifier + getIconString());
     }
 
     @Override
@@ -85,6 +88,4 @@ public abstract class ItemAbstract extends Item {
 
     protected void addInformation(ItemStack stack, EntityPlayer player, IItemTooltip tooltip) {
     }
-
-    public abstract String getModIdentifier();
 }

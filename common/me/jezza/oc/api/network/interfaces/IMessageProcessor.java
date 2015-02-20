@@ -1,7 +1,5 @@
 package me.jezza.oc.api.network.interfaces;
 
-import java.util.List;
-
 /**
  * Just an interface the nodes can use to harmlessly post messages through to their current network's message system.
  */
@@ -24,6 +22,6 @@ public interface IMessageProcessor {
      * @param to Finishing node
      * @return An ordered list starting at: from, and follows a path to: to
      */
-    public List<INetworkNode> getPathFrom(INetworkNode from, INetworkNode to);
+    public ISearchResult getPathFrom(INetworkNode from, INetworkNode to);
 
 }
