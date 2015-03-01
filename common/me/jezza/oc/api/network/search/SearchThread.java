@@ -13,6 +13,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 
 public class SearchThread extends Thread {
 
+    public static final ISearchResult EMPTY_SEARCH = new EmptyPattern();
+
     private static final SearchThread INSTANCE = new SearchThread();
 
     private SearchThread() {
@@ -62,7 +64,7 @@ public class SearchThread extends Thread {
 
     public static ISearchResult addSearchPattern(INetworkNode startNode, INetworkNode endNode, Map<? extends INetworkNode, ? extends Collection<INetworkNode>> nodeMap) {
         BFSPattern pattern = new BFSPattern(startNode, endNode, nodeMap);
-        searchPatterns.offer(pattern);
+        searchPatterns.offerLast(pattern);
         return pattern;
     }
 }

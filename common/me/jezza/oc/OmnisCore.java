@@ -1,6 +1,8 @@
 package me.jezza.oc;
 
 import cpw.mods.fml.common.Mod;
+import cpw.mods.fml.common.Mod.EventHandler;
+import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -11,7 +13,6 @@ import me.jezza.oc.api.configuration.Config;
 import me.jezza.oc.api.configuration.ConfigHandler;
 import me.jezza.oc.api.network.NetworkCore;
 import me.jezza.oc.api.network.NetworkInstance;
-import me.jezza.oc.api.network.NetworkResponse;
 import me.jezza.oc.api.network.search.SearchThread;
 import me.jezza.oc.common.CommonProxy;
 import me.jezza.oc.common.core.DebugHelper;
@@ -24,7 +25,7 @@ import static me.jezza.oc.common.core.CoreProperties.*;
 @Mod(modid = MOD_ID, name = MOD_NAME, version = VERSION, dependencies = DEPENDENCIES, guiFactory = Config.DEFAULT_GUI_FACTORY)
 public class OmnisCore {
 
-    @Mod.Instance(MOD_ID)
+    @Instance(MOD_ID)
     public static OmnisCore instance;
 
     @SidedProxy(clientSide = CLIENT_PROXY, serverSide = SERVER_PROXY)
@@ -32,7 +33,7 @@ public class OmnisCore {
 
     public static NetworkDispatcher networkDispatcher;
 
-    @Mod.EventHandler
+    @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         logger = event.getModLog();
         logger.info("-- Pre-Initialising " + MOD_ID + " (" + VERSION + ") --");
@@ -46,7 +47,7 @@ public class OmnisCore {
         logger.info("Success! Network fully integrated.");
     }
 
-    @Mod.EventHandler
+    @EventHandler
     public void initialize(FMLInitializationEvent event) {
         logger.info("-- Initialising --");
 
@@ -57,11 +58,10 @@ public class OmnisCore {
         new NetworkInstance();
         new NetworkCore();
         new Graph<>();
-        NetworkResponse.MessageResponse invalid = NetworkResponse.MessageResponse.INVALID;
         logger.info("Finished Preloading Network|API");
     }
 
-    @Mod.EventHandler
+    @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         logger.info("-- Post-Initialising --");
 //        ConfigHandler.initGuiFactories();

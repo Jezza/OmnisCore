@@ -115,8 +115,7 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
     public boolean postMessage(INetworkMessage message) {
         if (message.getOwner() == null)
             return false;
-        Collection<INetworkMessage> messages = messageMap.get(Phase.PRE_PROCESSING);
-
+        
         if (!messageListeners.isEmpty()) {
             for (IMessageListener node : messageListeners) {
                 ListenerResponse response = node.onMessagePosted(message);
@@ -137,6 +136,7 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
             }
         }
 
+        Collection<INetworkMessage> messages = messageMap.get(Phase.PRE_PROCESSING);
         messages.add(message);
         return messages.contains(message);
     }
@@ -148,7 +148,7 @@ public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
     @Override
     public ISearchResult getPathFrom(INetworkNode startNode, INetworkNode endNode) {
         if (!(graph.containsNode(startNode) && graph.containsNode(endNode)))
-            return null;
+            return SearchThread.EMPTY_SEARCH;
         return SearchThread.addSearchPattern(startNode, endNode, getNodeMap());
     }
 

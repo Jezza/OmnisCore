@@ -14,8 +14,7 @@ import static me.jezza.oc.common.utils.MathHelper.RoundingMethod;
 
 public class CoordSet {
 
-    // final
-    private int x, y, z;
+    public int x, y, z;
 
     public CoordSet() {
         this(0, 0, 0);
@@ -35,7 +34,7 @@ public class CoordSet {
         this(Integer.parseInt(x), Integer.parseInt(y), Integer.parseInt(z));
     }
 
-    public CoordSet(TileEntity tile) {
+    public CoordSet(TileEntity tile) throws NullPointerException {
         this(tile.xCoord, tile.yCoord, tile.zCoord);
     }
 
@@ -66,75 +65,6 @@ public class CoordSet {
         }
     }
 
-    public CoordSet setX(int x) {
-//        return new CoordSet(x, y, z);
-        this.x = x;
-        return this;
-    }
-
-    public CoordSet setY(int y) {
-//        return new CoordSet(x, y, z);
-        this.y = y;
-        return this;
-    }
-
-    public CoordSet setZ(int z) {
-//        return new CoordSet(x, y, z);
-        this.z = z;
-        return this;
-    }
-
-    public CoordSet addX(int x) {
-        this.x += x;
-        return this;
-    }
-
-    public CoordSet addY(int y) {
-        this.y += y;
-        return this;
-    }
-
-    public CoordSet addZ(int z) {
-        this.z += z;
-        return this;
-    }
-    
-    public CoordSet multiplyX(int x){
-        this.x *= x;
-        return this;
-    }
-
-    public CoordSet multiplyY(int y){
-        this.y *= y;
-        return this;
-    }
-
-    public CoordSet multiplyZ(int z){
-        this.z *= z;
-        return this;
-    }
-    
-    /**
-     * If x is final, this will be removed and x made public.
-     */
-    public int getX() {
-        return x;
-    }
-
-    /**
-     * If y is final, this will be removed and y made public.
-     */
-    public int getY() {
-        return y;
-    }
-
-    /**
-     * If z is final, this will be removed and z made public.
-     */
-    public int getZ() {
-        return z;
-    }
-
     public boolean withinRange(CoordSet tempSet, int range) {
         return getDistanceSq(tempSet) <= (range * range);
     }
@@ -151,7 +81,10 @@ public class CoordSet {
     }
 
     public CoordSet addCoordSet(CoordSet coordSet) {
-        return addX(coordSet.x).addY(coordSet.y).addZ(coordSet.z);
+        x += coordSet.x;
+        y += coordSet.y;
+        z += coordSet.z;
+        return this;
     }
 
     public CoordSet addForgeDirection(ForgeDirection direction) {

@@ -8,7 +8,7 @@ import me.jezza.oc.api.network.interfaces.INetworkNode;
  */
 public abstract class NetworkMessageAbstract implements INetworkMessage {
 
-    private INetworkNode owner;
+    protected INetworkNode owner;
 
     public NetworkMessageAbstract(INetworkNode owner) {
         this.owner = owner;

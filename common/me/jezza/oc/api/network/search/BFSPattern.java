@@ -37,7 +37,6 @@ public class BFSPattern implements ISearchPattern {
             return true;
         }
 
-//        Map<INetworkNode, ForgeDirection> map = new LinkedHashMap<INetworkNode, ForgeDirection>();
         Map<INetworkNode, INetworkNode> linkMap = new LinkedHashMap<INetworkNode, INetworkNode>();
         ArrayList<INetworkNode> visited = new ArrayList<INetworkNode>();
 
@@ -66,16 +65,11 @@ public class BFSPattern implements ISearchPattern {
                     linkMap.put(childNode, node);
                     deque.offer(childNode);
                 }
-//                for (Map.Entry<ForgeDirection, INetworkNode> entry : node.getDirectionalMap().entrySet()) {
-//                    INetworkNode childNode = entry.getValue();
-//                    if (visited.contains(childNode))
-//                        continue;
-//                    map.put(childNode, entry.getKey().getOpposite());
-//                    deque.offer(childNode);
-//                }
             }
         }
 
+        finished = true;
+        // I'm not setting the path to even an emptyList because when it's set to null, this will at least show that no path was found.
         return false;
     }
 

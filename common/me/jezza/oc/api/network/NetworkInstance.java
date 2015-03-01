@@ -49,7 +49,7 @@ public class NetworkInstance {
         switch (networksFound.size()) {
             case 0:
                 response = NodeAdded.NETWORK_CREATION;
-                networkNodeHandler = createNetworkNodeHandler();
+                networkNodeHandler = createNodeHandler();
                 break;
             case 1:
                 response = NodeAdded.NETWORK_JOIN;
@@ -69,6 +69,7 @@ public class NetworkInstance {
         if (!flag) {
             if (response == NodeAdded.NETWORK_CREATION)
                 removeNetworkNodeHandler(networkNodeHandler);
+
             throw new NetworkAddException("Failed to add node to network. Node: %s", node.getClass());
         }
         return response;
@@ -122,7 +123,7 @@ public class NetworkInstance {
                         continue;
                     connectedNodes = breadthFirstSearchSpread(networkNode, nodeMap);
                     visited.addAll(connectedNodes);
-                    createNetworkNodeHandlerAndFill(connectedNodes);
+                    createNodeHandlerAndFill(connectedNodes);
                 }
         }
 
@@ -180,7 +181,7 @@ public class NetworkInstance {
                         continue;
                     connectedNodes = breadthFirstSearchSpread(networkNode, nodeMap);
                     visited.addAll(connectedNodes);
-                    createNetworkNodeHandlerAndFill(connectedNodes);
+                    createNodeHandlerAndFill(connectedNodes);
                 }
         }
 
@@ -188,7 +189,7 @@ public class NetworkInstance {
         return NodeUpdated.NETWORK_UPDATED;
     }
 
-    private INetworkNodeHandler createNetworkNodeHandler() throws NetworkCreationException {
+    private INetworkNodeHandler createNodeHandler() throws NetworkCreationException {
         INetworkNodeHandler nodeHandler = null;
         try {
             nodeHandler = nodeHandlerClazz.newInstance();
@@ -201,8 +202,8 @@ public class NetworkInstance {
         return nodeHandler;
     }
 
-    private INetworkNodeHandler createNetworkNodeHandlerAndFill(Collection<INetworkNode> collection) throws NetworkCreationException {
-        INetworkNodeHandler nodeHandler = createNetworkNodeHandler();
+    private INetworkNodeHandler createNodeHandlerAndFill(Collection<INetworkNode> collection) throws NetworkCreationException {
+        INetworkNodeHandler nodeHandler = createNodeHandler();
         for (INetworkNode node : collection)
             nodeHandler.addNetworkNode(node);
         return nodeHandler;
