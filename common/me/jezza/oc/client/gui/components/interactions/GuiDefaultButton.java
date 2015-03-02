@@ -2,9 +2,9 @@ package me.jezza.oc.client.gui.components.interactions;
 
 import me.jezza.oc.client.gui.components.GuiTexturedButtonExpandable;
 import me.jezza.oc.client.gui.interfaces.ITextAlignment;
-import me.jezza.oc.client.gui.lib.Colour;
-import me.jezza.oc.client.gui.lib.ResourceHelper;
+import me.jezza.oc.client.lib.ResourceHelper;
 import me.jezza.oc.client.gui.lib.TextAlignment;
+import me.jezza.oc.client.lib.Colour;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.util.ResourceLocation;
 
@@ -59,10 +59,10 @@ public class GuiDefaultButton extends GuiTexturedButtonExpandable<GuiDefaultButt
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         super.renderBackground(mouseX, mouseY);
-        Colour.resetToWhite();
+        glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 
         drawText();
-        Colour.resetToWhite();
+        glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
     protected void drawText() {

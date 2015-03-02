@@ -6,7 +6,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.OmnisCore;
 import me.jezza.oc.client.gui.components.GuiWidget;
 import me.jezza.oc.client.gui.interfaces.IGuiRenderHandler;
-import me.jezza.oc.client.gui.lib.Colour;
+import me.jezza.oc.client.lib.Colour;
 import me.jezza.oc.common.core.network.MessageGuiNotify;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;

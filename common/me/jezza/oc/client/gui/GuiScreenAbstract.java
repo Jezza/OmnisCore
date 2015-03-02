@@ -2,7 +2,7 @@ package me.jezza.oc.client.gui;
 
 import me.jezza.oc.client.gui.components.GuiWidget;
 import me.jezza.oc.client.gui.interfaces.IGuiRenderHandler;
-import me.jezza.oc.client.gui.lib.Colour;
+import me.jezza.oc.client.lib.Colour;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;

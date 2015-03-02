@@ -5,6 +5,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -36,102 +37,224 @@ public class BlockRenderer {
         Minecraft.getMinecraft().renderEngine.bindTexture(texture);
     }
 
+    public static void drawFaces(ResourceLocation texture) {
+        drawFaces(0.0F, 0.0F, 0.0F, texture, DEFAULT_OFFSETS);
+    }
+
+    public static void drawFaces(ResourceLocation texture, float scale) {
+        drawFaces(0.0F, 0.0F, 0.0F, texture, DEFAULT_OFFSETS, scale);
+    }
+
+    public static void drawFaces(ResourceLocation texture, float[] offsets) {
+        drawFaces(0.0F, 0.0F, 0.0F, texture, offsets);
+    }
+
+    public static void drawFaces(ResourceLocation texture, float[] offsets, float scale) {
+        drawFaces(0.0F, 0.0F, 0.0F, texture, offsets, scale);
+    }
+
     public static void drawFaces(double x, double y, double z, ResourceLocation texture) {
-        drawFaces(x, y, z, texture, texture, texture, texture, texture, texture, DEFAULT_OFFSETS);
+        drawFaces(x, y, z, new ResourceLocation[]{texture, texture, texture, texture, texture, texture}, DEFAULT_OFFSETS);
+    }
+
+    public static void drawFaces(double x, double y, double z, ResourceLocation texture, float scale) {
+        drawFaces(x, y, z, new ResourceLocation[]{texture, texture, texture, texture, texture, texture}, DEFAULT_OFFSETS, scale);
     }
 
     public static void drawFaces(double x, double y, double z, ResourceLocation texture, float[] offsets) {
-        drawFaces(x, y, z, texture, texture, texture, texture, texture, texture, offsets);
+        drawFaces(x, y, z, new ResourceLocation[]{texture, texture, texture, texture, texture, texture}, offsets);
     }
 
-    public static void drawFaces(double x, double y, double z, ResourceLocation xNegTexture, ResourceLocation xPosTexture, ResourceLocation yNegTexture, ResourceLocation yPosTexture, ResourceLocation zNegTexture, ResourceLocation zPosTexture, float[] offsets) {
+    public static void drawFaces(double x, double y, double z, ResourceLocation texture, float[] offsets, float scale) {
+        drawFaces(x, y, z, new ResourceLocation[]{texture, texture, texture, texture, texture, texture}, offsets, scale);
+    }
+
+    public static void drawFaces(double x, double y, double z, ResourceLocation[] textures, float[] offsets) {
+        drawFaces(x, y, z, textures, offsets, 1.0F);
+    }
+
+    public static void drawFaces(double x, double y, double z, ResourceLocation[] textures, float[] offsets, float scale) {
         glPushMatrix();
         glTranslated(x, y, z);
 
-        drawFaceXNeg(xNegTexture, offsets[0]);
-        drawFaceXPos(xPosTexture, offsets[1]);
-        drawFaceYNeg(yNegTexture, offsets[2]);
-        drawFaceYPos(yPosTexture, offsets[3]);
-        drawFaceZNeg(zNegTexture, offsets[4]);
-        drawFaceZPos(zPosTexture, offsets[5]);
+        drawFaceXNeg(textures[0], offsets[0], scale);
+        drawFaceXPos(textures[1], offsets[1], scale);
+        drawFaceYNeg(textures[2], offsets[2], scale);
+        drawFaceYPos(textures[3], offsets[3], scale);
+        drawFaceZNeg(textures[4], offsets[4], scale);
+        drawFaceZPos(textures[5], offsets[5], scale);
 
         glPopMatrix();
     }
 
+    public static void drawFace(ForgeDirection direction, ResourceLocation texture, float offset) {
+        switch (direction) {
+            case DOWN:
+                BlockRenderer.drawFaceYNeg(texture, offset);
+                break;
+            case UP:
+                BlockRenderer.drawFaceYPos(texture, offset);
+                break;
+            case NORTH:
+                BlockRenderer.drawFaceZNeg(texture, offset);
+                break;
+            case SOUTH:
+                BlockRenderer.drawFaceZPos(texture, offset);
+                break;
+            case WEST:
+                BlockRenderer.drawFaceXNeg(texture, offset);
+                break;
+            case EAST:
+                BlockRenderer.drawFaceXPos(texture, offset);
+                break;
+            default:
+            case UNKNOWN:
+                break;
+        }
+    }
+
+    public static void drawFace(ForgeDirection direction, ResourceLocation texture, float offset, float scale) {
+        switch (direction) {
+            case DOWN:
+                BlockRenderer.drawFaceYNeg(texture, offset, scale);
+                break;
+            case UP:
+                BlockRenderer.drawFaceYPos(texture, offset, scale);
+                break;
+            case NORTH:
+                BlockRenderer.drawFaceZNeg(texture, offset, scale);
+                break;
+            case SOUTH:
+                BlockRenderer.drawFaceZPos(texture, offset, scale);
+                break;
+            case WEST:
+                BlockRenderer.drawFaceXNeg(texture, offset, scale);
+                break;
+            case EAST:
+                BlockRenderer.drawFaceXPos(texture, offset, scale);
+                break;
+            default:
+            case UNKNOWN:
+                break;
+        }
+    }
+
     public static void drawFaceXNeg(ResourceLocation texture, float offset) {
+        drawFaceXNeg(texture, offset, 1.0F);
+    }
+
+    public static void drawFaceXNeg(ResourceLocation texture, float offset, float scale) {
         bindTexture(texture);
-        instance.startDrawingQuads();
+        if (!instance.isDrawing)
+            instance.startDrawingQuads();
         instance.setNormal(-1.0F, 0.0F, 0.0F);
 
-        instance.addVertexWithUV(0.0D - offset, 0.0D, 0.0D, 0.0D, 1.0D);
-        instance.addVertexWithUV(0.0D - offset, 0.0D, 1.0D, 1.0D, 1.0D);
-        instance.addVertexWithUV(0.0D - offset, 1.0D, 1.0D, 1.0D, 0.0D);
-        instance.addVertexWithUV(0.0D - offset, 1.0D, 0.0D, 0.0D, 0.0D);
+        // @formatter:off
+        instance.addVertexWithUV(0.0D - offset, 0.0D        , 0.0D          , 0.0D, 1.0D);
+        instance.addVertexWithUV(0.0D - offset, 0.0D        , 1.0D * scale  , 1.0D, 1.0D);
+        instance.addVertexWithUV(0.0D - offset, 1.0D * scale, 1.0D * scale  , 1.0D, 0.0D);
+        instance.addVertexWithUV(0.0D - offset, 1.0D * scale, 0.0D          , 0.0D, 0.0D);
+        // @formatter:on
 
         instance.draw();
     }
 
     public static void drawFaceXPos(ResourceLocation texture, float offset) {
+        drawFaceXPos(texture, offset, 1.0F);
+    }
+
+    public static void drawFaceXPos(ResourceLocation texture, float offset, float scale) {
         bindTexture(texture);
-        instance.startDrawingQuads();
+        if (!instance.isDrawing)
+            instance.startDrawingQuads();
         instance.setNormal(1.0F, 0.0F, 0.0F);
 
-        instance.addVertexWithUV(1.0D + offset, 0.0D, 1.0D, 0.0D, 1.0D);
-        instance.addVertexWithUV(1.0D + offset, 0.0D, 0.0D, 1.0D, 1.0D);
-        instance.addVertexWithUV(1.0D + offset, 1.0D, 0.0D, 1.0D, 0.0D);
-        instance.addVertexWithUV(1.0D + offset, 1.0D, 1.0D, 0.0D, 0.0D);
+        // @formatter:off
+        instance.addVertexWithUV(1.0D + offset, 0.0D        , 1.0D * scale  , 0.0D, 1.0D);
+        instance.addVertexWithUV(1.0D + offset, 0.0D        , 0.0D          , 1.0D, 1.0D);
+        instance.addVertexWithUV(1.0D + offset, 1.0D * scale, 0.0D          , 1.0D, 0.0D);
+        instance.addVertexWithUV(1.0D + offset, 1.0D * scale, 1.0D * scale  , 0.0D, 0.0D);
+        // @formatter:on
 
         instance.draw();
     }
 
     public static void drawFaceYNeg(ResourceLocation texture, float offset) {
+        drawFaceYNeg(texture, offset, 1.0F);
+    }
+
+    public static void drawFaceYNeg(ResourceLocation texture, float offset, float scale) {
         bindTexture(texture);
-        instance.startDrawingQuads();
+        if (!instance.isDrawing)
+            instance.startDrawingQuads();
         instance.setNormal(0.0F, -1.0F, 0.0F);
 
-        instance.addVertexWithUV(0.0D, 0.0D - offset, 0.0D, 1.0D, 0.0D);
-        instance.addVertexWithUV(1.0D, 0.0D - offset, 0.0D, 0.0D, 0.0D);
-        instance.addVertexWithUV(1.0D, 0.0D - offset, 1.0D, 0.0D, 1.0D);
-        instance.addVertexWithUV(0.0D, 0.0D - offset, 1.0D, 1.0D, 1.0D);
+        // @formatter:off
+        instance.addVertexWithUV(0.0D           , 0.0D - offset, 0.0D           , 1.0D, 0.0D);
+        instance.addVertexWithUV(1.0D * scale   , 0.0D - offset, 0.0D           , 0.0D, 0.0D);
+        instance.addVertexWithUV(1.0D * scale   , 0.0D - offset, 1.0D * scale   , 0.0D, 1.0D);
+        instance.addVertexWithUV(0.0D           , 0.0D - offset, 1.0D * scale   , 1.0D, 1.0D);
+        // @formatter:on
 
         instance.draw();
     }
 
     public static void drawFaceYPos(ResourceLocation texture, float offset) {
+        drawFaceYPos(texture, offset, 1.0F);
+    }
+
+    public static void drawFaceYPos(ResourceLocation texture, float offset, float scale) {
         bindTexture(texture);
-        instance.startDrawingQuads();
+        if (!instance.isDrawing)
+            instance.startDrawingQuads();
         instance.setNormal(0.0F, 1.0F, 0.0F);
 
-        instance.addVertexWithUV(0.0D, 1.0D + offset, 1.0D, 1.0D, 0.0D);
-        instance.addVertexWithUV(1.0D, 1.0D + offset, 1.0D, 0.0D, 0.0D);
-        instance.addVertexWithUV(1.0D, 1.0D + offset, 0.0D, 0.0D, 1.0D);
-        instance.addVertexWithUV(0.0D, 1.0D + offset, 0.0D, 1.0D, 1.0D);
+        // @formatter:off
+        instance.addVertexWithUV(0.0D           , 1.0D + offset, 1.0D * scale   , 1.0D, 0.0D);
+        instance.addVertexWithUV(1.0D * scale   , 1.0D + offset, 1.0D * scale   , 0.0D, 0.0D);
+        instance.addVertexWithUV(1.0D * scale   , 1.0D + offset, 0.0D           , 0.0D, 1.0D);
+        instance.addVertexWithUV(0.0D           , 1.0D + offset, 0.0D           , 1.0D, 1.0D);
+        // @formatter:on
 
         instance.draw();
     }
 
     public static void drawFaceZNeg(ResourceLocation texture, float offset) {
+        drawFaceZNeg(texture, offset, 1.0F);
+    }
+
+    public static void drawFaceZNeg(ResourceLocation texture, float offset, float scale) {
         bindTexture(texture);
-        instance.startDrawingQuads();
+        if (!instance.isDrawing)
+            instance.startDrawingQuads();
         instance.setNormal(0.0F, 0.0F, -1.0F);
 
-        instance.addVertexWithUV(0.0D, 1.0D, 0.0D - offset, 1.0D, 0.0D);
-        instance.addVertexWithUV(1.0D, 1.0D, 0.0D - offset, 0.0D, 0.0D);
-        instance.addVertexWithUV(1.0D, 0.0D, 0.0D - offset, 0.0D, 1.0D);
-        instance.addVertexWithUV(0.0D, 0.0D, 0.0D - offset, 1.0D, 1.0D);
+        // @formatter:off
+        instance.addVertexWithUV(0.0D           , 1.0D * scale  , 0.0D - offset, 1.0D, 0.0D);
+        instance.addVertexWithUV(1.0D * scale   , 1.0D * scale  , 0.0D - offset, 0.0D, 0.0D);
+        instance.addVertexWithUV(1.0D * scale   , 0.0D          , 0.0D - offset, 0.0D, 1.0D);
+        instance.addVertexWithUV(0.0D           , 0.0D          , 0.0D - offset, 1.0D, 1.0D);
+        // @formatter:on
 
         instance.draw();
     }
 
     public static void drawFaceZPos(ResourceLocation texture, float offset) {
+        drawFaceZPos(texture, offset, 1.0F);
+    }
+
+    public static void drawFaceZPos(ResourceLocation texture, float offset, float scale) {
         bindTexture(texture);
-        instance.startDrawingQuads();
+        if (!instance.isDrawing)
+            instance.startDrawingQuads();
         instance.setNormal(0.0F, 0.0F, 1.0F);
 
-        instance.addVertexWithUV(0.0D, 1.0D, 1.0D + offset, 0.0D, 0.0D);
-        instance.addVertexWithUV(0.0D, 0.0D, 1.0D + offset, 0.0D, 1.0D);
-        instance.addVertexWithUV(1.0D, 0.0D, 1.0D + offset, 1.0D, 1.0D);
-        instance.addVertexWithUV(1.0D, 1.0D, 1.0D + offset, 1.0D, 0.0D);
+        // @formatter:off
+        instance.addVertexWithUV(0.0D           , 1.0D * scale  , 1.0D + offset, 0.0D, 0.0D);
+        instance.addVertexWithUV(0.0D           , 0.0D          , 1.0D + offset, 0.0D, 1.0D);
+        instance.addVertexWithUV(1.0D * scale   , 0.0D          , 1.0D + offset, 1.0D, 1.0D);
+        instance.addVertexWithUV(1.0D * scale   , 1.0D * scale  , 1.0D + offset, 1.0D, 0.0D);
+        // @formatter:on
 
         instance.draw();
     }
