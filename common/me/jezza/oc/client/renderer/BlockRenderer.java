@@ -30,7 +30,7 @@ public class BlockRenderer {
     public static final float[] DEFAULT_OFFSETS = new float[6];
     private static Tessellator instance = Tessellator.instance;
 
-    public BlockRenderer() {
+    private BlockRenderer() {
     }
 
     public static void bindTexture(ResourceLocation texture) {

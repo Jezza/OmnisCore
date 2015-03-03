@@ -56,6 +56,7 @@ public class ConfigData {
     }
 
     public void processIConfigRegistrar() {
+        CoreProperties.logger.info("Registering custom annotations for {}", modContainer.getModId());
         ((IConfigRegistrar) modContainer.getMod()).registerCustomAnnotations();
     }
 
