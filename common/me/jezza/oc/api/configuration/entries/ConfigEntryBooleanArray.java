@@ -6,8 +6,14 @@ import net.minecraftforge.common.config.Configuration;
 
 public class ConfigEntryBooleanArray extends ConfigEntry<ConfigBooleanArray, boolean[]> {
     @Override
-    public Object processAnnotation(Configuration config, String fieldName, ConfigBooleanArray annotation, boolean[] defaultValue) {
+    public Object loadAnnotation(Configuration config, String fieldName, ConfigBooleanArray annotation, boolean[] currentValue, boolean[] defaultValue) {
         String comment = processComment(annotation.comment());
         return config.get(annotation.category(), fieldName, defaultValue, comment, annotation.isListLengthFixed(), annotation.maxListLength()).getBooleanList();
+    }
+
+    @Override
+    public void saveAnnotation(Configuration config, String fieldName, ConfigBooleanArray annotation, boolean[] currentValue, boolean[] defaultValue) {
+        String comment = processComment(annotation.comment());
+        config.get(annotation.category(), fieldName, defaultValue, comment, annotation.isListLengthFixed(), annotation.maxListLength()).set(currentValue);
     }
 }

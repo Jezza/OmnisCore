@@ -6,6 +6,7 @@ import cpw.mods.fml.common.discovery.ASMDataTable;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import me.jezza.oc.api.configuration.Config.IConfigRegistrar;
 import me.jezza.oc.api.configuration.ConfigEntry;
+import me.jezza.oc.api.configuration.lib.IConfigRegistry;
 import me.jezza.oc.common.core.CoreProperties;
 
 import java.io.File;
@@ -19,7 +20,7 @@ public class ConfigData {
     private static final File CONFIG_DIR = new File(".", "config");
 
     private Collection<String> ownedClasses;
-    TreeMap<String, ConfigContainer> configSet;
+    TreeMap<String, ConfigContainer> containerMap;
     private ModContainer modContainer;
     public final boolean isRegistrar;
 
@@ -27,7 +28,7 @@ public class ConfigData {
         this.modContainer = modContainer;
         copyOwnedClasses(ownedClasses);
         isRegistrar = modContainer.getMod() instanceof IConfigRegistrar;
-        configSet = new TreeMap<>(dataComparator);
+        containerMap = new TreeMap<>(dataComparator);
     }
 
     private void copyOwnedClasses(Collection<String> ownedClasses) {
@@ -39,39 +40,52 @@ public class ConfigData {
     }
 
     public void addRoot(ASMData asmData) {
+        Map<String, Object> annotationInfo = asmData.getAnnotationInfo();
+
         String packageName = asmData.getClassName();
+
         int pkgIndex = packageName.lastIndexOf('.');
         if (pkgIndex > -1)
             packageName = packageName.substring(0, pkgIndex);
         packageName = packageName.replace(".", "/");
-        if (!configSet.containsKey(packageName)) {
+
+        if (!containerMap.containsKey(packageName)) {
             CoreProperties.logger.info("Discovered config controller inside: {}", packageName);
-            File defaultConfig = getConfigForPackage(asmData);
+
+            File defaultConfig = getConfigForPackage(annotationInfo);
+
             CoreProperties.logger.info("Setting config: {}", defaultConfig);
-            configSet.put(packageName, new ConfigContainer(packageName, defaultConfig));
+
+            containerMap.put(packageName, new ConfigContainer(defaultConfig));
         } else {
-            CoreProperties.logger.warn("THIS IS AN ERROR! Ignoring {}", asmData.getClassName());
             CoreProperties.logger.warn("Config controller discovered in the same root: {}. ", packageName);
+            CoreProperties.logger.warn("THIS IS AN ERROR! Ignoring {}", asmData.getClassName());
         }
     }
 
-    public void processIConfigRegistrar() {
+    public void processIConfigRegistrar(IConfigRegistry registry) {
         CoreProperties.logger.info("Registering custom annotations for {}", modContainer.getModId());
-        ((IConfigRegistrar) modContainer.getMod()).registerCustomAnnotations();
+        ((IConfigRegistrar) modContainer.getMod()).registerCustomAnnotations(registry);
     }
 
-    public void processAllRoots() {
-        for (String rootPackage : configSet.keySet())
-            configSet.get(rootPackage).setChildClasses(getAllChildClasses(rootPackage));
+    public void processRoots() {
+        for (String rootPackage : containerMap.keySet())
+            containerMap.get(rootPackage).setChildClasses(getAllChildClasses(rootPackage));
     }
 
-    public void processConfigContainers(ASMDataTable asmDataTable, LinkedHashMap<Class<? extends Annotation>, Class<? extends ConfigEntry<? extends Annotation, ?>>> annotationMap) {
-        for (ConfigContainer configContainer : configSet.values())
+    public void processConfigContainers(ASMDataTable asmDataTable, Map<Class<? extends Annotation>, Class<? extends ConfigEntry<? extends Annotation, ?>>> annotationMap) {
+        for (ConfigContainer configContainer : containerMap.values()) {
             configContainer.processAllClasses(asmDataTable, annotationMap);
+            configContainer.operateOnConfig(false);
+        }
     }
 
-    private File getConfigForPackage(ASMData asmData) {
-        Map<String, Object> annotationInfo = asmData.getAnnotationInfo();
+    public void save() {
+        for (ConfigContainer configContainer : containerMap.values())
+            configContainer.operateOnConfig(true);
+    }
+
+    private File getConfigForPackage(Map<String, Object> annotationInfo) {
         String configFile = (String) annotationInfo.get("configFile");
         if (Strings.isNullOrEmpty(configFile))
             return new File(CONFIG_DIR, modContainer.getModId() + ".cfg");
@@ -91,20 +105,6 @@ public class ConfigData {
             }
         }
         return children;
-    }
-
-    public boolean requiresSelection() {
-        return configSet.size() > 1;
-    }
-
-    public void populateList(List<ConfigContainer> containerList) {
-        for (ConfigContainer configContainer : configSet.values())
-            containerList.add(configContainer);
-    }
-
-    public ConfigContainer getFirstContainer() {
-        Iterator<ConfigContainer> iterator = configSet.values().iterator();
-        return iterator.hasNext() ? iterator.next() : null;
     }
 
     /**

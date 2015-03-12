@@ -1,5 +1,7 @@
 package me.jezza.oc.api.configuration;
 
+import me.jezza.oc.api.configuration.lib.IConfigRegistry;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -7,14 +9,21 @@ import java.lang.annotation.Target;
 
 public class Config {
 
-    public static final String DEFAULT_GUI_FACTORY = "me.jezza.oc.api.configuration.construction.DefaultModGuiFactory";
-
     /**
      * If you have a custom config file location, override configFile() with the location.
      * NOTE: That ANY string that configFile returns WILL be pushed on the end of the default config directory.
      * EG, configFile() return "AwesomeMod/awesomeMod.cfg";
      * ConfigHandler will try locating the config file as such "config/AwesomeMod/awesomeMod.cfg"
      * If it fails, it will generate it.
+     * <p/>
+     * saveOnExit(); Whether or not OmnisCore will save the config for you upon server exit.
+     * <p/>
+     * SAVE_ON_MANUAL_TRIGGER is the only category that can, surprise!, be saved by a manual trigger.
+     * SAVE_ON_WORLD_CLOSE will save on the world being closed.
+     * SAVE_ON_GAME_CLOSE will save on the game being closed.
+     * <p/>
+     * Each category is triggered by the ones below it.
+     * For example, I fire a manual save.
      */
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
@@ -28,7 +37,7 @@ public class Config {
      * NOTE: THIS MUST BE IMPLEMENTED ON THE MAIN MOD CLASS TO TAKE EFFECT
      */
     public static interface IConfigRegistrar {
-        public void registerCustomAnnotations();
+        public void registerCustomAnnotations(IConfigRegistry registry);
     }
 
     @Retention(RetentionPolicy.RUNTIME)

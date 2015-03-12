@@ -1,5 +1,7 @@
 package me.jezza.oc.api.configuration;
 
+import com.google.common.base.Strings;
+import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.discovery.ASMDataTable;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
@@ -7,25 +9,28 @@ import cpw.mods.fml.common.discovery.ModCandidate;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import me.jezza.oc.api.configuration.discovery.ConfigData;
 import me.jezza.oc.api.configuration.entries.*;
+import me.jezza.oc.api.configuration.lib.IConfigRegistry;
+import net.minecraftforge.common.MinecraftForge;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Modifier;
-import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 
 import static me.jezza.oc.api.configuration.Config.*;
 
-public class ConfigHandler {
+public class ConfigHandler implements IConfigRegistry {
+
+    private static ConfigHandler INSTANCE;
 
     // Once this is true, no more registering annotations.
+    private static boolean init = false;
     private static boolean processed = false;
     private static boolean postProcessed = false;
-    private static boolean init = false;
 
-    private static final LinkedHashMap<ModContainer, ConfigData> configMap = new LinkedHashMap<>();
-
-    private static final LinkedHashMap<Class<? extends Annotation>, Class<? extends ConfigEntry<? extends Annotation, ?>>> annotationMap = new LinkedHashMap<>();
+    private static final Map<String, ConfigData> configMap = new LinkedHashMap<>();
+    private static final Map<Class<? extends Annotation>, Class<? extends ConfigEntry<? extends Annotation, ?>>> annotationMap = new LinkedHashMap<>();
 
     static {
         annotationMap.put(ConfigBoolean.class, ConfigEntryBoolean.class);
@@ -40,9 +45,10 @@ public class ConfigHandler {
     }
 
     private ConfigHandler() {
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
-    public static void initConfigHandler(FMLPreInitializationEvent event) {
+    public void parseControllers(FMLPreInitializationEvent event) {
         if (init)
             return;
         init = true;
@@ -50,27 +56,26 @@ public class ConfigHandler {
         ASMDataTable asmDataTable = event.getAsmData();
         Set<ASMData> asmDataSet = asmDataTable.getAll(Controller.class.getName());
 
-        // Filters out all annotations and places them with their associated mod.
+        // Filters out all controller annotations and places them with their associated mod.
         for (ASMData data : asmDataSet) {
             ModCandidate candidate = data.getCandidate();
             for (ModContainer modContainer : candidate.getContainedMods()) {
-                if (!configMap.containsKey(modContainer))
-                    configMap.put(modContainer, new ConfigData(modContainer, candidate.getClassList()));
-                configMap.get(modContainer).addRoot(data);
+                String modId = modContainer.getModId();
+                if (!configMap.containsKey(modId))
+                    configMap.put(modId, new ConfigData(modContainer, candidate.getClassList()));
+                configMap.get(modId).addRoot(data);
             }
         }
 
-        Collection<ConfigData> values = configMap.values();
-
         // Process all potential registrars first.
-        for (ConfigData configValue : values)
+        for (ConfigData configValue : configMap.values())
             if (configValue.isRegistrar)
-                configValue.processIConfigRegistrar();
+                configValue.processIConfigRegistrar(this);
         processed = true;
 
-        for (ConfigData configData : values) {
+        for (ConfigData configData : configMap.values()) {
             // Organise all sub-packages.
-            configData.processAllRoots();
+            configData.processRoots();
 
             // Process all current classes associated with the ConfigContainer.
             configData.processConfigContainers(asmDataTable, annotationMap);
@@ -81,25 +86,34 @@ public class ConfigHandler {
     /**
      * Only call this when you've had the chance from the interface.
      * To use this, implement {@link me.jezza.oc.api.configuration.Config.IConfigRegistrar} on your main mod file.
+     * Please make sure you use that interface, that way I can guarantee that all the annotations are registered before all processing begins.
      */
-    public static boolean registerAnnotation(final Class<? extends Annotation> clazz, final Class<? extends ConfigEntry<? extends Annotation, ?>> configEntry) {
-        if (processed)
-            return false;
-        if (Modifier.isAbstract(configEntry.getModifiers()))
+    @Override
+    public boolean registerAnnotation(final Class<? extends Annotation> clazz, final Class<? extends ConfigEntry<? extends Annotation, ?>> configEntry) {
+        if (processed || Modifier.isAbstract(configEntry.getModifiers()))
             return false;
         if (!annotationMap.containsKey(clazz))
             annotationMap.put(clazz, configEntry);
         return true;
     }
 
-    public static ConfigData getConfigData(ModContainer modContainer) {
-        if (!postProcessed)
-            return null;
-        return configMap.get(modContainer);
+    public static void save(String modID) {
+        if (!postProcessed || Strings.isNullOrEmpty(modID) || !Loader.isModLoaded(modID))
+            return;
+        if (configMap.containsKey(modID))
+            configMap.get(modID).save();
     }
 
     @Override
     public String toString() {
         return annotationMap.toString();
+    }
+
+    public static void initConfigHandler(FMLPreInitializationEvent event) {
+        if (INSTANCE != null)
+            return;
+
+        INSTANCE = new ConfigHandler();
+        INSTANCE.parseControllers(event);
     }
 }

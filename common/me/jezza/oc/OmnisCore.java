@@ -22,7 +22,7 @@ import me.jezza.oc.common.core.network.NetworkDispatcher;
 import static me.jezza.oc.common.core.CoreProperties.*;
 
 @Config.Controller()
-@Mod(modid = MOD_ID, name = MOD_NAME, version = VERSION, dependencies = DEPENDENCIES, guiFactory = Config.DEFAULT_GUI_FACTORY)
+@Mod(modid = MOD_ID, name = MOD_NAME, version = VERSION, dependencies = DEPENDENCIES)
 public class OmnisCore {
 
     @Instance(MOD_ID)
@@ -64,7 +64,5 @@ public class OmnisCore {
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         logger.info("-- Post-Initialising --");
-//        ConfigHandler.initGuiFactories();
     }
-
 }

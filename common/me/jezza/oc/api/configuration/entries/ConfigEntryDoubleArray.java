@@ -5,9 +5,16 @@ import me.jezza.oc.api.configuration.ConfigEntry;
 import net.minecraftforge.common.config.Configuration;
 
 public class ConfigEntryDoubleArray extends ConfigEntry<ConfigDoubleArray, double[]> {
+
     @Override
-    public Object processAnnotation(Configuration config, String fieldName, ConfigDoubleArray annotation, double[] defaultValues) {
+    public Object loadAnnotation(Configuration config, String fieldName, ConfigDoubleArray annotation, double[] currentValue, double[] defaultValue) {
         String comment = processComment(annotation.comment());
-        return config.get(annotation.category(), fieldName, defaultValues, comment, annotation.minValue(), annotation.maxValue(), annotation.isListLengthFixed(), annotation.maxListLength()).getDoubleList();
+        return config.get(annotation.category(), fieldName, defaultValue, comment, annotation.minValue(), annotation.maxValue(), annotation.isListLengthFixed(), annotation.maxListLength()).getDoubleList();
+    }
+
+    @Override
+    public void saveAnnotation(Configuration config, String fieldName, ConfigDoubleArray annotation, double[] currentValue, double[] defaultValue) {
+        String comment = processComment(annotation.comment());
+        config.get(annotation.category(), fieldName, defaultValue, comment, annotation.minValue(), annotation.maxValue(), annotation.isListLengthFixed(), annotation.maxListLength()).set(currentValue);
     }
 }
