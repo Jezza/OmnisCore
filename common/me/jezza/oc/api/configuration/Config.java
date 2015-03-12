@@ -143,8 +143,6 @@ public class Config {
     public static @interface ConfigStringArray {
         String category();
 
-        String[] validValues() default {};
-
         String[] comment() default {};
     }
 }

@@ -38,7 +38,7 @@ public class ConfigContainer {
     public void processAllClasses(ASMDataTable dataTable, Map<Class<? extends Annotation>, Class<? extends ConfigEntry<? extends Annotation, ?>>> staticMap) {
         for (Map.Entry<Class<? extends Annotation>, Class<? extends ConfigEntry<? extends Annotation, ?>>> entry : staticMap.entrySet()) {
             try {
-                annotationMap.put(entry.getKey(), entry.getValue().newInstance());
+                annotationMap.put(entry.getKey(), entry.getValue().newInstance().setConfig(config));
             } catch (InstantiationException | IllegalAccessException e) {
                 CoreProperties.logger.fatal("Failed to create instance of the registered ConfigEntry!", e);
             }
@@ -85,7 +85,7 @@ public class ConfigContainer {
     public void operateOnConfig(boolean saveFlag) {
         config.load();
         for (ConfigEntry<? extends Annotation, ?> configEntry : annotationMap.values())
-            configEntry.processFields(config, saveFlag);
+            configEntry.processFields(saveFlag);
         if (config.hasChanged())
             config.save();
     }

@@ -9,12 +9,12 @@ public class ConfigEntryDoubleArray extends ConfigEntry<ConfigDoubleArray, doubl
     @Override
     public Object loadAnnotation(Configuration config, String fieldName, ConfigDoubleArray annotation, double[] currentValue, double[] defaultValue) {
         String comment = processComment(annotation.comment());
-        return config.get(annotation.category(), fieldName, defaultValue, comment, annotation.minValue(), annotation.maxValue(), annotation.isListLengthFixed(), annotation.maxListLength()).getDoubleList();
+        return getDoubleArray(annotation.category(), fieldName, defaultValue, comment, annotation.minValue(), annotation.maxValue(), annotation.isListLengthFixed(), annotation.maxListLength());
     }
 
     @Override
     public void saveAnnotation(Configuration config, String fieldName, ConfigDoubleArray annotation, double[] currentValue, double[] defaultValue) {
         String comment = processComment(annotation.comment());
-        config.get(annotation.category(), fieldName, defaultValue, comment, annotation.minValue(), annotation.maxValue(), annotation.isListLengthFixed(), annotation.maxListLength()).set(currentValue);
+        getDoubleArrayProperty(annotation.category(), fieldName, defaultValue, comment, annotation.minValue(), annotation.maxValue(), annotation.isListLengthFixed(), annotation.maxListLength()).set(currentValue);
     }
 }

@@ -8,12 +8,12 @@ public class ConfigEntryBooleanArray extends ConfigEntry<ConfigBooleanArray, boo
     @Override
     public Object loadAnnotation(Configuration config, String fieldName, ConfigBooleanArray annotation, boolean[] currentValue, boolean[] defaultValue) {
         String comment = processComment(annotation.comment());
-        return config.get(annotation.category(), fieldName, defaultValue, comment, annotation.isListLengthFixed(), annotation.maxListLength()).getBooleanList();
+        return getBooleanArray(annotation.category(), fieldName, defaultValue, comment, annotation.isListLengthFixed(), annotation.maxListLength());
     }
 
     @Override
     public void saveAnnotation(Configuration config, String fieldName, ConfigBooleanArray annotation, boolean[] currentValue, boolean[] defaultValue) {
         String comment = processComment(annotation.comment());
-        config.get(annotation.category(), fieldName, defaultValue, comment, annotation.isListLengthFixed(), annotation.maxListLength()).set(currentValue);
+        getBooleanArrayProperty(annotation.category(), fieldName, defaultValue, comment, annotation.isListLengthFixed(), annotation.maxListLength()).set(currentValue);
     }
 }

@@ -8,15 +8,12 @@ public class ConfigEntryStringArray extends ConfigEntry<ConfigStringArray, Strin
     @Override
     public Object loadAnnotation(Configuration config, String fieldName, ConfigStringArray annotation, String[] currentValue, String[] defaultValue) {
         String comment = processComment(annotation.comment());
-        String[] validValues = annotation.validValues();
-        if (validValues.length == 0)
-            return config.getStringList(fieldName, annotation.category(), defaultValue, comment);
-        return config.getStringList(fieldName, annotation.category(), defaultValue, comment, validValues);
+        return getStringArray(annotation.category(), fieldName, defaultValue, comment);
     }
 
     @Override
     public void saveAnnotation(Configuration config, String fieldName, ConfigStringArray annotation, String[] currentValue, String[] defaultValue) {
         String comment = processComment(annotation.comment());
-        config.get(annotation.category(), fieldName, defaultValue, comment).set(currentValue);
+        getStringArrayProperty(annotation.category(), fieldName, defaultValue, comment).set(currentValue);
     }
 }
