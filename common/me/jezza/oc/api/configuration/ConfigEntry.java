@@ -64,8 +64,10 @@ public abstract class ConfigEntry<T extends Annotation, D> {
         if (comments.length == 0)
             return "";
         StringBuilder stringBuilder = new StringBuilder();
-        for (String comment : comments)
+        for (String comment : comments) {
             stringBuilder.append(Localise.safeTranslate(comment));
+            stringBuilder.append(System.lineSeparator());
+        }
         return stringBuilder.toString().trim() + System.lineSeparator();
     }
 

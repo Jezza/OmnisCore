@@ -71,10 +71,8 @@ public class ConfigContainer {
             for (Annotation annotation : field.getAnnotations()) {
                 Class<? extends Annotation> annotationClazz = annotation.annotationType();
                 if (annotationMap.containsKey(annotationClazz)) {
-                    // Sets it accessible now for later use.
                     field.setAccessible(true);
-                    // Checks the saveType, if the @SaveType annotation is found, it uses that value.
-                    // Gets the associated ConfigEntry from the annotationClass. It then adds the saveType, the field it was found on, and casts the found annotation to the registered one.
+                    // Adds the field and the annotation to the ConfigEntry. No more annotations should be on the field, so break out of it and continue field iteration.
                     ((ConfigEntry<Annotation, Object>) annotationMap.get(annotationClazz)).add(field, annotation);
                     break;
                 }
