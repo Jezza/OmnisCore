@@ -1,6 +1,6 @@
 package me.jezza.oc.api.network.interfaces;
 
-public interface ISearchPattern extends ISearchResult {
+public interface ISearchPattern<T extends INetworkNode<T>> extends ISearchResult<T> {
 
     /**
      * @return true if path was found.

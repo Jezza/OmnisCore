@@ -2,16 +2,7 @@ package me.jezza.oc.api.network.interfaces;
 
 import static me.jezza.oc.api.network.NetworkResponse.ListenerResponse;
 
-public interface IMessageListener extends INetworkNode {
-
-    /**
-     * Used to determine what types of messages this node should be notified of.
-     * Can be used to be notified of multiple message types.
-     *
-     * @return null or empty array for all messages.
-     */
-    public String[] getListenerType();
-
+public interface IMessageListener<T extends INetworkNode<T>> extends INetworkNode<T> {
     /**
      * If you wish to override a message being posted, if returned with
      * - IGNORE, should be a default response, means you don't wish for anything to change.
@@ -22,7 +13,10 @@ public interface IMessageListener extends INetworkNode {
      *
      * @param message The message in question that was posted.
      */
-    public ListenerResponse onMessagePosted(INetworkMessage message);
+    public ListenerResponse onMessagePosted(INetworkMessage<T> message);
 
-
+    /**
+     * @return This instance.
+     */
+    public T getNode();
 }

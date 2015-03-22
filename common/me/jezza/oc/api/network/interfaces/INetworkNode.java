@@ -1,16 +1,10 @@
 package me.jezza.oc.api.network.interfaces;
 
+import net.minecraft.world.World;
+
 import java.util.Collection;
 
-public interface INetworkNode {
-
-    /**
-     * Saves you an instanceof check.
-     * Works with conjunction with processNode() as it won't be passed a different type.
-     *
-     * @return - the string identifying what type of networkNode it is.
-     */
-    public String getType();
+public interface INetworkNode<T extends INetworkNode<T>> {
 
     /**
      * This can be done by many methods, do it of your own free will.
@@ -18,15 +12,14 @@ public interface INetworkNode {
      *
      * @return all nearby network nodes; Nodes that are connected to this node.
      */
-    public Collection<INetworkNode> getNearbyNodes();
+    public Collection<T> getNearbyNodes();
 
     /**
      * This is used to notify the node of any details that might have happened.
      *
-     * @param id - id of this call in particular
+     * @param id      - id of this call in particular
      * @param process - the processID.
-     * @param data - Used to pass in extra data.
-     *
+     * @param data    - Used to pass in extra data.
      * @return Any object that the message requires. Can be null.
      */
     public Object notifyNode(int id, int process, Object... data);
@@ -36,6 +29,10 @@ public interface INetworkNode {
      * This allows you to post messages easily from the node without referring to the main NetworkInstance.
      * If you decide, for some stupid reason, to override this value, at least make sure it's an instance of INetworkNodeHandler, or you're going to get an exception thrown at your face, because of your stupidity.
      */
-    public void setIMessageProcessor(IMessageProcessor messageProcessor);
+    public void setIMessageProcessor(IMessageProcessor<T> messageProcessor);
 
+    /**
+     * @return The current world of the node.
+     */
+    public World getWorld();
 }

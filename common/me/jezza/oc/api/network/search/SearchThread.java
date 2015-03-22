@@ -62,9 +62,15 @@ public class SearchThread extends Thread {
         return INSTANCE;
     }
 
-    public static ISearchResult addSearchPattern(INetworkNode startNode, INetworkNode endNode, Map<? extends INetworkNode, ? extends Collection<INetworkNode>> nodeMap) {
-        BFSPattern pattern = new BFSPattern(startNode, endNode, nodeMap);
+    public static <T extends INetworkNode<T>> ISearchResult<T> addSearchPattern(T startNode, T endNode, Map<? extends T, ? extends Collection<T>> nodeMap) {
+        BFSPattern<T> pattern = new BFSPattern<>(startNode, endNode, nodeMap);
         searchPatterns.offerLast(pattern);
         return pattern;
     }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends INetworkNode<T>> ISearchResult<T> emptySearch() {
+        return (ISearchResult<T>) EMPTY_SEARCH;
+    }
+
 }

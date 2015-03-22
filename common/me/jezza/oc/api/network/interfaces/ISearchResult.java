@@ -2,7 +2,7 @@ package me.jezza.oc.api.network.interfaces;
 
 import java.util.List;
 
-public interface ISearchResult {
+public interface ISearchResult<T extends INetworkNode<T>> {
 
     /**
      * @return true if the search has successfully discovered a path.
@@ -10,8 +10,8 @@ public interface ISearchResult {
     public boolean hasFinished();
 
     /**
-     * @return the path that was discovered, else Collections.<INetworkNode>emptyList() (This could be returned either because the path doesn't exist OR because it's not yet finished.).
+     * @return the path that was discovered, else null.
      */
-    public List<INetworkNode> getPath();
+    public List<T> getPath();
 
 }
