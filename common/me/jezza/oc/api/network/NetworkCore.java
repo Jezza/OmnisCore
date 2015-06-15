@@ -1,35 +1,24 @@
 package me.jezza.oc.api.network;
 
-import com.google.common.collect.ImmutableList;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 import me.jezza.oc.api.collect.Graph;
 import me.jezza.oc.api.network.NetworkResponse.MessageResponse;
 import me.jezza.oc.api.network.interfaces.*;
 import me.jezza.oc.api.network.search.SearchThread;
-import me.jezza.oc.common.core.CoreProperties;
-import net.minecraft.entity.Entity;
-import net.minecraft.world.World;
-import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.*;
 
 import static me.jezza.oc.api.network.NetworkResponse.ListenerResponse;
 
-public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandler<T>, IMessageProcessor<T> {
+public class NetworkCore implements INetworkNodeHandler, IMessageProcessor {
 
     /**
      * Backing data structure for the network.
      * This maintains links/connections between nodes.
      * Something of my own design, will probably change through time.
      */
-    protected Graph<T> graph;
-
-    /**
-     * Used to keep track of what nodes would like to be notified of messages being posted to the system.
-     * Useful if you wish to have a "brain" of the network.
-     */
-    protected List<IMessageListener<T>> messageListeners;
+    private Graph<INetworkNode> graph;
 
     /**
      * Messages that are posted to the network are placed in this map.
@@ -38,80 +27,66 @@ public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandl
      * O(1) across the board for a lot of actions.
      * Fastest, but not necessarily the best.
      */
-    protected Map<Phase, Collection<INetworkMessage<T>>> messageMap;
+    private EnumMap<Phase, Collection<INetworkMessage>> messageMap;
 
-    protected List<World> worlds;
+    /**
+     * Used to keep track of what nodes would like to be notified of messages being posted to the system.
+     * Useful if you wish to have a "brain" of the network.
+     */
+    private ArrayList<IMessageListener> messageListeners;
 
     public NetworkCore() {
         graph = new Graph<>();
         messageListeners = new ArrayList<>();
 
         messageMap = new EnumMap<>(Phase.class);
-        messageMap.put(Phase.PRE_PROCESSING, new ArrayList<INetworkMessage<T>>());
-        messageMap.put(Phase.PROCESSING, new ArrayList<INetworkMessage<T>>());
-        messageMap.put(Phase.POST_PROCESSING, new ArrayList<INetworkMessage<T>>());
+        messageMap.put(Phase.PRE_PROCESSING, new ArrayList<INetworkMessage>());
+        messageMap.put(Phase.PROCESSING, new ArrayList<INetworkMessage>());
+        messageMap.put(Phase.POST_PROCESSING, new ArrayList<INetworkMessage>());
     }
 
     @Override
-    public boolean addNetworkNode(T node) {
-        if (!graph.addNode(node))
-            return false;
-        addWorld(node.getWorld());
-        Collection<T> nearbyNodes = node.getNearbyNodes();
+    public boolean addNetworkNode(INetworkNode node) {
+        boolean flag = graph.addNode(node);
+        Collection<INetworkNode> nearbyNodes = node.getNearbyNodes();
         if (nearbyNodes == null)
-            throw new RuntimeException(node.getClass() + " returned a null set of nodes!");
+            throw new RuntimeException(node.getType() + " returned a null set of nodes!");
         if (!nearbyNodes.isEmpty())
-            for (T nearbyNode : nearbyNodes)
+            for (INetworkNode nearbyNode : nearbyNodes)
                 graph.addEdge(node, nearbyNode);
         node.setIMessageProcessor(this);
         if (node instanceof IMessageListener)
-            messageListeners.add((IMessageListener<T>) node);
-        return true;
+            messageListeners.add((IMessageListener) node);
+        return flag;
     }
 
     @Override
-    public boolean removeNetworkNode(T node) {
+    public boolean removeNetworkNode(INetworkNode node) {
         if (node instanceof IMessageListener)
             messageListeners.remove(node);
-        removeWorld(node.getWorld());
         return graph.removeNode(node);
     }
 
     @Override
-    public boolean retainAll(Collection<? extends T> nodes) {
+    public boolean retainAll(Collection<? extends INetworkNode> nodes) {
         return graph.retainAll(nodes);
     }
 
     @Override
-    public void mergeNetwork(INetworkNodeHandler<T> nodeHandler) {
-        graph.addAll(nodeHandler.getNodeMap());
-        for (T node : graph.getNodes())
+    public void mergeNetwork(Map<? extends INetworkNode, ? extends Collection<INetworkNode>> networkNodeMap) {
+        graph.addAll(networkNodeMap);
+        for (INetworkNode node : graph.getNodes())
             node.setIMessageProcessor(this);
-        for (World world : nodeHandler.getNetworkedWorlds())
-            addWorld(world);
-
     }
 
     @Override
-    public Map<? extends T, ? extends Collection<T>> getNodeMap() {
+    public Map<? extends INetworkNode, ? extends Collection<INetworkNode>> getNodeMap() {
         return graph.asMap();
     }
 
     @Override
     public boolean requiresRegistration() {
         return true;
-    }
-
-    @Override
-    public void addWorld(World world) {
-        if (!(world == null || worlds.contains(world)))
-            worlds.add(world);
-    }
-
-    @Override
-    public void removeWorld(World world) {
-        if (world != null && worlds.contains(world))
-            worlds.remove(world);
     }
 
     @Override
@@ -132,27 +107,21 @@ public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandl
     }
 
     @Override
-    public boolean containsNode(T node) {
+    public boolean containsNode(INetworkNode node) {
         return graph.containsNode(node);
     }
 
     @Override
-    public boolean postMessage(INetworkMessage<T> message) {
-        if (message.getOwner() == null) {
-            CoreProperties.logger.info("{} has no owner! It returned null!", message.getClass());
-            throw new NullPointerException();
-        }
-
+    public boolean postMessage(INetworkMessage message) {
+        if (message.getOwner() == null)
+            return false;
+        
         if (!messageListeners.isEmpty()) {
-            for (IMessageListener<T> listener : messageListeners) {
-                ListenerResponse response = listener.onMessagePosted(message);
+            for (IMessageListener node : messageListeners) {
+                ListenerResponse response = node.onMessagePosted(message);
 
                 if (response == null)
-                    throw new RuntimeException(listener.getClass() + " returned a null response from onMessagePosted()");
-
-                T node = listener.getNode();
-                if (node == null)
-                    throw new RuntimeException(listener.getClass() + " returned a null value from getNode()");
+                    throw new RuntimeException(node.getClass() + " returned a null response from onMessagePosted()");
 
                 switch (response) {
                     case DELETE:
@@ -167,37 +136,9 @@ public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandl
             }
         }
 
-        Collection<INetworkMessage<T>> messages = messageMap.get(Phase.PRE_PROCESSING);
+        Collection<INetworkMessage> messages = messageMap.get(Phase.PRE_PROCESSING);
         messages.add(message);
         return messages.contains(message);
-    }
-
-    @Override
-    public boolean postMessage(INetworkEntity<T> message) {
-        T owner = message.getOwner();
-
-        if (owner == null) {
-            CoreProperties.logger.info("{} has no owner! It returned null!", message.getClass());
-            throw new NullPointerException();
-        }
-
-        World startingWorld = owner.getWorld();
-        Class<? extends Entity> entityClass = message.getEntityClass();
-
-        Entity entity;
-
-        try {
-            entity = entityClass.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            CoreProperties.logger.info("Failed to instantiate entity from {}", entityClass);
-            throw new RuntimeException(e);
-        }
-
-
-
-        startingWorld.spawnEntityInWorld(entity);
-
-        throw new NotImplementedException("Has not yet been implemented!");
     }
 
     /**
@@ -205,15 +146,10 @@ public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandl
      * This is going to be rewritten or destroyed...
      */
     @Override
-    public ISearchResult<T> getPathFrom(T startNode, T endNode) {
+    public ISearchResult getPathFrom(INetworkNode startNode, INetworkNode endNode) {
         if (!(graph.containsNode(startNode) && graph.containsNode(endNode)))
-            return SearchThread.emptySearch();
+            return SearchThread.EMPTY_SEARCH;
         return SearchThread.addSearchPattern(startNode, endNode, getNodeMap());
-    }
-
-    @Override
-    public List<World> getNetworkedWorlds() {
-        return ImmutableList.copyOf(worlds);
     }
 
     @SubscribeEvent
@@ -226,14 +162,14 @@ public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandl
     }
 
     private void processingPostMessages() {
-        Collection<INetworkMessage<T>> messages = messageMap.get(Phase.POST_PROCESSING);
+        Collection<INetworkMessage> messages = messageMap.get(Phase.POST_PROCESSING);
         if (messages.isEmpty())
             return;
-        Iterator<INetworkMessage<T>> iterator = messages.iterator();
+        Iterator<INetworkMessage> iterator = messages.iterator();
 
         messageIterator:
         while (iterator.hasNext()) {
-            INetworkMessage<T> message = iterator.next();
+            INetworkMessage message = iterator.next();
 
             MessageResponse response = message.postProcessing(this);
 
@@ -256,21 +192,21 @@ public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandl
     }
 
     private void processingMessages() {
-        Collection<INetworkMessage<T>> messages = messageMap.get(Phase.PROCESSING);
+        Collection<INetworkMessage> messages = messageMap.get(Phase.PROCESSING);
         if (messages.isEmpty())
             return;
-        Iterator<INetworkMessage<T>> iterator = messages.iterator();
+        Iterator<INetworkMessage> iterator = messages.iterator();
 
         messageIterator:
         while (iterator.hasNext()) {
-            INetworkMessage<T> message = iterator.next();
+            INetworkMessage message = iterator.next();
 
-            HashSet<T> visited = new HashSet<>(graph.size());
-            Queue<T> queue = new ArrayDeque<>(graph.size());
+            HashSet<INetworkNode> visited = new HashSet<>(graph.size());
+            Queue<INetworkNode> queue = new ArrayDeque<>(graph.size());
             queue.offer(message.getOwner());
 
             while (!queue.isEmpty()) {
-                T node = queue.poll();
+                INetworkNode node = queue.poll();
                 visited.add(node);
 
                 MessageResponse response = message.processNode(this, node);
@@ -280,11 +216,10 @@ public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandl
 
                 switch (response) {
                     case VALID:
-                        for (T childNode : graph.adjacentTo(node))
+                        for (INetworkNode childNode : graph.adjacentTo(node))
                             if (!visited.contains(childNode)) {
-                                // TODO Look at type recursion.
-//                                if (childNode.getType().equals(message.getOwner().getType()))
-                                queue.offer(childNode);
+                                if (childNode.getType().equals(message.getOwner().getType()))
+                                    queue.offer(childNode);
                             }
                         break;
                     case WAIT:
@@ -299,13 +234,13 @@ public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandl
     }
 
     private void processingPreMessages() {
-        Collection<INetworkMessage<T>> messages = messageMap.get(Phase.PRE_PROCESSING);
+        Collection<INetworkMessage> messages = messageMap.get(Phase.PRE_PROCESSING);
         if (messages.isEmpty())
             return;
-        Iterator<INetworkMessage<T>> iterator = messages.iterator();
+        Iterator<INetworkMessage> iterator = messages.iterator();
 
         while (iterator.hasNext()) {
-            INetworkMessage<T> message = iterator.next();
+            INetworkMessage message = iterator.next();
             MessageResponse response = message.preProcessing(this);
 
             if (response == null)
@@ -344,6 +279,6 @@ public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandl
          * The final stage of messages.
          * Finalising all the message properties to allow the message to act one last time before deletion.
          */
-        POST_PROCESSING
+        POST_PROCESSING;
     }
 }

@@ -3,44 +3,24 @@ package me.jezza.oc.api.network;
 import me.jezza.oc.api.network.interfaces.INetworkMessage;
 import me.jezza.oc.api.network.interfaces.INetworkNode;
 
-import java.util.HashMap;
-
 /**
  * Just a simple abstract class to remove the monotony of setting and getting owners
  */
-public abstract class NetworkMessageAbstract<T extends INetworkNode<T>> implements INetworkMessage<T> {
+public abstract class NetworkMessageAbstract implements INetworkMessage {
 
-    /**
-     * Any useful data that you want the message to carry.
-     * Such as a world, or coordinate position.
-     */
-    public HashMap<String, Object> dataMap;
+    protected INetworkNode owner;
 
-    protected T owner;
-
-    public NetworkMessageAbstract(T owner) {
-        this.owner = owner;
-    }
-
-    protected void initDataMap() {
-        if (dataMap != null && !dataMap.isEmpty())
-            dataMap.clear();
-        dataMap = new HashMap<>();
-    }
-
-    @Override
-    public void resetMessage() {
-        if (dataMap != null)
-            dataMap.clear();
-    }
-
-    @Override
-    public void setOwner(T owner) {
+    public NetworkMessageAbstract(INetworkNode owner) {
         this.owner = owner;
     }
 
     @Override
-    public T getOwner() {
+    public void setOwner(INetworkNode owner) {
+        this.owner = owner;
+    }
+
+    @Override
+    public INetworkNode getOwner() {
         return owner;
     }
 

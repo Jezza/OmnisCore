@@ -5,15 +5,15 @@ import me.jezza.oc.api.network.interfaces.ISearchPattern;
 
 import java.util.*;
 
-public class BFSPattern<T extends INetworkNode<T>> implements ISearchPattern<T> {
+public class BFSPattern implements ISearchPattern {
 
-    private Map<? extends T, ? extends Collection<T>> nodeMap;
-    private T startNode, endNode;
+    private Map<? extends INetworkNode, ? extends Collection<INetworkNode>> nodeMap;
+    private INetworkNode startNode, endNode;
     private boolean finished, deletable;
 
-    private List<T> path;
+    private List<INetworkNode> path;
 
-    public BFSPattern(T startNode, T endNode, Map<? extends T, ? extends Collection<T>> nodeMap) {
+    public BFSPattern(INetworkNode startNode, INetworkNode endNode, Map<? extends INetworkNode, ? extends Collection<INetworkNode>> nodeMap) {
         finished = deletable = false;
         this.startNode = startNode;
         this.endNode = endNode;
@@ -37,19 +37,19 @@ public class BFSPattern<T extends INetworkNode<T>> implements ISearchPattern<T> 
             return true;
         }
 
-        Map<T, T> linkMap = new LinkedHashMap<>();
-        ArrayList<T> visited = new ArrayList<>();
+        Map<INetworkNode, INetworkNode> linkMap = new LinkedHashMap<INetworkNode, INetworkNode>();
+        ArrayList<INetworkNode> visited = new ArrayList<INetworkNode>();
 
-        Deque<T> deque = new ArrayDeque<>();
+        Deque<INetworkNode> deque = new LinkedList<INetworkNode>();
         deque.offer(startNode);
 
         while (deque.size() > 0) {
-            T node = deque.poll();
+            INetworkNode node = deque.poll();
             visited.add(node);
 
             if (node.equals(endNode)) {
-                path = new ArrayList<T>();
-                T nextNode = endNode;
+                path = new ArrayList<INetworkNode>();
+                INetworkNode nextNode = endNode;
                 while (!nextNode.equals(startNode)) {
                     path.add(nextNode);
                     nextNode = linkMap.get(nextNode);
@@ -58,8 +58,8 @@ public class BFSPattern<T extends INetworkNode<T>> implements ISearchPattern<T> 
                 finished = true;
                 return true;
             } else {
-                Collection<T> nodes = nodeMap.get(node);
-                for (T childNode : nodes) {
+                Collection<INetworkNode> nodes = nodeMap.get(node);
+                for (INetworkNode childNode : nodes) {
                     if (visited.contains(childNode))
                         continue;
                     linkMap.put(childNode, node);
@@ -74,9 +74,9 @@ public class BFSPattern<T extends INetworkNode<T>> implements ISearchPattern<T> 
     }
 
     @Override
-    public List<T> getPath() {
+    public List<INetworkNode> getPath() {
         if (!finished || path == null || path.isEmpty())
-            return Collections.<T>emptyList();
+            return Collections.<INetworkNode>emptyList();
         deletable = true;
         return path;
     }
