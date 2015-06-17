@@ -12,7 +12,7 @@ import net.minecraftforge.common.util.ForgeDirection;
 
 import static me.jezza.oc.common.utils.MathHelper.RoundingMethod;
 
-public class CoordSet {
+public class CoordSet implements Cloneable {
 
     public int x, y, z;
 
@@ -245,9 +245,9 @@ public class CoordSet {
     }
 
     public CoordSet asBlockCoords() {
-        x *= 16;
-        y *= 16;
-        z *= 16;
+        x = x << 4;
+        y = y << 4;
+        z = z << 4;
 
         return this;
     }
@@ -257,9 +257,9 @@ public class CoordSet {
     }
 
     public CoordSet asChunkOffset() {
-        x = x < 0 ? -(-x % 16) : (x % 16);
-        y = y < 0 ? -(-y % 16) : (y % 16);
-        z = z < 0 ? -(-z % 16) : (z % 16);
+        x = x < 0 ? ((x % 16) + 16) & 15 : (x % 16);
+        y = y < 0 ? ((y % 16) + 16) & 15 : (y % 16);
+        z = z < 0 ? ((z % 16) + 16) & 15 : (z % 16);
         return this;
     }
 
@@ -270,5 +270,4 @@ public class CoordSet {
     public static CoordSet fromChunkCoordinates(ChunkCoordinates coordinates) {
         return new CoordSet(coordinates.posX, coordinates.posY, coordinates.posZ);
     }
-
 }
