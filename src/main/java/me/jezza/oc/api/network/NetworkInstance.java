@@ -61,7 +61,7 @@ public class NetworkInstance<T extends INetworkNode<T>> {
                 networkNodeHandler = networksFound.get(0);
                 List<INetworkNodeHandler<T>> nodes = networksFound.subList(1, networksFound.size());
                 for (INetworkNodeHandler<T> networkFound : nodes) {
-                    networkNodeHandler.mergeNetwork(networkFound.getNodeMap());
+//                    networkNodeHandler.mergeNetwork(networkFound.getNodeMap());
                     removeNetworkNodeHandler(networkFound);
                 }
         }

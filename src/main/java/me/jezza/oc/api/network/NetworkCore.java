@@ -14,8 +14,6 @@ import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.*;
 
-import static me.jezza.oc.api.network.NetworkResponse.ListenerResponse;
-
 public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandler<T>, IMessageProcessor<T> {
 
     /**
@@ -23,13 +21,7 @@ public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandl
      * This maintains links/connections between nodes.
      * Something of my own design, will probably change through time.
      */
-    protected Graph<T> graph;
-
-    /**
-     * Used to keep track of what nodes would like to be notified of messages being posted to the system.
-     * Useful if you wish to have a "brain" of the network.
-     */
-    protected List<IMessageListener<T>> messageListeners;
+    protected Graph<T> graph = new Graph<>();
 
     /**
      * Messages that are posted to the network are placed in this map.
@@ -43,9 +35,6 @@ public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandl
     protected List<World> worlds;
 
     public NetworkCore() {
-        graph = new Graph<>();
-        messageListeners = new ArrayList<>();
-
         messageMap = new EnumMap<>(Phase.class);
         messageMap.put(Phase.PRE_PROCESSING, new ArrayList<INetworkMessage<T>>());
         messageMap.put(Phase.PROCESSING, new ArrayList<INetworkMessage<T>>());
@@ -64,15 +53,11 @@ public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandl
             for (T nearbyNode : nearbyNodes)
                 graph.addEdge(node, nearbyNode);
         node.setIMessageProcessor(this);
-        if (node instanceof IMessageListener)
-            messageListeners.add((IMessageListener<T>) node);
         return true;
     }
 
     @Override
     public boolean removeNetworkNode(T node) {
-        if (node instanceof IMessageListener)
-            messageListeners.remove(node);
         removeWorld(node.getWorld());
         return graph.removeNode(node);
     }
@@ -128,7 +113,6 @@ public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandl
     public void destroy() {
         graph.clear();
         messageMap.clear();
-        messageListeners.clear();
     }
 
     @Override
@@ -141,30 +125,6 @@ public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandl
         if (message.getOwner() == null) {
             CoreProperties.logger.info("{} has no owner! It returned null!", message.getClass());
             throw new NullPointerException();
-        }
-
-        if (!messageListeners.isEmpty()) {
-            for (IMessageListener<T> listener : messageListeners) {
-                ListenerResponse response = listener.onMessagePosted(message);
-
-                if (response == null)
-                    throw new RuntimeException(listener.getClass() + " returned a null response from onMessagePosted()");
-
-                T node = listener.getNode();
-                if (node == null)
-                    throw new RuntimeException(listener.getClass() + " returned a null value from getNode()");
-
-                switch (response) {
-                    case DELETE:
-                        return false;
-                    case INTERCEPT:
-                        message.setOwner(node);
-                    case INJECT:
-                        message.onDataChanged(node);
-                    default:
-                    case IGNORE:
-                }
-            }
         }
 
         Collection<INetworkMessage<T>> messages = messageMap.get(Phase.PRE_PROCESSING);
@@ -192,7 +152,6 @@ public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandl
             CoreProperties.logger.info("Failed to instantiate entity from {}", entityClass);
             throw new RuntimeException(e);
         }
-
 
 
         startingWorld.spawnEntityInWorld(entity);
@@ -330,7 +289,7 @@ public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandl
         return graph.toString();
     }
 
-    private static enum Phase {
+    private enum Phase {
         /**
          * Messages being posted, this is the stage where intercepts would happen.
          */

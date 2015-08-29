@@ -1,0 +1,77 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+    }
+}
+
+apply plugin: 'forge'
+
+version = "0.2"
+group= "me.jezza.oc"
+archivesBaseName = "OmnisCore"
+
+minecraft {
+    version = "1.7.10-10.13.4.1492-1.7.10"
+    runDir = "eclipse"
+}
+
+dependencies {
+    // OmnisCore doesn't require any other dependencies.
+}
+
+processResources {
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+                
+        // replace version and mcversion
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+        
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+// Define the main jar with some version stuffs.
+jar {
+	version = minecraft.version + " - " + project.version
+	classifier = "universal"
+}
+
+// Source jar
+task srcJar(type: Jar, dependsOn: 'sourceMainJava') {
+	from sourceSets.main.allSource
+	// version = minecraft.version + " - " + project.version
+	classifier = "src"
+}
+
+// Deobfuscated jar
+task devJar(type: Jar, dependsOn: 'classes') {
+    from sourceSets.main.output
+	// version = minecraft.version + " - " + project.version
+    classifier = "dev"
+}
+
+artifacts {
+    archives devJar
+    archives srcJar
+}
+
+project.tasks.build.dependsOn devJar, srcJar
