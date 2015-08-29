@@ -21,6 +21,9 @@ version = "0.2"
 group= "me.jezza.oc"
 archivesBaseName = "OmnisCore"
 
+sourceCompatibility=1.7
+targetCompatibility=1.7
+
 minecraft {
     version = "1.7.10-10.13.4.1492-1.7.10"
     runDir = "eclipse"
@@ -56,16 +59,16 @@ jar {
 }
 
 // Source jar
-task srcJar(type: Jar, dependsOn: 'sourceMainJava') {
+task srcJar(type: Jar) {
 	from sourceSets.main.allSource
-	// version = minecraft.version + " - " + project.version
+	version = minecraft.version + " - " + project.version
 	classifier = "src"
 }
 
 // Deobfuscated jar
-task devJar(type: Jar, dependsOn: 'classes') {
+task devJar(type: Jar) {
     from sourceSets.main.output
-	// version = minecraft.version + " - " + project.version
+	version = minecraft.version + " - " + project.version
     classifier = "dev"
 }
 

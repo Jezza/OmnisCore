@@ -3,11 +3,11 @@
   "modid": "OmnisCore",
   "name": "Omnis Core",
   "description": "A Java library built on top of MinecraftForge to provide an API for easy implementation of Minecraft mods.",
-  "version": "${VERSION}",
-  "mcversion": "${MCVERSION}",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
   "logoFile": "/assets/omniscore/textures/logo.png",
   "url": "https://github.com/Jezza/OmnisCore",
-  "authorList ": [ "Jezza" ],
+  "authors ": [ "Jezza" ],
   "dependencies": [
      "MinecraftForge",
 	 "FML"
