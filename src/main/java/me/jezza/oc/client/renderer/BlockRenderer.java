@@ -27,6 +27,9 @@ public class BlockRenderer {
     public static final float OFFSET_14 = 0.875F;
     public static final float OFFSET_15 = 0.9375F;
 
+    /**
+     * No touchy.
+     */
     public static final float[] DEFAULT_OFFSETS = new float[6];
     private static Tessellator instance = Tessellator.instance;
 

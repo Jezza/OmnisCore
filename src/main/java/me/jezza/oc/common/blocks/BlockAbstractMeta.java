@@ -53,7 +53,7 @@ public abstract class BlockAbstractMeta extends BlockAbstract {
 
         String registerString = registryBuilder.toString();
         for (int i = 0; i < icons.length; i++)
-            icons[i] = iconRegister.registerIcon(registerString + names.get(MathHelper.clipInt(i, names.size())));
+            icons[i] = iconRegister.registerIcon(registerString + names.get(MathHelper.clip(i, 0, names.size())));
     }
 
     @Override

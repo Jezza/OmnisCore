@@ -4,15 +4,20 @@ import me.jezza.oc.api.configuration.Config.ConfigBoolean;
 import me.jezza.oc.api.configuration.ConfigEntry;
 import net.minecraftforge.common.config.Configuration;
 
-public class ConfigEntryBoolean extends ConfigEntry<ConfigBoolean, Boolean> {
+import java.lang.reflect.Field;
+
+public class CEBoolean extends ConfigEntry<ConfigBoolean, Boolean> {
+    public CEBoolean(Configuration config) {
+        super(config);
+    }
 
     @Override
-    public Object loadAnnotation(Configuration config, String fieldName, ConfigBoolean annotation, Boolean currentValue, Boolean defaultValue) {
+    public Object loadAnnotation(Configuration config, Field field, String fieldName, ConfigBoolean annotation, Boolean currentValue, Boolean defaultValue) {
         return getBoolean(annotation.category(), fieldName, defaultValue, processComment(annotation.comment()));
     }
 
     @Override
-    public void saveAnnotation(Configuration config, String fieldName, ConfigBoolean annotation, Boolean currentValue, Boolean defaultValue) {
+    public void saveAnnotation(Configuration config, Field field, String fieldName, ConfigBoolean annotation, Boolean currentValue, Boolean defaultValue) {
         getBooleanProperty(annotation.category(), fieldName, defaultValue, processComment(annotation.comment())).set(currentValue);
     }
 }

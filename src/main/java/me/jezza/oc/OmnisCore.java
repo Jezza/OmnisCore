@@ -8,11 +8,8 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.relauncher.Side;
-import me.jezza.oc.api.collect.Graph;
 import me.jezza.oc.api.configuration.Config;
 import me.jezza.oc.api.configuration.ConfigHandler;
-import me.jezza.oc.api.network.NetworkCore;
-import me.jezza.oc.api.network.NetworkInstance;
 import me.jezza.oc.api.network.search.SearchThread;
 import me.jezza.oc.common.CommonProxy;
 import me.jezza.oc.common.core.DebugHelper;
@@ -38,7 +35,7 @@ public class OmnisCore {
         logger = event.getModLog();
         logger.info("-- Pre-Initialising " + MOD_ID + " (" + VERSION + ") --");
 
-        ConfigHandler.initConfigHandler(event);
+        ConfigHandler.init(event);
         DebugHelper.checkSysOverrides();
 
         logger.info("Setting up internal network - Channel ID: " + MOD_ID);
@@ -53,12 +50,6 @@ public class OmnisCore {
 
         logger.info("Starting OmnisCore|NST");
         SearchThread.getInstance().start();
-
-        logger.info("Preloading Network|API");
-        new NetworkInstance();
-        new NetworkCore();
-        new Graph<>();
-        logger.info("Finished Preloading Network|API");
     }
 
     @EventHandler

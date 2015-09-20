@@ -41,26 +41,16 @@ public abstract class ItemAbstractMeta extends ItemAbstract {
     @Override
     public IIcon getIconFromDamage(int damage) {
         List<String> names = getNames();
-        damage = MathHelper.clipInt(damage, names.size() - 1);
+        damage = MathHelper.clip(damage, 0, names.size() - 1);
         return icons[damage];
     }
 
     @Override
     public String getUnlocalizedName(ItemStack itemStack) {
         List<String> names = getNames();
-        int damage = MathHelper.clipInt(itemStack.getItemDamage(), names.size() - 1);
+        int damage = MathHelper.clip(itemStack.getItemDamage(), 0, names.size() - 1);
         return "item." + names.get(damage);
     }
 
-    public boolean isValidStack(ItemStack itemStack, String name) {
-        int damage = itemStack.getItemDamage();
-        try {
-            return name.equals(getNames().get(damage));
-        } catch (Exception e) {
-        }
-        return false;
-    }
-
     public abstract List<String> getNames();
-
 }

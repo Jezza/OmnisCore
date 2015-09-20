@@ -6,6 +6,7 @@ import cpw.mods.fml.common.discovery.ASMDataTable;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import me.jezza.oc.api.configuration.Config.IConfigRegistrar;
 import me.jezza.oc.api.configuration.ConfigEntry;
+import me.jezza.oc.api.configuration.lib.ICEFactory;
 import me.jezza.oc.api.configuration.lib.IConfigRegistry;
 import me.jezza.oc.common.core.CoreProperties;
 
@@ -28,11 +29,11 @@ public class ConfigData {
         this.modContainer = modContainer;
         copyOwnedClasses(ownedClasses);
         isRegistrar = modContainer.getMod() instanceof IConfigRegistrar;
-        containerMap = new TreeMap<>(dataComparator);
+        containerMap = new TreeMap<>(LONGEST_STRING);
     }
 
     private void copyOwnedClasses(Collection<String> ownedClasses) {
-        ArrayList<String> sortedClasses = new ArrayList<>();
+        ArrayList<String> sortedClasses = new ArrayList<>(ownedClasses.size());
         for (String s : ownedClasses)
             if (!sortedClasses.contains(s))
                 sortedClasses.add(s);
@@ -41,25 +42,20 @@ public class ConfigData {
 
     public void addRoot(ASMData asmData) {
         Map<String, Object> annotationInfo = asmData.getAnnotationInfo();
-
         String packageName = asmData.getClassName();
 
         int pkgIndex = packageName.lastIndexOf('.');
         if (pkgIndex > -1)
             packageName = packageName.substring(0, pkgIndex);
-        packageName = packageName.replace(".", "/");
 
         if (!containerMap.containsKey(packageName)) {
             CoreProperties.logger.info("Discovered config controller inside: {}", packageName);
-
             File defaultConfig = getConfigForPackage(annotationInfo);
-
             CoreProperties.logger.info("Setting config: {}", defaultConfig);
-
             containerMap.put(packageName, new ConfigContainer(defaultConfig));
         } else {
             CoreProperties.logger.warn("Config controller discovered in the same root: {}. ", packageName);
-            CoreProperties.logger.warn("THIS IS AN ERROR! Ignoring {}", asmData.getClassName());
+            CoreProperties.logger.warn("Ignoring {}", asmData.getClassName());
         }
     }
 
@@ -73,11 +69,16 @@ public class ConfigData {
             containerMap.get(rootPackage).setChildClasses(getAllChildClasses(rootPackage));
     }
 
-    public void processConfigContainers(ASMDataTable asmDataTable, Map<Class<? extends Annotation>, Class<? extends ConfigEntry<? extends Annotation, ?>>> annotationMap) {
+    public void processConfigContainers(ASMDataTable asmDataTable, Collection<ICEFactory<?, ? extends ConfigEntry<? extends Annotation, ?>>> annotationMap) {
         for (ConfigContainer configContainer : containerMap.values()) {
             configContainer.processAllClasses(asmDataTable, annotationMap);
             configContainer.operateOnConfig(false);
         }
+    }
+
+    public void load() {
+        for (ConfigContainer configContainer : containerMap.values())
+            configContainer.operateOnConfig(false);
     }
 
     public void save() {
@@ -110,7 +111,7 @@ public class ConfigData {
     /**
      * Go from largest to smallest, that way when the childClasses get processed it can pull them out of the pool, without them already belonging to a more generic package.
      */
-    public static final Comparator<String> dataComparator = new Comparator<String>() {
+    public static final Comparator<String> LONGEST_STRING = new Comparator<String>() {
         @Override
         public int compare(String data1, String data2) {
             return data2.length() - data1.length();

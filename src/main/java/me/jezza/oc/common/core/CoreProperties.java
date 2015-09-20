@@ -6,7 +6,7 @@ public class CoreProperties {
 
     public static final String MOD_ID = "OmnisCore";
     public static final String MOD_NAME = "Omnis Core";
-    public static final String VERSION = "0.0.7";
+    public static final String VERSION = "0.2";
 
     private static final String BUILD = "1217";
 
@@ -21,5 +21,5 @@ public class CoreProperties {
     public static final String SERVER_PROXY = "me.jezza.oc.common.CommonProxy";
     public static final String CLIENT_PROXY = "me.jezza.oc.client.ClientProxy";
 
-    public static Logger logger; //  = LogManager.getLogger(MOD_ID)
+    public static Logger logger; //  = LogManager.getLogger(MOD_ID);
 }

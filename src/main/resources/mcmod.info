@@ -9,8 +9,8 @@
   "url": "https://github.com/Jezza/OmnisCore",
   "authors ": [ "Jezza" ],
   "dependencies": [
-     "MinecraftForge",
-	 "FML"
+	"FML",
+    "MinecraftForge",
   ]
 }
 ]

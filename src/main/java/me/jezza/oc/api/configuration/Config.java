@@ -10,59 +10,48 @@ import java.lang.annotation.Target;
 public class Config {
 
     /**
-     * If you have a custom config file location, override configFile() with the location.
-     * NOTE: That ANY string that configFile returns WILL be pushed on the end of the default config directory.
+     * If you want any custom config file location, override configFile() with the location.
+     * NOTE: That any string that configFile returns will be pushed on the end of the default config directory.
      * EG, configFile() return "AwesomeMod/awesomeMod.cfg";
      * ConfigHandler will try locating the config file as such "config/AwesomeMod/awesomeMod.cfg"
      * If it fails, it will generate it.
-     * <p/>
-     * saveOnExit(); Whether or not OmnisCore will save the config for you upon server exit.
-     * <p/>
-     * SAVE_ON_MANUAL_TRIGGER is the only category that can, surprise!, be saved by a manual trigger.
-     * SAVE_ON_WORLD_CLOSE will save on the world being closed.
-     * SAVE_ON_GAME_CLOSE will save on the game being closed.
-     * <p/>
-     * Each category is triggered by the ones below it.
-     * For example, I fire a manual save.
      */
-    @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.TYPE)
+    @Retention(RetentionPolicy.RUNTIME)
     public @interface Controller {
         String configFile() default "";
     }
 
     /**
-     * If the main mod class has implemented this, then the method will be fired before ANY config annotations are read on any mod.
+     * If the main mod class has implemented this, then the method will be fired before any config annotations are processed.
      * This way you have the ability to add any custom annotations.
      * NOTE: THIS MUST BE IMPLEMENTED ON THE MAIN MOD CLASS TO TAKE EFFECT
      */
-    public static interface IConfigRegistrar {
-        public void registerCustomAnnotations(IConfigRegistry registry);
+    public interface IConfigRegistrar {
+        void registerCustomAnnotations(IConfigRegistry registry);
     }
 
-    @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    public static @interface ConfigBoolean {
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface ConfigBoolean {
         String category();
 
         String[] comment() default {};
     }
 
-    @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    public static @interface ConfigBooleanArray {
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface ConfigBooleanArray {
         String category();
-
-        boolean isListLengthFixed() default false;
 
         int maxListLength() default -1;
 
         String[] comment() default {};
     }
 
-    @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    public static @interface ConfigInteger {
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface ConfigInteger {
         String category();
 
         int minValue() default Integer.MIN_VALUE;
@@ -72,25 +61,23 @@ public class Config {
         String[] comment() default {};
     }
 
-    @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    public static @interface ConfigIntegerArray {
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface ConfigIntegerArray {
         String category();
 
         int minValue() default Integer.MIN_VALUE;
 
         int maxValue() default Integer.MAX_VALUE;
 
-        boolean isListLengthFixed() default false;
-
         int maxListLength() default -1;
 
         String[] comment() default {};
     }
 
-    @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    public static @interface ConfigFloat {
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface ConfigFloat {
         String category();
 
         float minValue() default Float.MIN_VALUE;
@@ -100,9 +87,9 @@ public class Config {
         String[] comment() default {};
     }
 
-    @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    public static @interface ConfigDouble {
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface ConfigDouble {
         String category();
 
         double minValue() default Double.MIN_VALUE;
@@ -112,25 +99,23 @@ public class Config {
         String[] comment() default {};
     }
 
-    @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    public static @interface ConfigDoubleArray {
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface ConfigDoubleArray {
         String category();
 
         double minValue() default Double.MIN_VALUE;
 
         double maxValue() default Double.MAX_VALUE;
-
-        boolean isListLengthFixed() default false;
 
         int maxListLength() default -1;
 
         String[] comment() default {};
     }
 
-    @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    public static @interface ConfigString {
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface ConfigString {
         String category();
 
         String[] validValues() default {};
@@ -138,9 +123,17 @@ public class Config {
         String[] comment() default {};
     }
 
-    @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
-    public static @interface ConfigStringArray {
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface ConfigStringArray {
+        String category();
+
+        String[] comment() default {};
+    }
+
+    @Target(ElementType.FIELD)
+    @Retention(RetentionPolicy.RUNTIME)
+    public @interface ConfigEnum {
         String category();
 
         String[] comment() default {};

@@ -9,10 +9,14 @@ import cpw.mods.fml.common.discovery.ModCandidate;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import me.jezza.oc.api.configuration.discovery.ConfigData;
 import me.jezza.oc.api.configuration.entries.*;
+import me.jezza.oc.api.configuration.exceptions.ConfigurationException;
+import me.jezza.oc.api.configuration.lib.ICEFactory;
 import me.jezza.oc.api.configuration.lib.IConfigRegistry;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -21,38 +25,40 @@ import java.util.Set;
 import static me.jezza.oc.api.configuration.Config.*;
 
 public class ConfigHandler implements IConfigRegistry {
-
     private static ConfigHandler INSTANCE;
 
-    // Once this is true, no more registering annotations.
-    private static boolean init = false;
-    private static boolean processed = false;
+    // After 3rd party mod annotations have been added.
+    private static boolean registrarsProcessed = false;
+    // After all annotated fields have been located, processed, and cached.
     private static boolean postProcessed = false;
 
     private static final Map<String, ConfigData> configMap = new LinkedHashMap<>();
-    private static final Map<Class<? extends Annotation>, Class<? extends ConfigEntry<? extends Annotation, ?>>> annotationMap = new LinkedHashMap<>();
+    private static final Map<String, ICEFactory<?, ? extends ConfigEntry<? extends Annotation, ?>>> annotationMap = new LinkedHashMap<>();
 
     static {
-        annotationMap.put(ConfigBoolean.class, ConfigEntryBoolean.class);
-        annotationMap.put(ConfigBooleanArray.class, ConfigEntryBooleanArray.class);
-        annotationMap.put(ConfigInteger.class, ConfigEntryInteger.class);
-        annotationMap.put(ConfigIntegerArray.class, ConfigEntryIntegerArray.class);
-        annotationMap.put(ConfigFloat.class, ConfigEntryFloat.class);
-        annotationMap.put(ConfigDouble.class, ConfigEntryDouble.class);
-        annotationMap.put(ConfigDoubleArray.class, ConfigEntryDoubleArray.class);
-        annotationMap.put(ConfigString.class, ConfigEntryBoolean.class);
-        annotationMap.put(ConfigStringArray.class, ConfigEntryBoolean.class);
+        internalRegisterAnnotation(ConfigBoolean.class, CEBoolean.class);
+        internalRegisterAnnotation(ConfigBooleanArray.class, CEBooleanArray.class);
+        internalRegisterAnnotation(ConfigInteger.class, CEInteger.class);
+        internalRegisterAnnotation(ConfigIntegerArray.class, CEIntegerArray.class);
+        internalRegisterAnnotation(ConfigFloat.class, CEFloat.class);
+        internalRegisterAnnotation(ConfigDouble.class, CEDouble.class);
+        internalRegisterAnnotation(ConfigDoubleArray.class, CEDoubleArray.class);
+        internalRegisterAnnotation(ConfigString.class, CEString.class);
+        internalRegisterAnnotation(ConfigStringArray.class, CEStringArray.class);
+        internalRegisterAnnotation(ConfigEnum.class, CEEnum.class);
+    }
+
+    public static void init(FMLPreInitializationEvent event) {
+        if (INSTANCE != null)
+            return;
+        INSTANCE = new ConfigHandler();
+        INSTANCE.parseControllers(event);
     }
 
     private ConfigHandler() {
-        MinecraftForge.EVENT_BUS.register(this);
     }
 
     public void parseControllers(FMLPreInitializationEvent event) {
-        if (init)
-            return;
-        init = true;
-
         ASMDataTable asmDataTable = event.getAsmData();
         Set<ASMData> asmDataSet = asmDataTable.getAll(Controller.class.getName());
 
@@ -71,49 +77,76 @@ public class ConfigHandler implements IConfigRegistry {
         for (ConfigData configValue : configMap.values())
             if (configValue.isRegistrar)
                 configValue.processIConfigRegistrar(this);
-        processed = true;
+        registrarsProcessed = true;
 
         for (ConfigData configData : configMap.values()) {
             // Organise all sub-packages.
             configData.processRoots();
 
             // Process all current classes associated with the ConfigContainer.
-            configData.processConfigContainers(asmDataTable, annotationMap);
+            configData.processConfigContainers(asmDataTable, annotationMap.values());
         }
         postProcessed = true;
     }
 
     /**
-     * Only call this when you've had the chance from the interface.
+     * You can only call this when you've had the chance from the interface.
      * To use this, implement {@link me.jezza.oc.api.configuration.Config.IConfigRegistrar} on your main mod file.
      * Please make sure you use that interface, that way I can guarantee that all the annotations are registered before all processing begins.
      */
     @Override
-    public boolean registerAnnotation(final Class<? extends Annotation> clazz, final Class<? extends ConfigEntry<? extends Annotation, ?>> configEntry) {
-        if (processed || Modifier.isAbstract(configEntry.getModifiers()))
-            return false;
-        if (!annotationMap.containsKey(clazz))
-            annotationMap.put(clazz, configEntry);
-        return true;
+    public <A extends Annotation, T extends ConfigEntry<A, ?>> boolean registerAnnotation(Class<A> clazz, Class<T> configEntry) {
+        return !(registrarsProcessed || Modifier.isAbstract(configEntry.getModifiers())) && internalRegisterAnnotation(clazz, configEntry);
+    }
+
+    private static <A extends Annotation, T extends ConfigEntry<A, ?>> boolean internalRegisterAnnotation(Class<A> clazz, Class<T> configEntry) {
+        String canonicalName = clazz.getCanonicalName();
+        if (!annotationMap.containsKey(canonicalName)) {
+            annotationMap.put(canonicalName, createFactory(clazz, configEntry));
+            return true;
+        }
+        return false;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <A extends Annotation, T extends ConfigEntry<A, ?>> ICEFactory<A, T> createFactory(final Class<A> annotationClazz, final Class<T> configClazz) {
+        for (final Constructor<T> constructor : (Constructor<T>[]) configClazz.getDeclaredConstructors()) {
+            if (constructor.getParameterCount() == 1 && constructor.getParameterTypes()[0] == Configuration.class) {
+                constructor.setAccessible(true);
+                return new ICEFactory<A, T>() {
+                    @Override
+                    public T create(Object... params) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+                        return constructor.newInstance(params);
+                    }
+
+                    @Override
+                    public Class<A> annotationClazz() {
+                        return annotationClazz;
+                    }
+                };
+            }
+        }
+        throw new ConfigurationException("Found no entry point for the ConfigClass: " + configClazz + "! Requires a constructor with one parameter: " + Configuration.class);
+    }
+
+    public static void load(String modID) {
+        if (postProcessed && !Strings.isNullOrEmpty(modID) && Loader.isModLoaded(modID)) {
+            ConfigData configData = configMap.get(modID);
+            if (configData != null)
+                configData.load();
+        }
     }
 
     public static void save(String modID) {
-        if (!postProcessed || Strings.isNullOrEmpty(modID) || !Loader.isModLoaded(modID))
-            return;
-        if (configMap.containsKey(modID))
-            configMap.get(modID).save();
+        if (postProcessed && !Strings.isNullOrEmpty(modID) && Loader.isModLoaded(modID)) {
+            ConfigData configData = configMap.get(modID);
+            if (configData != null)
+                configData.save();
+        }
     }
 
     @Override
     public String toString() {
         return annotationMap.toString();
-    }
-
-    public static void initConfigHandler(FMLPreInitializationEvent event) {
-        if (INSTANCE != null)
-            return;
-
-        INSTANCE = new ConfigHandler();
-        INSTANCE.parseControllers(event);
     }
 }

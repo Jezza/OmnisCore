@@ -50,7 +50,7 @@ public abstract class GuiCycle<T extends GuiCycle> extends GuiTexturedButton<T> 
                 typeState = 0;
                 break;
         }
-        typeState = MathHelper.wrapInt(typeState, getNumberOfStates() - 1);
+        typeState = MathHelper.wrap(typeState, 0, getNumberOfStates() - 1);
 
         u = srcX + getShiftedX(typeState);
         v = srcY + getShiftedY(typeState);
