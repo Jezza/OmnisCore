@@ -3,7 +3,7 @@ package me.jezza.oc.api.network;
 import com.google.common.collect.ImmutableList;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
-import me.jezza.oc.api.collect.Graph;
+import me.jezza.oc.common.utils.collect.Graph;
 import me.jezza.oc.api.network.NetworkResponse.MessageResponse;
 import me.jezza.oc.api.network.interfaces.*;
 import me.jezza.oc.api.network.search.SearchThread;

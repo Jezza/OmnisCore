@@ -3,11 +3,9 @@ package me.jezza.oc.client.gui;
 import cpw.mods.fml.common.network.simpleimpl.IMessage;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import me.jezza.oc.OmnisCore;
 import me.jezza.oc.client.gui.components.GuiWidget;
 import me.jezza.oc.client.gui.interfaces.IGuiRenderHandler;
 import me.jezza.oc.client.lib.Colour;
-import me.jezza.oc.common.core.network.MessageGuiNotify;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -145,11 +143,11 @@ public abstract class GuiContainerAbstract extends GuiContainer implements IGuiR
      * @param process ID of the process.
      */
     public void sendMessage(int ID, int process) {
-        sendMessage(new MessageGuiNotify(ID, process));
+//        sendMessage(new MessageGuiNotify(ID, process));
     }
 
     public static void sendMessage(IMessage message) {
-        OmnisCore.networkDispatcher.sendToServer(message);
+//        OmnisCore.networkDispatcher.sendToServer(message);
     }
 
     public abstract void onActionPerformed(GuiWidget widget, int mouse);

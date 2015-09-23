@@ -1,39 +1,33 @@
 package me.jezza.oc.common.core;
 
-import me.jezza.oc.api.configuration.Config.ConfigBoolean;
+import me.jezza.oc.api.config.Config.ConfigBoolean;
 
 import static me.jezza.oc.common.core.CoreProperties.logger;
 
 public class DebugHelper {
 
-    @ConfigBoolean(category = "DebugHelpers")
-    private static boolean debug_enableConsole = false;
+    @ConfigBoolean(category = "Debug")
+    private static boolean debugChat = false;
 
-    @ConfigBoolean(category = "DebugHelpers")
-    private static boolean debug_enableChat = false;
+    @ConfigBoolean(category = "Debug")
+    private static boolean debugConsole = false;
 
-    /**
-     * Usable for all mods.
-     */
-    public static boolean isDebug_enableChat() {
-        return debug_enableChat;
+    public static boolean debugChat() {
+        return debugChat;
     }
 
-    /**
-     * Usable for all mods.
-     */
-    public static boolean isDebug_enableConsole() {
-        return debug_enableConsole;
+    public static boolean debugConsole() {
+        return debugConsole;
     }
 
     public static void checkSysOverrides() {
-        if (!debug_enableConsole && System.getenv("OC_DBG_CONSOLE") != null) {
-            debug_enableConsole = true;
-            logger.info("OmnisCore Console debugging override enabled via system properties.");
+        if (!debugConsole && System.getenv("OC_DBG_CONSOLE") != null) {
+            debugConsole = true;
+            logger.info("OmnisCore Console debugging override enabled via System properties.");
         }
-        if (!debug_enableChat && System.getenv("OC_DBG_CHAT") != null) {
-            debug_enableChat = true;
-            logger.info("OmnisCore Chat debugging override enabled via system properties.");
+        if (!debugChat && System.getenv("OC_DBG_CHAT") != null) {
+            debugChat = true;
+            logger.info("OmnisCore Chat debugging override enabled via System properties.");
         }
     }
 }

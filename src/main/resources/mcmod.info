@@ -7,10 +7,10 @@
   "mcversion": "${mcversion}",
   "logoFile": "/assets/omniscore/textures/logo.png",
   "url": "https://github.com/Jezza/OmnisCore",
-  "authors ": [ "Jezza" ],
+  "authorList": [ "Jezza" ],
   "dependencies": [
 	"FML",
-    "MinecraftForge",
+    "MinecraftForge"
   ]
 }
 ]
