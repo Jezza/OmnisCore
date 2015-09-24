@@ -4,7 +4,7 @@ import com.google.common.base.Strings;
 import me.jezza.oc.api.exceptions.ConfigurationException;
 import me.jezza.oc.common.core.CoreProperties;
 import me.jezza.oc.common.utils.Localise;
-import me.jezza.oc.common.utils.MathHelper;
+import me.jezza.oc.common.utils.MathsHelper;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import org.apache.logging.log4j.Level;
@@ -227,7 +227,7 @@ public abstract class ConfigEntry<T extends Annotation, V> {
     public float getFloat(String category, String key, float defaultValue, float minValue, float maxValue, String comment, String langKey) {
         Property prop = getFloatProperty(category, key, defaultValue, minValue, maxValue, comment, langKey);
         try {
-            return MathHelper.clip(Float.parseFloat(prop.getString()), minValue, maxValue);
+            return MathsHelper.clip(Float.parseFloat(prop.getString()), minValue, maxValue);
         } catch (Exception ignored) {
         }
         return defaultValue;
@@ -252,7 +252,7 @@ public abstract class ConfigEntry<T extends Annotation, V> {
 
     public int getInt(String category, String key, int defaultValue, int minValue, int maxValue, String comment, String langKey) {
         int value = getIntProperty(category, key, defaultValue, minValue, maxValue, comment, langKey).getInt(defaultValue);
-        return MathHelper.clip(value, minValue, maxValue);
+        return MathsHelper.clip(value, minValue, maxValue);
     }
 
     public Property getIntProperty(String category, String key, int defaultValue, int minValue, int maxValue, String comment) {

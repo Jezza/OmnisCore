@@ -65,13 +65,11 @@ public class OmnisCodec extends MessageToMessageCodec<FMLProxyPacket, IOmnisPack
                 player = this.getClientPlayer();
                 pkt.processClientSide(player);
                 break;
-
             case SERVER:
                 INetHandler netHandler = ctx.channel().attr(NetworkRegistry.NET_HANDLER).get();
                 player = ((NetHandlerPlayServer) netHandler).playerEntity;
                 pkt.processServerSide(player);
                 break;
-
             default:
         }
     }

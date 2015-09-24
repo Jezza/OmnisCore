@@ -2,7 +2,7 @@ package me.jezza.oc.common.items;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import me.jezza.oc.common.utils.MathHelper;
+import me.jezza.oc.common.utils.MathsHelper;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -41,14 +41,14 @@ public abstract class ItemAbstractMeta extends ItemAbstract {
     @Override
     public IIcon getIconFromDamage(int damage) {
         List<String> names = getNames();
-        damage = MathHelper.clip(damage, 0, names.size() - 1);
+        damage = MathsHelper.clip(damage, 0, names.size() - 1);
         return icons[damage];
     }
 
     @Override
     public String getUnlocalizedName(ItemStack itemStack) {
         List<String> names = getNames();
-        int damage = MathHelper.clip(itemStack.getItemDamage(), 0, names.size() - 1);
+        int damage = MathsHelper.clip(itemStack.getItemDamage(), 0, names.size() - 1);
         return "item." + names.get(damage);
     }
 

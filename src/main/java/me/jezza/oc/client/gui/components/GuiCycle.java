@@ -2,7 +2,7 @@ package me.jezza.oc.client.gui.components;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import me.jezza.oc.common.utils.MathHelper;
+import me.jezza.oc.common.utils.MathsHelper;
 
 /**
  * If you do instantiate this class, make sure to pass the class to the super.
@@ -50,7 +50,7 @@ public abstract class GuiCycle<T extends GuiCycle> extends GuiTexturedButton<T> 
                 typeState = 0;
                 break;
         }
-        typeState = MathHelper.wrap(typeState, 0, getNumberOfStates() - 1);
+        typeState = MathsHelper.wrap(typeState, 0, getNumberOfStates() - 1);
 
         u = srcX + getShiftedX(typeState);
         v = srcY + getShiftedY(typeState);

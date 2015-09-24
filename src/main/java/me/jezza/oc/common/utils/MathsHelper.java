@@ -1,6 +1,6 @@
 package me.jezza.oc.common.utils;
 
-public class MathHelper {
+public class MathsHelper {
     public static int wrap(int value, int min, int max) {
         return value < min ? max : value > max ? min : value;
     }

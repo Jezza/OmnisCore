@@ -12,6 +12,8 @@ import me.jezza.oc.api.channel.SidedChannel;
 import me.jezza.oc.common.core.CoreProperties;
 import me.jezza.oc.common.core.channel.internal.ChannelFML;
 import me.jezza.oc.common.core.channel.internal.ChannelMC;
+import me.jezza.oc.common.utils.Localise;
+import me.jezza.oc.common.utils.helpers.ModHelper;
 import me.jezza.oc.common.utils.helpers.StringHelper;
 
 import java.lang.reflect.Field;
@@ -27,7 +29,6 @@ public class ChannelDispatcher {
     private static ChannelDispatcher INSTANCE;
 
     private static final Map<String, IChannel> channelMap = new HashMap<>();
-    private static Map<String, ModContainer> indexedModMap;
 
     private static boolean lockdown = false;
 
@@ -50,7 +51,11 @@ public class ChannelDispatcher {
                 Class<?> clazz = Class.forName(data.getClassName());
                 Field field = clazz.getDeclaredField(data.getObjectName());
                 if (!Modifier.isStatic(field.getModifiers())) {
-                    CoreProperties.logger.warn("Non static field");
+                    CoreProperties.logger.warn(Localise.format("Discovered @{} on a non-static field. Skipping...", SidedChannel.class.getSimpleName()));
+                    continue;
+                }
+                if (Modifier.isFinal(field.getModifiers())) {
+                    CoreProperties.logger.warn(Localise.format("Discovered @{} on a final field. Skipping...", SidedChannel.class.getSimpleName()));
                     continue;
                 }
                 field.setAccessible(true);
@@ -74,21 +79,12 @@ public class ChannelDispatcher {
             throw new IllegalArgumentException("Not a valid channel name: " + modId);
         IChannel channel = channelMap.get(modId);
         if (channel == null) {
-            ModContainer mod = getIndexedModMap().get(modId);
+            ModContainer mod = ModHelper.getIndexedModMap().get(modId);
             channel = new OmnisChannel(mod, modId, FMLCommonHandler.instance().getSide(), new OmnisCodec());
             channelMap.put(modId, channel);
         }
         return channel;
     }
-
-    /**
-     * This way only one unmodifiable list is created.
-     * @return A ImmutableMap of all mods, mapped to their modId.
-     */
-    public static Map<String, ModContainer> getIndexedModMap() {
-        return indexedModMap != null ? indexedModMap : (indexedModMap = Loader.instance().getIndexedModList());
-    }
-
 
     public static ChannelMC minecraft() {
         throw new UnsupportedOperationException("Not Yet Implemented!");
@@ -98,11 +94,11 @@ public class ChannelDispatcher {
         throw new UnsupportedOperationException("Not Yet Implemented!");
     }
 
-    public static void lockdown(FMLPostInitializationEvent event) {
-        lockdown = lockdown || event != null;
-    }
-
     public static boolean lockdown() {
         return lockdown;
+    }
+
+    public static void lockdown(FMLPostInitializationEvent event) {
+        lockdown |= event != null;
     }
 }
