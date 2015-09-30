@@ -1,13 +1,12 @@
 package me.jezza.oc.common.core.channel;
 
-import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.network.FMLEmbeddedChannel;
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import cpw.mods.fml.relauncher.Side;
+import io.netty.channel.ChannelFuture;
 import io.netty.util.AttributeKey;
 import me.jezza.oc.api.channel.IChannel;
 import me.jezza.oc.api.channel.IOmnisPacket;
-import me.jezza.oc.api.config.Config.ConfigDouble;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.Packet;
@@ -17,105 +16,117 @@ import net.minecraft.world.World;
 import static cpw.mods.fml.common.network.FMLOutboundHandler.FML_MESSAGETARGET;
 import static cpw.mods.fml.common.network.FMLOutboundHandler.FML_MESSAGETARGETARGS;
 import static cpw.mods.fml.common.network.FMLOutboundHandler.OutboundTarget.*;
+import static cpw.mods.fml.common.network.NetworkRegistry.CHANNEL_SOURCE;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static me.jezza.oc.common.core.channel.ChannelDispatcher.NETWORK_UPDATE_RANGE;
 
 /**
  * @author Jezza
  */
-public class OmnisChannel extends FMLEmbeddedChannel implements IChannel {
+public class OmnisChannel implements IChannel {
     private static final AttributeKey<Boolean> CHANNEL_LOCKDOWN = new AttributeKey<>("omnis:lockdown");
 
-    @ConfigDouble(category = "Networking", minValue = 5, maxValue = 120, comment = "The default network update range.")
-    private static double NETWORK_UPDATE_RANGE = 60;
-
+    private final FMLEmbeddedChannel channel;
     private final OmnisCodec codec;
 
-    public OmnisChannel(ModContainer mod, String modId, Side source, OmnisCodec codec) {
-        super(mod, modId + "|OmnisCodec", source, codec);
+    public OmnisChannel(FMLEmbeddedChannel channel, OmnisCodec codec) {
+        this.channel = channel;
         this.codec = codec;
-        attr(CHANNEL_LOCKDOWN).setIfAbsent(Boolean.FALSE);
+        channel.attr(CHANNEL_LOCKDOWN).setIfAbsent(FALSE);
     }
 
     @Override
     public boolean registerPacket(Class<? extends IOmnisPacket> packetClass) {
-        if (attr(CHANNEL_LOCKDOWN).get())
-            throw new IllegalStateException("You cannot register any packets after FMLPostInitializationEvent is released!");
+        if (channel.attr(CHANNEL_LOCKDOWN).get())
+            throw new IllegalStateException("You cannot register any packets after FMLPostInitializationEvent is released or after already sending a packet!");
         return codec.registerPacket(packetClass);
     }
 
     @Override
-    public void sendToAll(IOmnisPacket packet) {
-        attr(CHANNEL_LOCKDOWN).compareAndSet(Boolean.FALSE, Boolean.TRUE);
-        attr(FML_MESSAGETARGET).set(ALL);
-        writeAndFlush(packet);
+    public ChannelFuture sendToAll(IOmnisPacket packet) {
+        channel.attr(CHANNEL_LOCKDOWN).compareAndSet(FALSE, TRUE);
+        channel.attr(FML_MESSAGETARGET).set(ALL);
+        return channel.writeAndFlush(packet);
     }
 
     @Override
-    public void sendTo(IOmnisPacket packet, EntityPlayerMP player) {
-        attr(CHANNEL_LOCKDOWN).compareAndSet(Boolean.FALSE, Boolean.TRUE);
-        attr(FML_MESSAGETARGET).set(PLAYER);
-        attr(FML_MESSAGETARGETARGS).set(player);
-        writeAndFlush(packet);
+    public ChannelFuture sendTo(IOmnisPacket packet, EntityPlayerMP player) {
+        channel.attr(CHANNEL_LOCKDOWN).compareAndSet(FALSE, TRUE);
+        channel.attr(FML_MESSAGETARGET).set(PLAYER);
+        channel.attr(FML_MESSAGETARGETARGS).set(player);
+        return channel.writeAndFlush(packet);
     }
 
     @Override
-    public void sendTo(IOmnisPacket packet, EntityPlayer player) {
-        attr(CHANNEL_LOCKDOWN).compareAndSet(Boolean.FALSE, Boolean.TRUE);
-        attr(FML_MESSAGETARGET).set(PLAYER);
-        attr(FML_MESSAGETARGETARGS).set(player);
-        writeAndFlush(packet);
+    public ChannelFuture sendTo(IOmnisPacket packet, EntityPlayer player) {
+        channel.attr(CHANNEL_LOCKDOWN).compareAndSet(FALSE, TRUE);
+        channel.attr(FML_MESSAGETARGET).set(PLAYER);
+        channel.attr(FML_MESSAGETARGETARGS).set(player);
+        return channel.writeAndFlush(packet);
     }
 
     @Override
-    public void sendToAllAround(IOmnisPacket packet, TargetPoint point) {
-        attr(CHANNEL_LOCKDOWN).compareAndSet(Boolean.FALSE, Boolean.TRUE);
-        attr(FML_MESSAGETARGET).set(ALLAROUNDPOINT);
-        attr(FML_MESSAGETARGETARGS).set(point);
-        writeAndFlush(packet);
+    public ChannelFuture sendToAllAround(IOmnisPacket packet, TargetPoint point) {
+        channel.attr(CHANNEL_LOCKDOWN).compareAndSet(FALSE, TRUE);
+        channel.attr(FML_MESSAGETARGET).set(ALLAROUNDPOINT);
+        channel.attr(FML_MESSAGETARGETARGS).set(point);
+        return channel.writeAndFlush(packet);
     }
 
     @Override
-    public void sendToAllAround(IOmnisPacket packet, TileEntity point) {
-        sendToAllAround(packet, point, NETWORK_UPDATE_RANGE);
+    public ChannelFuture sendToAllAround(IOmnisPacket packet, TileEntity point) {
+        return sendToAllAround(packet, point, NETWORK_UPDATE_RANGE);
     }
 
     @Override
-    public void sendToAllAround(IOmnisPacket packet, TileEntity point, double range) {
-        attr(CHANNEL_LOCKDOWN).compareAndSet(Boolean.FALSE, Boolean.TRUE);
-        attr(FML_MESSAGETARGET).set(ALLAROUNDPOINT);
-        attr(FML_MESSAGETARGETARGS).set(new TargetPoint(point.getWorldObj().provider.dimensionId, point.xCoord, point.yCoord, point.zCoord, range));
-        writeAndFlush(packet);
+    public ChannelFuture sendToAllAround(IOmnisPacket packet, TileEntity point, double range) {
+        channel.attr(CHANNEL_LOCKDOWN).compareAndSet(FALSE, TRUE);
+        channel.attr(FML_MESSAGETARGET).set(ALLAROUNDPOINT);
+        channel.attr(FML_MESSAGETARGETARGS).set(new TargetPoint(point.getWorldObj().provider.dimensionId, point.xCoord, point.yCoord, point.zCoord, range));
+        return channel.writeAndFlush(packet);
     }
 
     @Override
-    public void sendToAllAround(IOmnisPacket packet, World world, int x, int y, int z) {
-        sendToAllAround(packet, world, x, y, z, NETWORK_UPDATE_RANGE);
+    public ChannelFuture sendToAllAround(IOmnisPacket packet, World world, int x, int y, int z) {
+        return sendToAllAround(packet, world, x, y, z, NETWORK_UPDATE_RANGE);
     }
 
     @Override
-    public void sendToAllAround(IOmnisPacket packet, World world, int x, int y, int z, double range) {
-        attr(CHANNEL_LOCKDOWN).compareAndSet(Boolean.FALSE, Boolean.TRUE);
-        attr(FML_MESSAGETARGET).set(ALLAROUNDPOINT);
-        attr(FML_MESSAGETARGETARGS).set(new TargetPoint(world.provider.dimensionId, x, y, z, range));
-        writeAndFlush(packet);
+    public ChannelFuture sendToAllAround(IOmnisPacket packet, World world, int x, int y, int z, double range) {
+        channel.attr(CHANNEL_LOCKDOWN).compareAndSet(FALSE, TRUE);
+        channel.attr(FML_MESSAGETARGET).set(ALLAROUNDPOINT);
+        channel.attr(FML_MESSAGETARGETARGS).set(new TargetPoint(world.provider.dimensionId, x, y, z, range));
+        return channel.writeAndFlush(packet);
     }
 
     @Override
-    public void sendToDimension(IOmnisPacket packet, int dimId) {
-        attr(CHANNEL_LOCKDOWN).compareAndSet(Boolean.FALSE, Boolean.TRUE);
-        attr(FML_MESSAGETARGET).set(DIMENSION);
-        attr(FML_MESSAGETARGETARGS).set(dimId);
-        writeAndFlush(packet);
+    public ChannelFuture sendToDimension(IOmnisPacket packet, int dimId) {
+        channel.attr(CHANNEL_LOCKDOWN).compareAndSet(FALSE, TRUE);
+        channel.attr(FML_MESSAGETARGET).set(DIMENSION);
+        channel.attr(FML_MESSAGETARGETARGS).set(dimId);
+        return channel.writeAndFlush(packet);
     }
 
     @Override
-    public void sendToServer(IOmnisPacket packet) {
-        attr(CHANNEL_LOCKDOWN).compareAndSet(Boolean.FALSE, Boolean.TRUE);
-        attr(FML_MESSAGETARGET).set(TOSERVER);
-        writeAndFlush(packet);
+    public ChannelFuture sendToServer(IOmnisPacket packet) {
+        channel.attr(CHANNEL_LOCKDOWN).compareAndSet(FALSE, TRUE);
+        channel.attr(FML_MESSAGETARGET).set(TOSERVER);
+        return channel.writeAndFlush(packet);
+    }
+
+    @Override
+    public void lockdown() {
+        channel.attr(CHANNEL_LOCKDOWN).compareAndSet(FALSE, TRUE);
     }
 
     @Override
     public Packet mcPacket(IOmnisPacket packet) {
-        return generatePacketFrom(packet);
+        return channel.generatePacketFrom(packet);
+    }
+
+    @Override
+    public Side source() {
+        return channel.attr(CHANNEL_SOURCE).get();
     }
 }

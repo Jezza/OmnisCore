@@ -1,4 +1,4 @@
-package me.jezza.oc.common.core;
+package me.jezza.oc.common.utils.helpers;
 
 import me.jezza.oc.api.config.Config.ConfigBoolean;
 

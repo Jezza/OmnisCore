@@ -5,7 +5,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.common.interfaces.IItemTooltip;
-import me.jezza.oc.common.utils.MovingObjectPositionHelper;
+import me.jezza.oc.common.utils.helpers.EntityHelper;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -62,7 +62,7 @@ public abstract class ItemAbstract extends Item {
     }
 
     public MovingObjectPosition getMOP(EntityLivingBase entity) {
-        return MovingObjectPositionHelper.getCurrentMovingObjectPosition(entity);
+        return EntityHelper.getCurrentMovingObjectPosition(entity);
     }
 
     @Override

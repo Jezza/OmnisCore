@@ -3,8 +3,7 @@ package me.jezza.oc.common.core.config;
 import com.google.common.base.Strings;
 import me.jezza.oc.api.exceptions.ConfigurationException;
 import me.jezza.oc.common.core.CoreProperties;
-import me.jezza.oc.common.utils.Localise;
-import me.jezza.oc.common.utils.MathsHelper;
+import me.jezza.oc.common.utils.Maths;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import org.apache.logging.log4j.Level;
@@ -15,6 +14,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static me.jezza.oc.common.utils.helpers.StringHelper.format;
+import static me.jezza.oc.common.utils.helpers.StringHelper.translateWithFallback;
 import static net.minecraftforge.common.config.Property.Type.STRING;
 
 public abstract class ConfigEntry<T extends Annotation, V> {
@@ -29,7 +30,7 @@ public abstract class ConfigEntry<T extends Annotation, V> {
     public void add(Field field, T annotation) {
         String fieldName = field.getDeclaringClass().getCanonicalName() + '.' + field.getName();
         if (!checkField(field, annotation)) {
-            throw error(Localise.format("@{0} threw an error on {1}! Please confirm the field type.", annotation.annotationType().getSimpleName(), fieldName));
+            throw error(format("@{} threw an error on {}! Please confirm the field type.", annotation.annotationType().getSimpleName(), fieldName));
         }
         if (!configMap.containsKey(fieldName))
             configMap.put(fieldName, new AnnotatedField<T, V>(field, annotation));
@@ -74,7 +75,7 @@ public abstract class ConfigEntry<T extends Annotation, V> {
         StringBuilder builder = new StringBuilder();
         for (String comment : comments) {
             if (!Strings.isNullOrEmpty(comment)) {
-                String translated = Localise.translateWithFallback(comment);
+                String translated = translateWithFallback(comment);
                 if (!Strings.isNullOrEmpty(translated)) {
                     builder.append(comment).append(System.lineSeparator());
                 }
@@ -227,7 +228,7 @@ public abstract class ConfigEntry<T extends Annotation, V> {
     public float getFloat(String category, String key, float defaultValue, float minValue, float maxValue, String comment, String langKey) {
         Property prop = getFloatProperty(category, key, defaultValue, minValue, maxValue, comment, langKey);
         try {
-            return MathsHelper.clip(Float.parseFloat(prop.getString()), minValue, maxValue);
+            return Maths.clip(Float.parseFloat(prop.getString()), minValue, maxValue);
         } catch (Exception ignored) {
         }
         return defaultValue;
@@ -252,7 +253,7 @@ public abstract class ConfigEntry<T extends Annotation, V> {
 
     public int getInt(String category, String key, int defaultValue, int minValue, int maxValue, String comment, String langKey) {
         int value = getIntProperty(category, key, defaultValue, minValue, maxValue, comment, langKey).getInt(defaultValue);
-        return MathsHelper.clip(value, minValue, maxValue);
+        return Maths.clip(value, minValue, maxValue);
     }
 
     public Property getIntProperty(String category, String key, int defaultValue, int minValue, int maxValue, String comment) {

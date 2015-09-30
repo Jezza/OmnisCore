@@ -12,9 +12,8 @@ import me.jezza.oc.api.channel.SidedChannel;
 import me.jezza.oc.api.config.Config.Controller;
 import me.jezza.oc.api.network.search.SearchThread;
 import me.jezza.oc.common.CommonProxy;
-import me.jezza.oc.common.core.DebugHelper;
+import me.jezza.oc.common.utils.helpers.DebugHelper;
 import me.jezza.oc.common.core.channel.ChannelDispatcher;
-import me.jezza.oc.common.core.channel.TestPacket;
 import me.jezza.oc.common.core.config.ConfigHandler;
 
 import static me.jezza.oc.common.core.CoreProperties.*;
@@ -43,8 +42,6 @@ public class OmnisCore {
         DebugHelper.checkSysOverrides();
         logger.info("-- Configuring Internal Channels --");
         ChannelDispatcher.init(event);
-
-        channel.registerPacket(TestPacket.class);
     }
 
     @EventHandler
@@ -52,15 +49,13 @@ public class OmnisCore {
         logger.info("-- Initialising --");
         logger.info("-- Starting OmnisCore|NST --");
         SearchThread.getInstance().start();
-        channel.sendToServer(new TestPacket());
     }
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         logger.info("-- Post-Initialising --");
 
-        logger.info("-- Locking down Channel packet registration. --");
+        logger.info("-- Locking Channel packet registration. --");
         ChannelDispatcher.lockdown(event);
-        logger.info("--  Can no longer register Channel packets!  --");
     }
 }

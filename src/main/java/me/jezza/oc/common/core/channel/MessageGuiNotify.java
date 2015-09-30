@@ -1,5 +1,6 @@
 package me.jezza.oc.common.core.channel;
 
+@Deprecated
 public class MessageGuiNotify {//  extends NetworkDispatcher.MessageAbstract<MessageGuiNotify, IMessage> {
 
 //    private int id, process;

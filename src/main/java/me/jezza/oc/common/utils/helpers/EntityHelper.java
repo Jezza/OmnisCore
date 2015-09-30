@@ -1,11 +1,11 @@
-package me.jezza.oc.common.utils;
+package me.jezza.oc.common.utils.helpers;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 
-public class MovingObjectPositionHelper {
+public class EntityHelper {
 
     public static MovingObjectPosition getCurrentMovingObjectPosition(EntityLivingBase entity) {
         double distance = 4.5F;

@@ -1,6 +1,8 @@
 package me.jezza.oc.api.channel;
 
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
+import cpw.mods.fml.relauncher.Side;
+import io.netty.channel.ChannelFuture;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.Packet;
@@ -13,25 +15,29 @@ import net.minecraft.world.World;
 public interface IChannel {
     boolean registerPacket(Class<? extends IOmnisPacket> packetClass);
 
-    void sendTo(IOmnisPacket packet, EntityPlayer player);
+    ChannelFuture sendTo(IOmnisPacket packet, EntityPlayer player);
 
-    void sendTo(IOmnisPacket packet, EntityPlayerMP player);
+    ChannelFuture sendTo(IOmnisPacket packet, EntityPlayerMP player);
 
-    void sendToAll(IOmnisPacket packet);
+    ChannelFuture sendToAll(IOmnisPacket packet);
 
-    void sendToServer(IOmnisPacket packet);
+    ChannelFuture sendToServer(IOmnisPacket packet);
 
-    void sendToDimension(IOmnisPacket packet, int dimId);
+    ChannelFuture sendToDimension(IOmnisPacket packet, int dimId);
 
-    void sendToAllAround(IOmnisPacket packet, TargetPoint point);
+    ChannelFuture sendToAllAround(IOmnisPacket packet, TargetPoint point);
 
-    void sendToAllAround(IOmnisPacket packet, TileEntity point);
+    ChannelFuture sendToAllAround(IOmnisPacket packet, TileEntity point);
 
-    void sendToAllAround(IOmnisPacket packet, TileEntity point, double range);
+    ChannelFuture sendToAllAround(IOmnisPacket packet, TileEntity point, double range);
 
-    void sendToAllAround(IOmnisPacket packet, World world, int x, int y, int z);
+    ChannelFuture sendToAllAround(IOmnisPacket packet, World world, int x, int y, int z);
 
-    void sendToAllAround(IOmnisPacket packet, World world, int x, int y, int z, double range);
+    ChannelFuture sendToAllAround(IOmnisPacket packet, World world, int x, int y, int z, double range);
+
+    void lockdown();
 
     Packet mcPacket(IOmnisPacket packet);
+
+    Side source();
 }

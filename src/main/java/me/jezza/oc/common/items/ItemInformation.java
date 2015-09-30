@@ -5,11 +5,12 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.client.ClientUtil;
 import me.jezza.oc.common.interfaces.IItemTooltip;
-import me.jezza.oc.common.utils.Localise;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import static me.jezza.oc.common.utils.helpers.StringHelper.translate;
 
 @SideOnly(Side.CLIENT)
 public class ItemInformation implements IItemTooltip {
@@ -25,7 +26,7 @@ public class ItemInformation implements IItemTooltip {
     }
 
     public void defaultInfoList() {
-        infoList.add(Localise.translate("info.tooltip.default.shift"));
+        infoList.add(translate("info.tooltip.default.shift"));
     }
 
     public void addToBothLists(String string) {

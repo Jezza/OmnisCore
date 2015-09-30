@@ -3,7 +3,7 @@ package me.jezza.oc.common.blocks;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import me.jezza.oc.common.utils.MathsHelper;
+import me.jezza.oc.common.utils.Maths;
 import me.jezza.oc.common.items.ItemBlockAbstract;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -53,7 +53,7 @@ public abstract class BlockAbstractMeta extends BlockAbstract {
 
         String registerString = registryBuilder.toString();
         for (int i = 0; i < icons.length; i++)
-            icons[i] = iconRegister.registerIcon(registerString + names.get(MathsHelper.clip(i, 0, names.size())));
+            icons[i] = iconRegister.registerIcon(registerString + names.get(Maths.clip(i, 0, names.size())));
     }
 
     @Override

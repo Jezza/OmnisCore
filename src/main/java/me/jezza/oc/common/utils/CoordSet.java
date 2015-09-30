@@ -10,7 +10,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
-import static me.jezza.oc.common.utils.MathsHelper.RoundingMethod;
+import static me.jezza.oc.common.utils.Maths.RoundingMethod;
 
 public class CoordSet {
 

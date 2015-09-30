@@ -6,6 +6,8 @@ import me.jezza.oc.common.core.CoreProperties;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
+import static me.jezza.oc.common.utils.helpers.StringHelper.convertToSnakeCase;
+
 /**
  * @author Jezza
  */
@@ -21,7 +23,7 @@ public class AnnotatedField<T extends Annotation, V> {
      */
     public AnnotatedField(Field field, T annotation) {
         this.field = field;
-        this.fieldName = field.getName().toLowerCase();
+        this.fieldName = convertToSnakeCase(field.getName());
         this.annotation = annotation;
         this.defaultValue = currentValue();
     }
