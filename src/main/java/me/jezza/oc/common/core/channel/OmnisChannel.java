@@ -121,7 +121,7 @@ public class OmnisChannel implements IChannel {
     }
 
     @Override
-    public Packet mcPacket(IOmnisPacket packet) {
+    public Packet toMinecraftPacket(IOmnisPacket packet) {
         return channel.generatePacketFrom(packet);
     }
 

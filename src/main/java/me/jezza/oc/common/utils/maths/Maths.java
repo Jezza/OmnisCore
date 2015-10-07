@@ -1,4 +1,4 @@
-package me.jezza.oc.common.utils;
+package me.jezza.oc.common.utils.maths;
 
 public class Maths {
     public static int wrap(int value, int min, int max) {
@@ -71,9 +71,5 @@ public class Maths {
 
     public static float interpolate(float a, float b, float d) {
         return a + (b - a) * d;
-    }
-
-    public enum RoundingMethod {
-        FLOOR, CEILING, ROUND
     }
 }

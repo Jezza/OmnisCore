@@ -11,8 +11,7 @@ import java.lang.annotation.Annotation;
 public interface IConfigRegistry {
     /**
      * To use this, implement {@link me.jezza.oc.api.config.Config.IConfigRegistrar} on your main mod file.
-     *
-     * @return true - if the configEntry was successfully registered, false otherwise
+     * @return true - if the configEntry was successfully registered, false otherwise.
      */
     <A extends Annotation, T extends ConfigEntry<A, ?>> boolean registerAnnotation(Class<A> clazz, Class<T> configEntry);
 }

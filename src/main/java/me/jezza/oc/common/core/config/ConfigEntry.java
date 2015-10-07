@@ -3,7 +3,7 @@ package me.jezza.oc.common.core.config;
 import com.google.common.base.Strings;
 import me.jezza.oc.api.exceptions.ConfigurationException;
 import me.jezza.oc.common.core.CoreProperties;
-import me.jezza.oc.common.utils.Maths;
+import me.jezza.oc.common.utils.maths.Maths;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import org.apache.logging.log4j.Level;

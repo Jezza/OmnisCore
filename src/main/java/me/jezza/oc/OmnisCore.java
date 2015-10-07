@@ -38,7 +38,7 @@ public class OmnisCore {
 
         logger.info("-- Initialising ConfigAnnotations --");
         ConfigHandler.init(event);
-        logger.info("-- Checking CA Overrides --");
+        logger.info("-- Checking Debug Overrides --");
         DebugHelper.checkSysOverrides();
         logger.info("-- Configuring Internal Channels --");
         ChannelDispatcher.init(event);

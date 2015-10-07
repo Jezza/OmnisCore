@@ -1,8 +1,6 @@
 package me.jezza.oc.api.channel;
 
 import io.netty.channel.ChannelHandlerContext;
-import me.jezza.oc.common.core.channel.internal.InputBuffer;
-import me.jezza.oc.common.core.channel.internal.OutputBuffer;
 import net.minecraft.entity.player.EntityPlayer;
 
 /**

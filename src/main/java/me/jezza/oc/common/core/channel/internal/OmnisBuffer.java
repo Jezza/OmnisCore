@@ -3,6 +3,9 @@ package me.jezza.oc.common.core.channel.internal;
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import me.jezza.oc.api.channel.InputBuffer;
+import me.jezza.oc.api.channel.OutputBuffer;
+import me.jezza.oc.common.utils.maths.CoordSet;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
@@ -13,7 +16,6 @@ import net.minecraftforge.fluids.FluidStack;
  * @author Jezza
  */
 public class OmnisBuffer implements InputBuffer, OutputBuffer {
-
     private final ByteBuf buffer;
 
     public OmnisBuffer() {
@@ -113,6 +115,11 @@ public class OmnisBuffer implements InputBuffer, OutputBuffer {
         for (int i = 0; i < length; i++)
             values[i] = buffer.readInt();
         return values;
+    }
+
+    @Override
+    public CoordSet readCoordSet() {
+        return CoordSet.of(readInts(3));
     }
 
     @Override
@@ -228,7 +235,12 @@ public class OmnisBuffer implements InputBuffer, OutputBuffer {
         return this;
     }
 
-    @Override
+	@Override
+	public OutputBuffer writeCoordSet(CoordSet coordSet) {
+		return writeInts(coordSet.asArray());
+	}
+
+	@Override
     public OutputBuffer writeNBT(NBTTagCompound tag) {
         ByteBufUtils.writeTag(buffer, tag);
         return this;
@@ -252,7 +264,12 @@ public class OmnisBuffer implements InputBuffer, OutputBuffer {
         return this;
     }
 
-    public ByteBuf copy() {
+	@Override
+	public ByteBuf buffer() {
+		return buffer;
+	}
+
+	public ByteBuf copy() {
         return buffer.copy();
     }
 }

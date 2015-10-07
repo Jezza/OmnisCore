@@ -2,7 +2,7 @@ package me.jezza.oc.client.gui.components;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import me.jezza.oc.common.utils.Maths;
+import me.jezza.oc.common.utils.maths.Maths;
 
 /**
  * If you do instantiate this class, make sure to pass the class to the super.

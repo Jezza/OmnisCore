@@ -36,7 +36,7 @@ public final class ChannelDispatcher {
     @ConfigDouble(category = "Networking", minValue = 5, maxValue = 120, comment = "The default network update range.")
     protected static double NETWORK_UPDATE_RANGE = 60;
 
-    private static final EnumMap<Side, Map<String, IChannel>> channelMap = new EnumMap<>(Side.class);
+    private static final Map<Side, Map<String, IChannel>> channelMap = new EnumMap<>(Side.class);
     private static boolean lockdown = false;
 
     static {

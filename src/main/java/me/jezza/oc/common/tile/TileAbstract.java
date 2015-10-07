@@ -1,6 +1,6 @@
 package me.jezza.oc.common.tile;
 
-import me.jezza.oc.common.utils.CoordSet;
+import me.jezza.oc.common.utils.maths.CoordSet;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
@@ -8,6 +8,7 @@ import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 
 public abstract class TileAbstract extends TileEntity {
+	protected transient CoordSet coordSet;
 
     @Override
     public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
@@ -31,7 +32,7 @@ public abstract class TileAbstract extends TileEntity {
     }
 
     public CoordSet getCoordSet() {
-        return new CoordSet(xCoord, yCoord, zCoord);
+        return coordSet != null ? coordSet : (coordSet = CoordSet.of(xCoord, yCoord, zCoord).lock());
     }
 
     public void markForUpdate() {

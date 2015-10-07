@@ -3,7 +3,7 @@ package me.jezza.oc.common.blocks;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import me.jezza.oc.common.utils.Maths;
+import me.jezza.oc.common.utils.maths.Maths;
 import me.jezza.oc.common.items.ItemBlockAbstract;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;

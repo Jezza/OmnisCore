@@ -2,7 +2,7 @@ package me.jezza.oc.common.items;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import me.jezza.oc.common.utils.Maths;
+import me.jezza.oc.common.utils.maths.Maths;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;

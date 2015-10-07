@@ -6,9 +6,8 @@ import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
 
 public abstract class CommandAbstract extends CommandBase {
-
-    private String commandName = "";
-    private String commandUsage = "";
+    private final String commandName;
+    private final String commandUsage;
 
     public CommandAbstract(String commandName, String commandUsage) {
         this.commandName = commandName.toLowerCase();
@@ -104,7 +103,7 @@ public abstract class CommandAbstract extends CommandBase {
      * @return The value given any necessary shifts.
      */
     public static double parseRelativePosition(ICommandSender sender, double position, String argument, int lowerBound, int upperBound) {
-        return CommandBase.func_110665_a(sender, position, argument, lowerBound, upperBound);
+        return func_110665_a(sender, position, argument, lowerBound, upperBound);
     }
 
     public static int parseInt(String number) {
