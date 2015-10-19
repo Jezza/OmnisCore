@@ -21,7 +21,6 @@ public class ClientUtil {
     }
 
     public static boolean isPlayer(String name) {
-        return Minecraft.getMinecraft().thePlayer.getCommandSenderName().endsWith(name);
+        return Minecraft.getMinecraft().thePlayer.getCommandSenderName().equals(name);
     }
-
 }

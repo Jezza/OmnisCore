@@ -4,4 +4,4 @@ oc.config.gui.selector.title.2=Please select one.
 debug_enablechat=[Debug] Enable Chat
 debug_enableconsole=[Debug] Enable Console
 
-info.tooltip.default.shift=$8Press $7Shift $8for more info.
+info.tooltip.default.shift=$7Press $4Shift $7for more info.

@@ -3,8 +3,8 @@ package me.jezza.oc.common.blocks;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import me.jezza.oc.common.utils.maths.Maths;
 import me.jezza.oc.common.items.ItemBlockAbstract;
+import me.jezza.oc.common.utils.maths.Maths;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.creativetab.CreativeTabs;
@@ -18,67 +18,67 @@ import java.util.List;
 @Deprecated
 public abstract class BlockAbstractMeta extends BlockAbstract {
 
-    @SideOnly(Side.CLIENT)
-    private IIcon[] icons;
+	@SideOnly(Side.CLIENT)
+	private IIcon[] icons;
 
-    public BlockAbstractMeta(Material material, String name) {
-        super(material, name);
-    }
+	public BlockAbstractMeta(Material material, String name) {
+		super(material, name);
+	}
 
-    @Override
-    public BlockAbstract register(String name) {
-        GameRegistry.registerBlock(this, getItemBlockClass(), name);
-        return this;
-    }
+	@Override
+	public BlockAbstract register(String name) {
+		GameRegistry.registerBlock(this, getItemBlockClass(), name);
+		return this;
+	}
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void getSubBlocks(Item item, CreativeTabs tab, List list) {
-        List<String> names = getNames();
-        for (int i = 0; i < names.size(); i++)
-            list.add(new ItemStack(item, 1, i));
-    }
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void getSubBlocks(Item item, CreativeTabs tab, List list) {
+		List<String> names = getNames();
+		for (int i = 0; i < names.size(); i++)
+			list.add(new ItemStack(item, 1, i));
+	}
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(IIconRegister iconRegister) {
-        List<String> names = getNames();
-        icons = new IIcon[names.size()];
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void registerBlockIcons(IIconRegister iconRegister) {
+		List<String> names = getNames();
+		icons = new IIcon[names.size()];
 
-        StringBuilder registryBuilder = new StringBuilder(modIdentifier);
-        if (usesTextureSubDirectory()){
-            registryBuilder.append(getTextureSubDirectory());
-            registryBuilder.append("/");
-        }
+		StringBuilder registryBuilder = new StringBuilder(modIdentifier);
+		if (usesTextureSubDirectory()) {
+			registryBuilder.append(getTextureSubDirectory());
+			registryBuilder.append("/");
+		}
 
-        String registerString = registryBuilder.toString();
-        for (int i = 0; i < icons.length; i++)
-            icons[i] = iconRegister.registerIcon(registerString + names.get(Maths.clip(i, 0, names.size())));
-    }
+		String registerString = registryBuilder.toString();
+		for (int i = 0; i < icons.length; i++)
+			icons[i] = iconRegister.registerIcon(registerString + names.get(Maths.clip(i, 0, names.size())));
+	}
 
-    @Override
-    public int damageDropped(int damage) {
-        return damage;
-    }
+	@Override
+	public int damageDropped(int damage) {
+		return damage;
+	}
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(int side, int meta) {
-        return icons[meta % icons.length];
-    }
+	@Override
+	@SideOnly(Side.CLIENT)
+	public IIcon getIcon(int side, int meta) {
+		return icons[meta % icons.length];
+	}
 
-    protected Class<? extends ItemBlock> getItemBlockClass() {
-        return ItemBlockAbstract.class;
-    }
+	protected Class<? extends ItemBlock> getItemBlockClass() {
+		return ItemBlockAbstract.class;
+	}
 
-    public boolean usesTextureSubDirectory() {
-        return !getTextureSubDirectory().equals("");
-    }
+	public boolean usesTextureSubDirectory() {
+		return !getTextureSubDirectory().equals("");
+	}
 
-    public String getTextureSubDirectory() {
-        return "";
-    }
+	public String getTextureSubDirectory() {
+		return "";
+	}
 
-    public abstract List<String> getNames();
+	public abstract List<String> getNames();
 
 }

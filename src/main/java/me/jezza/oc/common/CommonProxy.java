@@ -2,12 +2,12 @@ package me.jezza.oc.common;
 
 public class CommonProxy {
 
-    public boolean isClient() {
-        return false;
-    }
+	public boolean isClient() {
+		return false;
+	}
 
-    public boolean isServer() {
-        return true;
-    }
+	public boolean isServer() {
+		return true;
+	}
 
 }

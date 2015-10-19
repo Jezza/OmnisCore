@@ -51,6 +51,7 @@ public abstract class GuiScreenAbstract extends GuiScreen implements IGuiRenderH
     /**
      * Draws the screen and all the components in it.
      */
+    @Override
     public void drawScreen(int mouseX, int mouseY, float tick) {
         this.drawDefaultBackground();
 

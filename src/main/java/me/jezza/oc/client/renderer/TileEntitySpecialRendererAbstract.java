@@ -10,6 +10,7 @@ import net.minecraft.world.World;
 public abstract class TileEntitySpecialRendererAbstract<T extends TileEntity> extends TileEntitySpecialRenderer {
     protected TileEntityRendererDispatcher dispatcher;
 
+    @Override
     @SuppressWarnings("unchecked")
     public void renderTileEntityAt(TileEntity tileEntity, double x, double y, double z, float tick) {
         renderTileAt((T) tileEntity, x, y, z, tick);
@@ -22,10 +23,12 @@ public abstract class TileEntitySpecialRendererAbstract<T extends TileEntity> ex
         field_147501_a.field_147553_e.bindTexture(texture);
     }
 
+    @Override
     public void func_147497_a(TileEntityRendererDispatcher dispatcher) {
         this.dispatcher = dispatcher;
     }
 
+    @Override
     public void func_147496_a(World world) {
         setupRenderer(world);
     }

@@ -2,7 +2,8 @@ package me.jezza.oc.common.items;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import me.jezza.oc.common.interfaces.IItemTooltip;
+import me.jezza.oc.common.interfaces.Tooltip;
+import me.jezza.oc.common.interfaces.TooltipAdapter;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
@@ -13,35 +14,40 @@ import java.util.List;
 
 public class ItemBlockAbstract extends ItemBlock {
 
-    public ItemBlockAbstract(Block block) {
-        super(block);
-        setMaxDamage(0);
-        setHasSubtypes(true);
-    }
+	public ItemBlockAbstract(Block block) {
+		super(block);
+		setMaxDamage(0);
+		setHasSubtypes(true);
+	}
 
-    public Block getBlock() {
-        return field_150939_a;
-    }
+	public Block getBlock() {
+		return field_150939_a;
+	}
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIconFromDamage(int damage) {
-        return getBlock().getIcon(2, damage);
-    }
+	@Override
+	@SideOnly(Side.CLIENT)
+	public IIcon getIconFromDamage(int damage) {
+		return getBlock().getIcon(2, damage);
+	}
 
-    @Override
-    public int getMetadata(int meta) {
-        return meta;
-    }
+	@Override
+	public int getMetadata(int meta) {
+		return meta;
+	}
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean par4) {
-        ItemInformation information = new ItemInformation();
-        addInformation(stack, player, information);
-        information.populateList(list);
-    }
+	@Override
+	@SideOnly(Side.CLIENT)
+	public final void addInformation(ItemStack stack, EntityPlayer player, List _list, boolean advancedItemTooltips) {
+		@SuppressWarnings("unchecked")
+		TooltipAdapter adapter = createTooltipAdapter((List<String>) _list);
+		addInformation(stack, player, adapter, advancedItemTooltips);
+		adapter.postAddition(stack, player, advancedItemTooltips);
+	}
 
-    protected void addInformation(ItemStack stack, EntityPlayer player, IItemTooltip information) {
-    }
+	protected TooltipAdapter createTooltipAdapter(List<String> tooltip) {
+		return new ItemTooltipInformation(tooltip);
+	}
+
+	protected void addInformation(ItemStack stack, EntityPlayer player, Tooltip tooltip, boolean advancedItemTooltips) {
+	}
 }

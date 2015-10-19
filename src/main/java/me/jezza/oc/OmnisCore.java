@@ -12,9 +12,9 @@ import me.jezza.oc.api.channel.SidedChannel;
 import me.jezza.oc.api.config.Config.Controller;
 import me.jezza.oc.api.network.search.SearchThread;
 import me.jezza.oc.common.CommonProxy;
-import me.jezza.oc.common.utils.helpers.DebugHelper;
 import me.jezza.oc.common.core.channel.ChannelDispatcher;
 import me.jezza.oc.common.core.config.ConfigHandler;
+import me.jezza.oc.common.utils.helpers.DebugHelper;
 
 import static me.jezza.oc.common.core.CoreProperties.*;
 
@@ -22,40 +22,40 @@ import static me.jezza.oc.common.core.CoreProperties.*;
 @Mod(modid = MOD_ID, name = MOD_NAME, version = VERSION, dependencies = DEPENDENCIES)
 public class OmnisCore {
 
-    @Instance(MOD_ID)
-    public static OmnisCore instance;
+	@Instance(MOD_ID)
+	public static OmnisCore instance;
 
-    @SidedProxy(clientSide = CLIENT_PROXY, serverSide = SERVER_PROXY)
-    public static CommonProxy proxy;
+	@SidedProxy(clientSide = CLIENT_PROXY, serverSide = SERVER_PROXY)
+	public static CommonProxy proxy;
 
-    @SidedChannel(MOD_ID)
-    public static IChannel channel;
+	@SidedChannel(MOD_ID)
+	public static IChannel channel;
 
-    @EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
-        logger = event.getModLog();
-        logger.info("-- Pre-Initialising " + MOD_ID + " (" + VERSION + ") --");
+	@EventHandler
+	public void preInit(FMLPreInitializationEvent event) {
+		logger = event.getModLog();
+		logger.info("-- Pre-Initialising " + MOD_ID + " (" + VERSION + ") --");
 
-        logger.info("-- Initialising ConfigAnnotations --");
-        ConfigHandler.init(event);
-        logger.info("-- Checking Debug Overrides --");
-        DebugHelper.checkSysOverrides();
-        logger.info("-- Configuring Internal Channels --");
-        ChannelDispatcher.init(event);
-    }
+		logger.info("-- Initialising ConfigAnnotations --");
+		ConfigHandler.init(event);
+		logger.info("-- Checking Debug Overrides --");
+		DebugHelper.checkSysOverrides();
+		logger.info("-- Configuring Internal Channels --");
+		ChannelDispatcher.init(event);
+	}
 
-    @EventHandler
-    public void initialize(FMLInitializationEvent event) {
-        logger.info("-- Initialising --");
-        logger.info("-- Starting OmnisCore|NST --");
-        SearchThread.getInstance().start();
-    }
+	@EventHandler
+	public void initialize(FMLInitializationEvent event) {
+		logger.info("-- Initialising --");
+		logger.info("-- Starting OmnisCore|NST --");
+		SearchThread.getInstance().start();
+	}
 
-    @EventHandler
-    public void postInit(FMLPostInitializationEvent event) {
-        logger.info("-- Post-Initialising --");
+	@EventHandler
+	public void postInit(FMLPostInitializationEvent event) {
+		logger.info("-- Post-Initialising --");
 
-        logger.info("-- Locking Channel packet registration. --");
-        ChannelDispatcher.lockdown(event);
-    }
+		logger.info("-- Locking Channel packet registration. --");
+		ChannelDispatcher.lockdown(event);
+	}
 }

@@ -19,6 +19,7 @@ public class SearchThread extends Thread {
 
     private SearchThread() {
         super(CoreProperties.MOD_ID + "|NST");
+        setDaemon(true);
     }
 
     private static final LinkedBlockingDeque<ISearchPattern> searchPatterns = new LinkedBlockingDeque<ISearchPattern>(256);

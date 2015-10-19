@@ -6,6 +6,7 @@ import net.minecraft.world.World;
 
 public interface ITileProvider extends ITileEntityProvider {
 
+    @Override
     TileEntity createNewTileEntity(World world, int meta);
 
 

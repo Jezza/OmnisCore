@@ -21,7 +21,9 @@ public abstract class CoordSet implements Copyable<CoordSet> {
 	public static final Pattern COORD_SET_PATTERN = Pattern.compile("-?\\d+?:-?\\d+?:-?\\d+?");
 
 	public abstract int getX();
+
 	public abstract int getY();
+
 	public abstract int getZ();
 
 	public CoordSet add(int value) {
@@ -159,7 +161,9 @@ public abstract class CoordSet implements Copyable<CoordSet> {
 	}
 
 	public abstract CoordSet chunkCoords();
+
 	public abstract CoordSet blockCoords();
+
 	public abstract CoordSet chunkOffset();
 
 	public abstract CoordSet lock();

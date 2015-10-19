@@ -4,7 +4,8 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import me.jezza.oc.common.interfaces.IItemTooltip;
+import me.jezza.oc.common.interfaces.Tooltip;
+import me.jezza.oc.common.interfaces.TooltipAdapter;
 import me.jezza.oc.common.utils.helpers.EntityHelper;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
@@ -17,75 +18,80 @@ import net.minecraft.util.MovingObjectPosition;
 import java.util.List;
 
 public abstract class ItemAbstract extends Item {
-    protected boolean textureReg = true;
-    protected boolean hasEffect = false;
-    public final String modIdentifier;
+	protected boolean textureReg = true;
+	protected boolean effect = false;
+	public final String modIdentifier;
 
-    public ItemAbstract(String name) {
-        modIdentifier = Loader.instance().activeModContainer().getModId() + ":";
-        setName(name);
-        register(name);
-    }
+	public ItemAbstract(String name) {
+		modIdentifier = Loader.instance().activeModContainer().getModId() + ":";
+		setName(name);
+		register(name);
+	}
 
-    public ItemAbstract setName(String name) {
-        setUnlocalizedName(name);
-        setTextureName(name);
-        return this;
-    }
+	protected ItemAbstract setName(String name) {
+		setUnlocalizedName(name);
+		setTextureName(name);
+		return this;
+	}
 
-    public ItemAbstract register(String name) {
-        GameRegistry.registerItem(this, name);
-        return this;
-    }
+	protected ItemAbstract register(String name) {
+		GameRegistry.registerItem(this, name);
+		return this;
+	}
 
-    public ItemAbstract setTextureless() {
-        this.textureReg = false;
-        return this;
-    }
+	protected ItemAbstract textureless(boolean textureless) {
+		textureReg = !textureless;
+		return this;
+	}
 
-    public ItemAbstract setEffect() {
-        this.hasEffect = true;
-        return this;
-    }
+	protected ItemAbstract effect(boolean effect) {
+		this.effect = effect;
+		return this;
+	}
 
-    public ItemAbstract setShapelessRecipe(Object... items) {
-        return setShapelessRecipe(1, items);
-    }
+	public ItemAbstract setShapelessRecipe(Object... items) {
+		return setShapelessRecipe(1, items);
+	}
 
-    public ItemAbstract setShapelessRecipe(int resultSize, Object... items) {
-        return setShapelessRecipe(resultSize, 0, items);
-    }
+	public ItemAbstract setShapelessRecipe(int resultSize, Object... items) {
+		return setShapelessRecipe(resultSize, 0, items);
+	}
 
-    public ItemAbstract setShapelessRecipe(int resultSize, int meta, Object... items) {
-        CraftingManager.getInstance().addShapelessRecipe(new ItemStack(this, resultSize, meta), items);
-        return this;
-    }
+	public ItemAbstract setShapelessRecipe(int resultSize, int meta, Object... items) {
+		CraftingManager.getInstance().addShapelessRecipe(new ItemStack(this, resultSize, meta), items);
+		return this;
+	}
 
-    public MovingObjectPosition getMOP(EntityLivingBase entity) {
-        return EntityHelper.getCurrentMovingObjectPosition(entity);
-    }
+	public MovingObjectPosition getMOP(EntityLivingBase entity) {
+		return EntityHelper.getMOP(entity);
+	}
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public boolean hasEffect(ItemStack itemStack) {
-        return itemStack.isItemEnchanted() || hasEffect;
-    }
+	@Override
+	@SideOnly(Side.CLIENT)
+	public boolean hasEffect(ItemStack itemStack) {
+		return itemStack.isItemEnchanted() || effect;
+	}
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void registerIcons(IIconRegister iconRegister) {
-        if (textureReg)
-            itemIcon = iconRegister.registerIcon(modIdentifier + getIconString());
-    }
+	@Override
+	@SideOnly(Side.CLIENT)
+	public void registerIcons(IIconRegister iconRegister) {
+		if (textureReg)
+			itemIcon = iconRegister.registerIcon(modIdentifier + getIconString());
+	}
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, EntityPlayer player, List list, boolean par4) {
-        ItemInformation information = new ItemInformation();
-        addInformation(stack, player, information);
-        information.populateList(list);
-    }
+	@Override
+	@SideOnly(Side.CLIENT)
+	public final void addInformation(ItemStack stack, EntityPlayer player, List _list, boolean advancedItemTooltips) {
+		@SuppressWarnings("unchecked")
+		TooltipAdapter adapter = createTooltipAdapter((List<String>) _list);
+		addInformation(stack, player, adapter, advancedItemTooltips);
+		adapter.postAddition(stack, player, advancedItemTooltips);
+	}
 
-    protected void addInformation(ItemStack stack, EntityPlayer player, IItemTooltip tooltip) {
-    }
+	protected TooltipAdapter createTooltipAdapter(List<String> tooltip) {
+		return new ItemTooltipInformation(tooltip);
+	}
+
+	protected void addInformation(ItemStack stack, EntityPlayer player, Tooltip tooltip, boolean advancedItemTooltips) {
+	}
 }

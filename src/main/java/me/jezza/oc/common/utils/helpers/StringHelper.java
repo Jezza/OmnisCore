@@ -1,12 +1,23 @@
 package me.jezza.oc.common.utils.helpers;
 
 import com.google.common.base.CaseFormat;
+import cpw.mods.fml.relauncher.ReflectionHelper;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
+
+import java.util.*;
 
 /**
  * @author Jezza
  */
 public class StringHelper {
+	public static final char FORMATTING_CHAR = '$';
+	public static final Map<Character, EnumChatFormatting> formattingCodeMapping;
+
+	static {
+		Map<Character, EnumChatFormatting> formattingMap = ReflectionHelper.getPrivateValue(EnumChatFormatting.class, null, "formattingCodeMapping");
+		formattingCodeMapping = Collections.unmodifiableMap(formattingMap);
+	}
 
     public static boolean nullOrEmpty(CharSequence charSequence) {
         return charSequence == null || charSequence.length() == 0;
@@ -45,14 +56,90 @@ public class StringHelper {
     }
 
     public static String translateWithFallback(String key, String defaultString) {
-        String translated = translate(key);
-        return translated.equals(key) ? defaultString : translated;
+        return StatCollector.canTranslate(key) ? translate(key) : defaultString;
     }
 
-    public static String convertToSnakeCase(String value) {
+    public static String formatColour(String value) {
+		StringBuilder builder = new StringBuilder(value);
+		for (int i = 0; i < builder.length(); i++) {
+			char c = builder.charAt(i);
+			if (c == FORMATTING_CHAR) {
+				if (i != 0 && builder.charAt(i - 1) == '\\')
+					continue;
+				EnumChatFormatting format = formattingCodeMapping.get(builder.charAt(i + 1));
+				if (format != null)
+					builder.replace(i, i + 2, format.toString());
+			}
+		}
+		return builder.toString();
+	}
+
+    public static String convertToLowerSnakeCase(String value) {
         if (!useable(value))
             return "";
-        CaseFormat origin = value.contains("_") ? CaseFormat.UPPER_UNDERSCORE : CaseFormat.LOWER_CAMEL;
-        return origin.to(CaseFormat.LOWER_UNDERSCORE, value);
+		for (int i = 0; i < value.length(); i++) {
+			char c = value.charAt(i);
+			if (c == '_')
+				break;
+			if (Character.isLowerCase(c))
+				return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, value);
+		}
+		return CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_UNDERSCORE, value);
+	}
+
+    public static List<String> wrap(String text, int size) {
+        return wrap(text, size, false);
+    }
+
+    public static List<String> wrap(String text, int size, boolean ignoreNewlines) {
+		final List<String> lines;
+        StringBuilder sb;
+        String[] words;
+        String space;
+
+        if (ignoreNewlines) {
+            text = text.replaceAll(System.lineSeparator(), " ");
+            text = text.replaceAll("\\n", " ");
+
+            words = text.split(" ");
+        	lines = new ArrayList<>(words.length);
+            sb = new StringBuilder();
+            space = "";
+			for (int i = 0; i < words.length; i++) {
+				String word = words[i];
+				if (i != 0 && sb.length() + space.length() + word.length() > size) {
+					lines.add(sb.toString());
+					sb.setLength(0);
+					space = "";
+				}
+				sb.append(space).append(word);
+				space = " ";
+			}
+            lines.add(sb.toString());
+			return lines;
+        }
+
+		lines = new ArrayList<>(6);
+		for (String part : text.split("\\n")) {
+			if (part.length() <= size) {
+				lines.add(part);
+			} else {
+				words = part.split(" ");
+				sb = new StringBuilder();
+				space = "";
+				for (int i = 0; i < words.length; i++) {
+					String word = words[i];
+					if (i != 0 && sb.length() + space.length() + word.length() > size) {
+						lines.add(sb.toString());
+						sb.setLength(0);
+						space = "";
+					}
+					sb.append(space).append(word);
+					space = " ";
+				}
+				lines.add(sb.toString());
+			}
+		}
+        return lines;
     }
 }
