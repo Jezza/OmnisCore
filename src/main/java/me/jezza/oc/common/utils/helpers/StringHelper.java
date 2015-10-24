@@ -19,7 +19,11 @@ public class StringHelper {
 		formattingCodeMapping = Collections.unmodifiableMap(formattingMap);
 	}
 
-    public static boolean nullOrEmpty(CharSequence charSequence) {
+	private StringHelper() {
+		throw new IllegalStateException();
+	}
+
+	public static boolean nullOrEmpty(CharSequence charSequence) {
         return charSequence == null || charSequence.length() == 0;
     }
 

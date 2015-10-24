@@ -6,6 +6,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.common.interfaces.Tooltip;
 import me.jezza.oc.common.interfaces.TooltipAdapter;
+import me.jezza.oc.common.utils.ASM;
 import me.jezza.oc.common.utils.helpers.EntityHelper;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
@@ -26,6 +27,7 @@ public abstract class ItemAbstract extends Item {
 		modIdentifier = Loader.instance().activeModContainer().getModId() + ":";
 		setName(name);
 		register(name);
+		ASM.findOwner(getClass());
 	}
 
 	protected ItemAbstract setName(String name) {
@@ -50,15 +52,15 @@ public abstract class ItemAbstract extends Item {
 	}
 
 	public ItemAbstract setShapelessRecipe(Object... items) {
-		return setShapelessRecipe(1, items);
+		return setShapelessRecipe(1, 0, items);
 	}
 
 	public ItemAbstract setShapelessRecipe(int resultSize, Object... items) {
 		return setShapelessRecipe(resultSize, 0, items);
 	}
 
-	public ItemAbstract setShapelessRecipe(int resultSize, int meta, Object... items) {
-		CraftingManager.getInstance().addShapelessRecipe(new ItemStack(this, resultSize, meta), items);
+	public ItemAbstract setShapelessRecipe(int resultSize, int damage, Object... items) {
+		CraftingManager.getInstance().addShapelessRecipe(new ItemStack(this, resultSize, damage), items);
 		return this;
 	}
 
@@ -67,9 +69,10 @@ public abstract class ItemAbstract extends Item {
 	}
 
 	@Override
+	@Deprecated
 	@SideOnly(Side.CLIENT)
 	public boolean hasEffect(ItemStack itemStack) {
-		return itemStack.isItemEnchanted() || effect;
+		return super.hasEffect(itemStack) || effect;
 	}
 
 	@Override

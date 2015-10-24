@@ -1,11 +1,10 @@
 package me.jezza.oc.common.interfaces;
 
 public interface Tooltip {
-	int TRANSLATE = 0b100_0000_0000_0000_0000_0000_0000_0000;
-	int WRAP = 0b10_0000_0000_0000_0000_0000_0000_0000;
-	int COLOUR = 0b1_0000_0000_0000_0000_0000_0000_0000;
-
-	int WRAP_MASK = 0b111111111;
+	int TRANSLATE = 0x1000;
+	int WRAP = 0x800;
+	int COLOUR = 0x400;
+	int WRAP_MASK = 0x3ff;
 
 	Tooltip defaultInfo();
 

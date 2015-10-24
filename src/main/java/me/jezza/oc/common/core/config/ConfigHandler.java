@@ -1,29 +1,30 @@
 package me.jezza.oc.common.core.config;
 
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.ModContainer;
-import cpw.mods.fml.common.discovery.ASMDataTable;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
-import cpw.mods.fml.common.discovery.ModCandidate;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import me.jezza.oc.api.config.IConfigRegistry;
+import me.jezza.oc.api.exceptions.ConfigurationException;
 import me.jezza.oc.common.core.config.discovery.ConfigData;
 import me.jezza.oc.common.core.config.entries.*;
-import me.jezza.oc.api.exceptions.ConfigurationException;
-import me.jezza.oc.api.config.IConfigRegistry;
+import me.jezza.oc.common.utils.ASM;
 import net.minecraftforge.common.config.Configuration;
+import org.apache.commons.lang3.ClassUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import static me.jezza.oc.api.config.Config.*;
 
-public class ConfigHandler implements IConfigRegistry {
+public final class ConfigHandler implements IConfigRegistry {
     private static ConfigHandler INSTANCE;
 
     // After 3rd party mod annotations have been added.
@@ -33,6 +34,13 @@ public class ConfigHandler implements IConfigRegistry {
 
     private static final Map<String, ConfigData> configMap = new LinkedHashMap<>();
     private static final Map<String, ICEFactory<?, ? extends ConfigEntry<? extends Annotation, ?>>> annotationMap = new LinkedHashMap<>();
+
+	public static void init() {
+		if (INSTANCE != null)
+			return;
+		INSTANCE = new ConfigHandler();
+		INSTANCE.parseControllers();
+	}
 
     static {
         internalRegister(ConfigBoolean.class, CEBoolean.class);
@@ -47,38 +55,42 @@ public class ConfigHandler implements IConfigRegistry {
         internalRegister(ConfigEnum.class, CEEnum.class);
     }
 
-    public static void init(FMLPreInitializationEvent event) {
-        if (INSTANCE != null)
-            return;
-        INSTANCE = new ConfigHandler();
-        INSTANCE.parseControllers(event);
-    }
-
     private ConfigHandler() {
     }
 
-    private void parseControllers(FMLPreInitializationEvent event) {
-        ASMDataTable dataTable = event.getAsmData();
-        Set<ASMData> dataSet = dataTable.getAll(Controller.class.getName());
+    private ConfigHandler parseControllers() {
+		Set<ASMData> dataSet = ASM.dataTable(Controller.class);
 
         // Filters out all controller annotations and places them with their associated mod.
         for (ASMData data : dataSet) {
-            ModCandidate candidate = data.getCandidate();
-            for (ModContainer mod : candidate.getContainedMods()) {
-                String modId = mod.getModId();
-                ConfigData configData = configMap.get(modId);
-                if (configData == null) {
-                    configData = new ConfigData(mod, candidate.getClassList());
-                    configMap.put(modId, configData);
-                }
-                configData.addRoot(data);
-            }
+			final String packageName = ClassUtils.getPackageName(data.getClassName());
+			String modId = ASM.findOwner(packageName).getModId();
+			ConfigData configData = configMap.get(modId);
+			if (configData == null) {
+				Set<String> classes = ASM.ownedClasses(packageName);
+				configData = new ConfigData(modId, classes);
+				configMap.put(modId, configData);
+			}
+			configData.addRoot(data);
         }
 
-        // Process all potential registrars first.
-        for (ConfigData configValue : configMap.values())
-            if (configValue.isRegistrar)
-                configValue.processIConfigRegistrar(this);
+		// Process all potential registrars first.
+		for (Entry<ASMData, Method> entry : ASM.methodsWithExact(ConfigRegistrar.class, IConfigRegistry.class).entrySet()) {
+			Method method = entry.getValue();
+			if (!Modifier.isStatic(method.getModifiers()))
+				throw new IllegalStateException("Found a @" + ConfigRegistrar.class + " on a non-static method!");
+			Class<?>[] types = method.getParameterTypes();
+			if (types.length != 1)
+				throw new IllegalStateException("Found a @" + ConfigRegistrar.class + " on a method with an incorrect parameter count! Expected 1, found " + types.length);
+			if (types[0] != IConfigRegistry.class)
+				throw new IllegalStateException("Found a @" + ConfigRegistrar.class + " on a method with an incorrect parameter! Expected parameter of type IConfigRegistry, found " + types[0]);
+			try {
+				method.invoke(null, this);
+			} catch (IllegalAccessException | InvocationTargetException e) {
+				// Shouldn't happen.
+				throw Throwables.propagate(e);
+			}
+		}
         registrarsProcessed = true;
 
         for (ConfigData configData : configMap.values()) {
@@ -86,9 +98,10 @@ public class ConfigHandler implements IConfigRegistry {
             configData.processRoots();
 
             // Process all current classes associated with the ConfigContainer.
-            configData.processConfigContainers(dataTable, annotationMap.values());
+            configData.processConfigContainers(annotationMap.values());
         }
         postProcessed = true;
+		return this;
     }
 
     @Override
@@ -126,20 +139,26 @@ public class ConfigHandler implements IConfigRegistry {
         throw new ConfigurationException("Found no entry point for the ConfigClass: " + configClazz + "! Requires a constructor with one parameter: " + Configuration.class);
     }
 
-    public static void load(String modID) {
+    public static boolean load(String modID) {
         if (postProcessed && !Strings.isNullOrEmpty(modID) && Loader.isModLoaded(modID)) {
             ConfigData configData = configMap.get(modID);
-            if (configData != null)
+            if (configData != null) {
                 configData.load();
+				return true;
+			}
         }
+		return false;
     }
 
-    public static void save(String modID) {
+    public static boolean save(String modID) {
         if (postProcessed && !Strings.isNullOrEmpty(modID) && Loader.isModLoaded(modID)) {
             ConfigData configData = configMap.get(modID);
-            if (configData != null)
+            if (configData != null) {
                 configData.save();
+				return true;
+			}
         }
+		return false;
     }
 
     @Override

@@ -22,8 +22,10 @@ public abstract class ItemAbstractMeta extends ItemAbstract {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	@SideOnly(Side.CLIENT)
-	public void getSubItems(Item item, CreativeTabs tab, List list) {
+	public void getSubItems(Item item, CreativeTabs tab, List _list) {
+		List<ItemStack> list = (List<ItemStack>) _list;
 		List<String> names = getNames();
 		for (int i = 0; i < names.size(); i++)
 			list.add(new ItemStack(this, 1, i));

@@ -14,7 +14,9 @@ import me.jezza.oc.api.network.search.SearchThread;
 import me.jezza.oc.common.CommonProxy;
 import me.jezza.oc.common.core.channel.ChannelDispatcher;
 import me.jezza.oc.common.core.config.ConfigHandler;
+import me.jezza.oc.common.items.ItemAbstract;
 import me.jezza.oc.common.utils.helpers.DebugHelper;
+import net.minecraft.creativetab.CreativeTabs;
 
 import static me.jezza.oc.common.core.CoreProperties.*;
 
@@ -37,11 +39,20 @@ public class OmnisCore {
 		logger.info("-- Pre-Initialising " + MOD_ID + " (" + VERSION + ") --");
 
 		logger.info("-- Initialising ConfigAnnotations --");
-		ConfigHandler.init(event);
+		ConfigHandler.init();
 		logger.info("-- Checking Debug Overrides --");
 		DebugHelper.checkSysOverrides();
 		logger.info("-- Configuring Internal Channels --");
-		ChannelDispatcher.init(event);
+		ChannelDispatcher.init();
+		new ItemTest();
+	}
+
+	public static class ItemTest extends ItemAbstract {
+		public ItemTest() {
+			super("Test");
+			textureless(true);
+			setCreativeTab(CreativeTabs.tabMisc);
+		}
 	}
 
 	@EventHandler
@@ -54,7 +65,6 @@ public class OmnisCore {
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		logger.info("-- Post-Initialising --");
-
 		logger.info("-- Locking Channel packet registration. --");
 		ChannelDispatcher.lockdown(event);
 	}
