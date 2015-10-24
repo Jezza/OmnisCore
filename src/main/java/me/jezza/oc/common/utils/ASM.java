@@ -54,11 +54,8 @@ public class ASM {
 	}
 
 	public static ModContainer findOwner(String packageName) {
-		ListMultimap<String, ModContainer> packageOwners = packageOwners();
-		System.out.println(packageOwners);
-		ModContainer modContainer = packageOwners.get(packageName).get(0);
-		System.out.println(modContainer.getName());
-		return modContainer;
+		List<ModContainer> containers = packageOwners().get(packageName);
+		return containers != null ? containers.get(0) : Loader.instance().getMinecraftModContainer();
 	}
 
 	public static Set<String> ownedClasses(String packageName) {
