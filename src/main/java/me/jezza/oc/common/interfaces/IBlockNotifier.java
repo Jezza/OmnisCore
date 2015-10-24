@@ -11,12 +11,12 @@ import net.minecraft.world.World;
  */
 public interface IBlockNotifier {
 
-    public void onBlockRemoval(World world, int x, int y, int z);
+	public void onBlockRemoval(World world, int x, int y, int z);
 
-    public void onBlockAdded(EntityLivingBase entityLivingBase, World world, int x, int y, int z, ItemStack itemStack);
-    
-    public void onNeighbourBlockChanged(World world, int x, int y, int z, Block block);
-    
-    public void onNeighbourTileChanged(IBlockAccess world, int x, int y, int z, int tileX, int tileY, int tileZ);
+	public void onBlockAdded(EntityLivingBase entityLivingBase, World world, int x, int y, int z, ItemStack itemStack);
+
+	public void onNeighbourBlockChanged(World world, int x, int y, int z, Block block);
+
+	public void onNeighbourTileChanged(IBlockAccess world, int x, int y, int z, int tileX, int tileY, int tileZ);
 
 }

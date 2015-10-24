@@ -7,6 +7,6 @@ import net.minecraft.entity.player.EntityPlayer;
  */
 public interface IGuiMessageHandler {
 
-    public void onClientClick(EntityPlayer player, int id, int process);
+	public void onClientClick(EntityPlayer player, int id, int process);
 
 }

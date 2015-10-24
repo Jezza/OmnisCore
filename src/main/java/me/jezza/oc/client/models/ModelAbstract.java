@@ -12,25 +12,25 @@ import net.minecraftforge.client.model.IModelCustom;
 @SideOnly(Side.CLIENT)
 public abstract class ModelAbstract {
 
-    protected IModelCustom customModel;
+	protected IModelCustom customModel;
 
-    public ModelAbstract(ResourceLocation customModelLocation) {
-        this.customModel = AdvancedModelLoader.loadModel(customModelLocation);
-    }
+	public ModelAbstract(ResourceLocation customModelLocation) {
+		this.customModel = AdvancedModelLoader.loadModel(customModelLocation);
+	}
 
-    public void renderAll() {
-        customModel.renderAll();
-    }
+	public void renderAll() {
+		customModel.renderAll();
+	}
 
-    public void renderAllExcept(String... excludedGroupNames) {
-        customModel.renderAllExcept(excludedGroupNames);
-    }
+	public void renderAllExcept(String... excludedGroupNames) {
+		customModel.renderAllExcept(excludedGroupNames);
+	}
 
-    public void renderOnly(String... groupNames) {
-        customModel.renderOnly(groupNames);
-    }
+	public void renderOnly(String... groupNames) {
+		customModel.renderOnly(groupNames);
+	}
 
-    public void renderPart(String part) {
-        customModel.renderPart(part);
-    }
+	public void renderPart(String part) {
+		customModel.renderPart(part);
+	}
 }

@@ -8,10 +8,10 @@ import java.util.List;
 
 public interface IGuiRenderHandler {
 
-    public GuiScreen getGuiScreen();
+	public GuiScreen getGuiScreen();
 
-    public void renderTooltip(ItemStack itemStack, int x, int y);
+	public void renderTooltip(ItemStack itemStack, int x, int y);
 
-    public void renderHoveringText(List list, int x, int y, FontRenderer font);
+	public void renderHoveringText(List list, int x, int y, FontRenderer font);
 
 }

@@ -14,61 +14,61 @@ import me.jezza.oc.api.network.NetworkResponse.MessageResponse;
  */
 public interface INetworkMessage<T extends INetworkNode<T>> {
 
-    /**
-     * @param node the node being passed ownership to.
-     */
-    public void setOwner(T node);
+	/**
+	 * @param node the node being passed ownership to.
+	 */
+	public void setOwner(T node);
 
-    /**
-     * @return the current INetworkNode that is viewed as the node that sent out this message.
-     */
-    public T getOwner();
+	/**
+	 * @return the current INetworkNode that is viewed as the node that sent out this message.
+	 */
+	public T getOwner();
 
-    /**
-     * Called when the message gets reposted upon completion and requires reposting.
-     * <p/>
-     * Use this to reset any values (if you want to reset anything) before the repost.
-     */
-    public void resetMessage();
+	/**
+	 * Called when the message gets reposted upon completion and requires reposting.
+	 * <p/>
+	 * Use this to reset any values (if you want to reset anything) before the repost.
+	 */
+	public void resetMessage();
 
-    /**
-     * The contents of this message were changed in some way.
-     *
-     * @param node The node that returned the INJECT state.
-     */
-    public void onDataChanged(T node);
+	/**
+	 * The contents of this message were changed in some way.
+	 *
+	 * @param node The node that returned the INJECT state.
+	 */
+	public void onDataChanged(T node);
 
-    /**
-     * Fired during the preProcessing Phase.
-     * Can be used to setup/(wait for) data.
-     * Such as a path to a node, or waiting for another messages execution.
-     *
-     * @param messageProcessor - The IMessageProcessor that handles this message.
-     * @return Take a look at {@link me.jezza.oc.api.network.NetworkResponse.MessageResponse}
-     */
-    public MessageResponse preProcessing(IMessageProcessor<T> messageProcessor);
+	/**
+	 * Fired during the preProcessing Phase.
+	 * Can be used to setup/(wait for) data.
+	 * Such as a path to a node, or waiting for another messages execution.
+	 *
+	 * @param messageProcessor - The IMessageProcessor that handles this message.
+	 * @return Take a look at {@link me.jezza.oc.api.network.NetworkResponse.MessageResponse}
+	 */
+	public MessageResponse preProcessing(IMessageProcessor<T> messageProcessor);
 
-    /**
-     * Fired during the processing Phase.
-     * <p/>
-     * If the message wants to add it to a list, or alter something, you have the ability to.
-     * A node will not be fired with this method more than once.
-     *
-     * @param messageProcessor - The IMessageProcessor that handles this message.
-     * @param node             - A node that exists as a part of the network.
-     * @return Take a look at {@link me.jezza.oc.api.network.NetworkResponse.MessageResponse}
-     */
-    public MessageResponse processNode(IMessageProcessor<T> messageProcessor, T node);
+	/**
+	 * Fired during the processing Phase.
+	 * <p/>
+	 * If the message wants to add it to a list, or alter something, you have the ability to.
+	 * A node will not be fired with this method more than once.
+	 *
+	 * @param messageProcessor - The IMessageProcessor that handles this message.
+	 * @param node             - A node that exists as a part of the network.
+	 * @return Take a look at {@link me.jezza.oc.api.network.NetworkResponse.MessageResponse}
+	 */
+	public MessageResponse processNode(IMessageProcessor<T> messageProcessor, T node);
 
-    /**
-     * Fired during the postProcessing Phase.
-     * <p/>
-     * Used to determine what the system should do with the message after giving passing it off to this method.
-     * This is after the message has been completed.
-     *
-     * @param messageProcessor - The IMessageProcessor that handles this message.
-     * @return Take a look at {@link me.jezza.oc.api.network.NetworkResponse.MessageResponse}
-     */
-    public MessageResponse postProcessing(IMessageProcessor<T> messageProcessor);
+	/**
+	 * Fired during the postProcessing Phase.
+	 * <p/>
+	 * Used to determine what the system should do with the message after giving passing it off to this method.
+	 * This is after the message has been completed.
+	 *
+	 * @param messageProcessor - The IMessageProcessor that handles this message.
+	 * @return Take a look at {@link me.jezza.oc.api.network.NetworkResponse.MessageResponse}
+	 */
+	public MessageResponse postProcessing(IMessageProcessor<T> messageProcessor);
 
 }

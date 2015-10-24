@@ -5,7 +5,10 @@ import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Jezza
@@ -24,46 +27,46 @@ public class StringHelper {
 	}
 
 	public static boolean nullOrEmpty(CharSequence charSequence) {
-        return charSequence == null || charSequence.length() == 0;
-    }
+		return charSequence == null || charSequence.length() == 0;
+	}
 
-    public static boolean notNullOrEmpty(CharSequence charSequence) {
-        return charSequence != null && charSequence.length() != 0;
-    }
+	public static boolean notNullOrEmpty(CharSequence charSequence) {
+		return charSequence != null && charSequence.length() != 0;
+	}
 
-    public static boolean useable(CharSequence charSequence) {
-        if (charSequence == null || charSequence.length() == 0)
-            return false;
-        for (int i = 0; i < charSequence.length(); i++)
-            if (charSequence.charAt(i) > ' ')
-                return true;
-        return false;
-    }
+	public static boolean useable(CharSequence charSequence) {
+		if (charSequence == null || charSequence.length() == 0)
+			return false;
+		for (int i = 0; i < charSequence.length(); i++)
+			if (charSequence.charAt(i) > ' ')
+				return true;
+		return false;
+	}
 
-    public static String translate(String key) {
-        return StatCollector.translateToLocal(key);
-    }
+	public static String translate(String key) {
+		return StatCollector.translateToLocal(key);
+	}
 
-    public static String translate(String key, Object... params) {
-        return format(translate(key), params);
-    }
+	public static String translate(String key, Object... params) {
+		return format(translate(key), params);
+	}
 
-    public static String format(String target, Object... params) {
-        if (params != null && params.length != 0)
-            for (Object param : params)
-                target = target.replaceFirst("\\{\\}", String.valueOf(param));
-        return target;
-    }
+	public static String format(String target, Object... params) {
+		if (params != null && params.length != 0)
+			for (Object param : params)
+				target = target.replaceFirst("\\{\\}", String.valueOf(param));
+		return target;
+	}
 
-    public static String translateWithFallback(String key) {
-        return translateWithFallback(key, key);
-    }
+	public static String translateWithFallback(String key) {
+		return translateWithFallback(key, key);
+	}
 
-    public static String translateWithFallback(String key, String defaultString) {
-        return StatCollector.canTranslate(key) ? translate(key) : defaultString;
-    }
+	public static String translateWithFallback(String key, String defaultString) {
+		return StatCollector.canTranslate(key) ? translate(key) : defaultString;
+	}
 
-    public static String formatColour(String value) {
+	public static String formatColour(String value) {
 		StringBuilder builder = new StringBuilder(value);
 		for (int i = 0; i < builder.length(); i++) {
 			char c = builder.charAt(i);
@@ -78,9 +81,9 @@ public class StringHelper {
 		return builder.toString();
 	}
 
-    public static String convertToLowerSnakeCase(String value) {
-        if (!useable(value))
-            return "";
+	public static String convertToLowerSnakeCase(String value) {
+		if (!useable(value))
+			return "";
 		for (int i = 0; i < value.length(); i++) {
 			char c = value.charAt(i);
 			if (c == '_')
@@ -91,24 +94,24 @@ public class StringHelper {
 		return CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.LOWER_UNDERSCORE, value);
 	}
 
-    public static List<String> wrap(String text, int size) {
-        return wrap(text, size, false);
-    }
+	public static List<String> wrap(String text, int size) {
+		return wrap(text, size, false);
+	}
 
-    public static List<String> wrap(String text, int size, boolean ignoreNewlines) {
+	public static List<String> wrap(String text, int size, boolean ignoreNewlines) {
 		final List<String> lines;
-        StringBuilder sb;
-        String[] words;
-        String space;
+		StringBuilder sb;
+		String[] words;
+		String space;
 
-        if (ignoreNewlines) {
-            text = text.replaceAll(System.lineSeparator(), " ");
-            text = text.replaceAll("\\n", " ");
+		if (ignoreNewlines) {
+			text = text.replaceAll(System.lineSeparator(), " ");
+			text = text.replaceAll("\\n", " ");
 
-            words = text.split(" ");
-        	lines = new ArrayList<>(words.length);
-            sb = new StringBuilder();
-            space = "";
+			words = text.split(" ");
+			lines = new ArrayList<>(words.length);
+			sb = new StringBuilder();
+			space = "";
 			for (int i = 0; i < words.length; i++) {
 				String word = words[i];
 				if (i != 0 && sb.length() + space.length() + word.length() > size) {
@@ -119,9 +122,9 @@ public class StringHelper {
 				sb.append(space).append(word);
 				space = " ";
 			}
-            lines.add(sb.toString());
+			lines.add(sb.toString());
 			return lines;
-        }
+		}
 
 		lines = new ArrayList<>(6);
 		for (String part : text.split("\\n")) {
@@ -144,6 +147,6 @@ public class StringHelper {
 				lines.add(sb.toString());
 			}
 		}
-        return lines;
-    }
+		return lines;
+	}
 }

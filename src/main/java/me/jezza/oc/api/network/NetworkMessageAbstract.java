@@ -10,38 +10,38 @@ import java.util.HashMap;
  */
 public abstract class NetworkMessageAbstract<T extends INetworkNode<T>> implements INetworkMessage<T> {
 
-    /**
-     * Any useful data that you want the message to carry.
-     * Such as a world, or coordinate position.
-     */
-    public HashMap<String, Object> dataMap;
+	/**
+	 * Any useful data that you want the message to carry.
+	 * Such as a world, or coordinate position.
+	 */
+	public HashMap<String, Object> dataMap;
 
-    protected T owner;
+	protected T owner;
 
-    public NetworkMessageAbstract(T owner) {
-        this.owner = owner;
-    }
+	public NetworkMessageAbstract(T owner) {
+		this.owner = owner;
+	}
 
-    protected void initDataMap() {
-        if (dataMap != null && !dataMap.isEmpty())
-            dataMap.clear();
-        dataMap = new HashMap<>();
-    }
+	protected void initDataMap() {
+		if (dataMap != null && !dataMap.isEmpty())
+			dataMap.clear();
+		dataMap = new HashMap<>();
+	}
 
-    @Override
-    public void resetMessage() {
-        if (dataMap != null)
-            dataMap.clear();
-    }
+	@Override
+	public void resetMessage() {
+		if (dataMap != null)
+			dataMap.clear();
+	}
 
-    @Override
-    public void setOwner(T owner) {
-        this.owner = owner;
-    }
+	@Override
+	public void setOwner(T owner) {
+		this.owner = owner;
+	}
 
-    @Override
-    public T getOwner() {
-        return owner;
-    }
+	@Override
+	public T getOwner() {
+		return owner;
+	}
 
 }

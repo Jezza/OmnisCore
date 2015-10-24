@@ -7,19 +7,19 @@ import net.minecraftforge.common.config.Configuration;
 import java.lang.reflect.Field;
 
 public class CEStringArray extends ConfigEntry<ConfigStringArray, String[]> {
-    public CEStringArray(Configuration config) {
-        super(config);
-    }
+	public CEStringArray(Configuration config) {
+		super(config);
+	}
 
-    @Override
-    public Object loadAnnotation(Configuration config, Field field, String fieldName, ConfigStringArray annotation, String[] currentValue, String[] defaultValue) {
-        String comment = processComment(annotation.comment());
-        return getStringArray(annotation.category(), fieldName, defaultValue, comment);
-    }
+	@Override
+	public Object loadAnnotation(Configuration config, Field field, String fieldName, ConfigStringArray annotation, String[] currentValue, String[] defaultValue) {
+		String comment = processComment(annotation.comment());
+		return getStringArray(annotation.category(), fieldName, defaultValue, comment);
+	}
 
-    @Override
-    public void saveAnnotation(Configuration config, Field field, String fieldName, ConfigStringArray annotation, String[] currentValue, String[] defaultValue) {
-        String comment = processComment(annotation.comment());
-        getStringArrayProperty(annotation.category(), fieldName, defaultValue, comment).set(currentValue);
-    }
+	@Override
+	public void saveAnnotation(Configuration config, Field field, String fieldName, ConfigStringArray annotation, String[] currentValue, String[] defaultValue) {
+		String comment = processComment(annotation.comment());
+		getStringArrayProperty(annotation.category(), fieldName, defaultValue, comment).set(currentValue);
+	}
 }

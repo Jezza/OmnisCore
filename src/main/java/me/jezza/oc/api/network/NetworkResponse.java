@@ -2,7 +2,7 @@ package me.jezza.oc.api.network;
 
 public class NetworkResponse {
 
-    //@formatter:off
+	//@formatter:off
     /**
      * PRE_PROCESSING:
      *  INVALID:
@@ -36,50 +36,50 @@ public class NetworkResponse {
      *      (Useful for setting up new messages, but have to wait for a path from node A to node B)
      */
     //@formatter:on
-    public static enum MessageResponse {
-        INVALID,
-        VALID,
-        WAIT;
-    }
+	public static enum MessageResponse {
+		INVALID,
+		VALID,
+		WAIT;
+	}
 
-    /**
-     * These responses are designed to help you identify what the network is doing.
-     * NETWORK_JOIN:
-     *  A single adjacent network has been found and been added.
-     * NETWORK_MERGE:
-     *  More than one valid network has been found, and these networks have been merged.
-     * NETWORK_CREATION:
-     *  No valid adjacent network has been found, so one was created.
-     */
-    public static enum NodeAdded {
-        NETWORK_JOIN,
-        NETWORK_MERGE,
-        NETWORK_CREATION,
+	/**
+	 * These responses are designed to help you identify what the network is doing.
+	 * NETWORK_JOIN:
+	 * A single adjacent network has been found and been added.
+	 * NETWORK_MERGE:
+	 * More than one valid network has been found, and these networks have been merged.
+	 * NETWORK_CREATION:
+	 * No valid adjacent network has been found, so one was created.
+	 */
+	public static enum NodeAdded {
+		NETWORK_JOIN,
+		NETWORK_MERGE,
+		NETWORK_CREATION,
 
-        // Not used internally. Just here to for you to replace the response if an exception is thrown.
-        NETWORK_FAILED_TO_ADD;
-    }
+		// Not used internally. Just here to for you to replace the response if an exception is thrown.
+		NETWORK_FAILED_TO_ADD;
+	}
 
-    public static enum NodeRemoved {
-        NETWORK_NOT_FOUND,
-        NETWORK_LEAVE,
-        NETWORK_SPLIT,
-        NETWORK_DESTROYED,
+	public static enum NodeRemoved {
+		NETWORK_NOT_FOUND,
+		NETWORK_LEAVE,
+		NETWORK_SPLIT,
+		NETWORK_DESTROYED,
 
-        // Not used internally. Just here to for you to replace the response if an exception is thrown.
-        NETWORK_FAILED_TO_REMOVE;
-    }
+		// Not used internally. Just here to for you to replace the response if an exception is thrown.
+		NETWORK_FAILED_TO_REMOVE;
+	}
 
-    public static enum NodeUpdated {
-        NETWORK_NOT_FOUND,
-        NETWORK_NO_DELTA_DETECTED,
-        NETWORK_UPDATED,
+	public static enum NodeUpdated {
+		NETWORK_NOT_FOUND,
+		NETWORK_NO_DELTA_DETECTED,
+		NETWORK_UPDATED,
 
-        // Not used internally. Just here to for you to replace the response if an exception is thrown.
-        NETWORK_FAILED_TO_UPDATE;
-    }
+		// Not used internally. Just here to for you to replace the response if an exception is thrown.
+		NETWORK_FAILED_TO_UPDATE;
+	}
 
-    //@formatter:off
+	//@formatter:off
     /**
      * IGNORE:
      *  The node did nothing to the message.
@@ -94,10 +94,10 @@ public class NetworkResponse {
      *  The message is deleted from the network, and unable to continue propagating.
      */
     //@formatter:on
-    public static enum ListenerResponse {
-        IGNORE,
-        INTERCEPT,
-        INJECT,
-        DELETE;
-    }
+	public static enum ListenerResponse {
+		IGNORE,
+		INTERCEPT,
+		INJECT,
+		DELETE;
+	}
 }

@@ -4,6 +4,6 @@ import net.minecraft.client.gui.GuiListExtended;
 
 public interface IGuiSlotEntry extends GuiListExtended.IGuiListEntry {
 
-    public int getWidth();
+	public int getWidth();
 
 }

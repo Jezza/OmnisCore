@@ -23,15 +23,14 @@ public class Config {
 	/**
 	 * Throw this on a static method, with one parameter: IConfigRegistry.
 	 * If it doesn't have it, an error will be thrown.
-	 *
+	 * <p/>
 	 * eg;
 	 * <pre>
-	 * 	@ConfigRegistrar
+	 *    @ConfigRegistrar
 	 * 	private static void registerMyCrap(IConfigRegistry registry) {
 	 * 		registry.registerAnnotation();
 	 * 	}
 	 * </pre>
-	 *
 	 */
 	@Target(ElementType.METHOD)
 	@Retention(RetentionPolicy.RUNTIME)

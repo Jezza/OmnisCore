@@ -4,6 +4,6 @@ import net.minecraft.entity.Entity;
 
 public interface INetworkEntity<T extends INetworkNode<T>> extends INetworkMessage<T> {
 
-    public Class<? extends Entity> getEntityClass();
+	public Class<? extends Entity> getEntityClass();
 
 }

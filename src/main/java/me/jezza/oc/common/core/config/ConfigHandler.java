@@ -25,15 +25,15 @@ import java.util.Set;
 import static me.jezza.oc.api.config.Config.*;
 
 public final class ConfigHandler implements IConfigRegistry {
-    private static ConfigHandler INSTANCE;
+	private static ConfigHandler INSTANCE;
 
-    // After 3rd party mod annotations have been added.
-    private static boolean registrarsProcessed = false;
-    // After all annotated fields have been located, processed, and cached.
-    private static boolean postProcessed = false;
+	// After 3rd party mod annotations have been added.
+	private static boolean registrarsProcessed = false;
+	// After all annotated fields have been located, processed, and cached.
+	private static boolean postProcessed = false;
 
-    private static final Map<String, ConfigData> configMap = new LinkedHashMap<>();
-    private static final Map<String, ICEFactory<?, ? extends ConfigEntry<? extends Annotation, ?>>> annotationMap = new LinkedHashMap<>();
+	private static final Map<String, ConfigData> configMap = new LinkedHashMap<>();
+	private static final Map<String, ICEFactory<?, ? extends ConfigEntry<? extends Annotation, ?>>> annotationMap = new LinkedHashMap<>();
 
 	public static void init() {
 		if (INSTANCE != null)
@@ -42,27 +42,27 @@ public final class ConfigHandler implements IConfigRegistry {
 		INSTANCE.parseControllers();
 	}
 
-    static {
-        internalRegister(ConfigBoolean.class, CEBoolean.class);
-        internalRegister(ConfigBooleanArray.class, CEBooleanArray.class);
-        internalRegister(ConfigInteger.class, CEInteger.class);
-        internalRegister(ConfigIntegerArray.class, CEIntegerArray.class);
-        internalRegister(ConfigFloat.class, CEFloat.class);
-        internalRegister(ConfigDouble.class, CEDouble.class);
-        internalRegister(ConfigDoubleArray.class, CEDoubleArray.class);
-        internalRegister(ConfigString.class, CEString.class);
-        internalRegister(ConfigStringArray.class, CEStringArray.class);
-        internalRegister(ConfigEnum.class, CEEnum.class);
-    }
+	static {
+		internalRegister(ConfigBoolean.class, CEBoolean.class);
+		internalRegister(ConfigBooleanArray.class, CEBooleanArray.class);
+		internalRegister(ConfigInteger.class, CEInteger.class);
+		internalRegister(ConfigIntegerArray.class, CEIntegerArray.class);
+		internalRegister(ConfigFloat.class, CEFloat.class);
+		internalRegister(ConfigDouble.class, CEDouble.class);
+		internalRegister(ConfigDoubleArray.class, CEDoubleArray.class);
+		internalRegister(ConfigString.class, CEString.class);
+		internalRegister(ConfigStringArray.class, CEStringArray.class);
+		internalRegister(ConfigEnum.class, CEEnum.class);
+	}
 
-    private ConfigHandler() {
-    }
+	private ConfigHandler() {
+	}
 
-    private ConfigHandler parseControllers() {
+	private ConfigHandler parseControllers() {
 		Set<ASMData> dataSet = ASM.dataTable(Controller.class);
 
-        // Filters out all controller annotations and places them with their associated mod.
-        for (ASMData data : dataSet) {
+		// Filters out all controller annotations and places them with their associated mod.
+		for (ASMData data : dataSet) {
 			final String packageName = ClassUtils.getPackageName(data.getClassName());
 			String modId = ASM.findOwner(packageName).getModId();
 			ConfigData configData = configMap.get(modId);
@@ -72,7 +72,7 @@ public final class ConfigHandler implements IConfigRegistry {
 				configMap.put(modId, configData);
 			}
 			configData.addRoot(data);
-        }
+		}
 
 		// Process all potential registrars first.
 		for (Entry<ASMData, Method> entry : ASM.methodsWithExact(ConfigRegistrar.class, IConfigRegistry.class).entrySet()) {
@@ -91,78 +91,78 @@ public final class ConfigHandler implements IConfigRegistry {
 				throw Throwables.propagate(e);
 			}
 		}
-        registrarsProcessed = true;
+		registrarsProcessed = true;
 
-        for (ConfigData configData : configMap.values()) {
-            // Organise all sub-packages.
-            configData.processRoots();
+		for (ConfigData configData : configMap.values()) {
+			// Organise all sub-packages.
+			configData.processRoots();
 
-            // Process all current classes associated with the ConfigContainer.
-            configData.processConfigContainers(annotationMap.values());
-        }
-        postProcessed = true;
+			// Process all current classes associated with the ConfigContainer.
+			configData.processConfigContainers(annotationMap.values());
+		}
+		postProcessed = true;
 		return this;
-    }
+	}
 
-    @Override
-    public <A extends Annotation, T extends ConfigEntry<A, ?>> boolean registerAnnotation(Class<A> clazz, Class<T> configEntry) {
-        return !(registrarsProcessed || Modifier.isAbstract(configEntry.getModifiers())) && internalRegister(clazz, configEntry);
-    }
+	@Override
+	public <A extends Annotation, T extends ConfigEntry<A, ?>> boolean registerAnnotation(Class<A> clazz, Class<T> configEntry) {
+		return !(registrarsProcessed || Modifier.isAbstract(configEntry.getModifiers())) && internalRegister(clazz, configEntry);
+	}
 
-    private static <A extends Annotation, T extends ConfigEntry<A, ?>> boolean internalRegister(Class<A> clazz, Class<T> configEntry) {
-        String canonicalName = clazz.getCanonicalName();
-        if (!annotationMap.containsKey(canonicalName)) {
-            annotationMap.put(canonicalName, createFactory(clazz, configEntry));
-            return true;
-        }
-        return false;
-    }
+	private static <A extends Annotation, T extends ConfigEntry<A, ?>> boolean internalRegister(Class<A> clazz, Class<T> configEntry) {
+		String canonicalName = clazz.getCanonicalName();
+		if (!annotationMap.containsKey(canonicalName)) {
+			annotationMap.put(canonicalName, createFactory(clazz, configEntry));
+			return true;
+		}
+		return false;
+	}
 
-    @SuppressWarnings("unchecked")
-    private static <A extends Annotation, T extends ConfigEntry<A, ?>> ICEFactory<A, T> createFactory(final Class<A> annotationClazz, final Class<T> configClazz) {
-        for (final Constructor<T> constructor : (Constructor<T>[]) configClazz.getDeclaredConstructors()) {
-            if (constructor.getParameterCount() == 1 && constructor.getParameterTypes()[0] == Configuration.class) {
-                constructor.setAccessible(true);
-                return new ICEFactory<A, T>() {
-                    @Override
-                    public T create(Object... params) throws InstantiationException, IllegalAccessException, InvocationTargetException {
-                        return constructor.newInstance(params);
-                    }
+	@SuppressWarnings("unchecked")
+	private static <A extends Annotation, T extends ConfigEntry<A, ?>> ICEFactory<A, T> createFactory(final Class<A> annotationClazz, final Class<T> configClazz) {
+		for (final Constructor<T> constructor : (Constructor<T>[]) configClazz.getDeclaredConstructors()) {
+			if (constructor.getParameterCount() == 1 && constructor.getParameterTypes()[0] == Configuration.class) {
+				constructor.setAccessible(true);
+				return new ICEFactory<A, T>() {
+					@Override
+					public T create(Object... params) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+						return constructor.newInstance(params);
+					}
 
-                    @Override
-                    public Class<A> annotationClazz() {
-                        return annotationClazz;
-                    }
-                };
-            }
-        }
-        throw new ConfigurationException("Found no entry point for the ConfigClass: " + configClazz + "! Requires a constructor with one parameter: " + Configuration.class);
-    }
+					@Override
+					public Class<A> annotationClazz() {
+						return annotationClazz;
+					}
+				};
+			}
+		}
+		throw new ConfigurationException("Found no entry point for the ConfigClass: " + configClazz + "! Requires a constructor with one parameter: " + Configuration.class);
+	}
 
-    public static boolean load(String modID) {
-        if (postProcessed && !Strings.isNullOrEmpty(modID) && Loader.isModLoaded(modID)) {
-            ConfigData configData = configMap.get(modID);
-            if (configData != null) {
-                configData.load();
+	public static boolean load(String modID) {
+		if (postProcessed && !Strings.isNullOrEmpty(modID) && Loader.isModLoaded(modID)) {
+			ConfigData configData = configMap.get(modID);
+			if (configData != null) {
+				configData.load();
 				return true;
 			}
-        }
+		}
 		return false;
-    }
+	}
 
-    public static boolean save(String modID) {
-        if (postProcessed && !Strings.isNullOrEmpty(modID) && Loader.isModLoaded(modID)) {
-            ConfigData configData = configMap.get(modID);
-            if (configData != null) {
-                configData.save();
+	public static boolean save(String modID) {
+		if (postProcessed && !Strings.isNullOrEmpty(modID) && Loader.isModLoaded(modID)) {
+			ConfigData configData = configMap.get(modID);
+			if (configData != null) {
+				configData.save();
 				return true;
 			}
-        }
+		}
 		return false;
-    }
+	}
 
-    @Override
-    public String toString() {
-        return annotationMap.toString();
-    }
+	@Override
+	public String toString() {
+		return annotationMap.toString();
+	}
 }

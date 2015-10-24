@@ -9,18 +9,23 @@ public interface Tooltip {
 	Tooltip defaultInfo();
 
 	Tooltip add(CharSequence sequence);
+
 	Tooltip add(Iterable<? extends CharSequence> sequences);
 
 	Tooltip add(CharSequence sequence, int flags);
+
 	Tooltip add(Iterable<? extends CharSequence> sequences, int flags);
 
 	boolean shift();
+
 	boolean shift(int key);
 
 	boolean ctrl();
+
 	boolean ctrl(int key);
 
 	boolean alt();
+
 	boolean alt(int key);
 
 	boolean pressed(int key);

@@ -118,6 +118,7 @@ public class ASM {
 	public static Set<ASMData> dataTable(Class<? extends Annotation> annotationClass) {
 		return dataTable().getAll(annotationClass.getName());
 	}
+
 	public static Map<ASMData, Method> methodsWith(Class<? extends Annotation> annotationClass) {
 		Map<ASMData, Method> methods = Maps.newHashMap();
 		for (ASMData data : dataTable(annotationClass))

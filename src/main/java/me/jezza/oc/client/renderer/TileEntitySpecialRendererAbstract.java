@@ -8,35 +8,35 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 public abstract class TileEntitySpecialRendererAbstract<T extends TileEntity> extends TileEntitySpecialRenderer {
-    protected TileEntityRendererDispatcher dispatcher;
+	protected TileEntityRendererDispatcher dispatcher;
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public void renderTileEntityAt(TileEntity tileEntity, double x, double y, double z, float tick) {
-        renderTileAt((T) tileEntity, x, y, z, tick);
-    }
+	@Override
+	@SuppressWarnings("unchecked")
+	public void renderTileEntityAt(TileEntity tileEntity, double x, double y, double z, float tick) {
+		renderTileAt((T) tileEntity, x, y, z, tick);
+	}
 
-    public abstract void renderTileAt(T tile, double x, double y, double z, float tick);
+	public abstract void renderTileAt(T tile, double x, double y, double z, float tick);
 
-    @Override
-    protected void bindTexture(ResourceLocation texture) {
-        field_147501_a.field_147553_e.bindTexture(texture);
-    }
+	@Override
+	protected void bindTexture(ResourceLocation texture) {
+		field_147501_a.field_147553_e.bindTexture(texture);
+	}
 
-    @Override
-    public void func_147497_a(TileEntityRendererDispatcher dispatcher) {
-        this.dispatcher = dispatcher;
-    }
+	@Override
+	public void func_147497_a(TileEntityRendererDispatcher dispatcher) {
+		this.dispatcher = dispatcher;
+	}
 
-    @Override
-    public void func_147496_a(World world) {
-        setupRenderer(world);
-    }
+	@Override
+	public void func_147496_a(World world) {
+		setupRenderer(world);
+	}
 
-    public void setupRenderer(World world) {
-    }
+	public void setupRenderer(World world) {
+	}
 
-    public FontRenderer getFontRenderer() {
-        return func_147498_b();
-    }
+	public FontRenderer getFontRenderer() {
+		return func_147498_b();
+	}
 }
