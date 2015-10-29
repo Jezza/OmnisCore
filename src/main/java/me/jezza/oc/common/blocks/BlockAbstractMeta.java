@@ -4,6 +4,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.common.items.ItemBlockAbstract;
+import me.jezza.oc.common.utils.helpers.StringHelper;
 import me.jezza.oc.common.utils.maths.Maths;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -45,15 +46,17 @@ public abstract class BlockAbstractMeta extends BlockAbstract {
 		List<String> names = getNames();
 		icons = new IIcon[names.size()];
 
-		StringBuilder registryBuilder = new StringBuilder(modIdentifier);
-		if (usesTextureSubDirectory()) {
-			registryBuilder.append(getTextureSubDirectory());
-			registryBuilder.append("/");
+		StringBuilder directory = new StringBuilder(modIdentifier);
+		String subDirectory = textureDirectory();
+		if (StringHelper.useable(subDirectory)) {
+			directory.append(subDirectory);
+			if (!subDirectory.endsWith("/"))
+				directory.append("/");
 		}
 
-		String registerString = registryBuilder.toString();
+		String registryDirectory = directory.toString();
 		for (int i = 0; i < icons.length; i++)
-			icons[i] = iconRegister.registerIcon(registerString + names.get(Maths.clip(i, 0, names.size())));
+			icons[i] = iconRegister.registerIcon(registryDirectory + names.get(Maths.clip(i, 0, names.size())));
 	}
 
 	@Override
@@ -71,12 +74,8 @@ public abstract class BlockAbstractMeta extends BlockAbstract {
 		return ItemBlockAbstract.class;
 	}
 
-	public boolean usesTextureSubDirectory() {
-		return !getTextureSubDirectory().equals("");
-	}
-
-	public String getTextureSubDirectory() {
-		return "";
+	public String textureDirectory() {
+		return null;
 	}
 
 	public abstract List<String> getNames();

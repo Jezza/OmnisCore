@@ -8,7 +8,7 @@ import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToMessageCodec;
-import me.jezza.oc.api.channel.IOmnisPacket;
+import me.jezza.oc.common.interfaces.IOmnisPacket;
 import me.jezza.oc.common.core.CoreProperties;
 import me.jezza.oc.common.core.channel.internal.OmnisBuffer;
 import me.jezza.oc.common.utils.collect.PacketShortHashMap;
@@ -27,14 +27,14 @@ import static cpw.mods.fml.common.network.NetworkRegistry.NET_HANDLER;
  */
 @Sharable
 public class OmnisCodec extends MessageToMessageCodec<FMLProxyPacket, IOmnisPacket> {
-
 	private final PacketShortHashMap<Class<? extends IOmnisPacket>> packetMap = new PacketShortHashMap<>();
 
 	public OmnisCodec() {
 	}
 
 	protected boolean registerPacket(Class<? extends IOmnisPacket> packetClass) {
-		return packetMap.add(packetClass);
+		packetMap.add(packetClass);
+		return true;
 	}
 
 	@Override

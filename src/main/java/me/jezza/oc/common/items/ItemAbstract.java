@@ -1,6 +1,5 @@
 package me.jezza.oc.common.items;
 
-import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -24,10 +23,9 @@ public abstract class ItemAbstract extends Item {
 	public final String modIdentifier;
 
 	public ItemAbstract(String name) {
-		modIdentifier = Loader.instance().activeModContainer().getModId() + ":";
+		modIdentifier = ASM.findOwner(getClass()).getModId() + ':';
 		setName(name);
 		register(name);
-		ASM.findOwner(getClass());
 	}
 
 	protected ItemAbstract setName(String name) {
@@ -72,7 +70,7 @@ public abstract class ItemAbstract extends Item {
 	@Deprecated
 	@SideOnly(Side.CLIENT)
 	public boolean hasEffect(ItemStack itemStack) {
-		return super.hasEffect(itemStack) || effect;
+		return effect || super.hasEffect(itemStack);
 	}
 
 	@Override

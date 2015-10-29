@@ -1,13 +1,9 @@
 package me.jezza.oc.common.core.config;
 
 import com.google.common.base.Strings;
-import com.google.common.base.Throwables;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
-import me.jezza.oc.api.config.IConfigRegistry;
-import me.jezza.oc.api.exceptions.ConfigurationException;
 import me.jezza.oc.common.core.config.discovery.ConfigData;
-import me.jezza.oc.common.core.config.entries.*;
 import me.jezza.oc.common.utils.ASM;
 import net.minecraftforge.common.config.Configuration;
 import org.apache.commons.lang3.ClassUtils;
@@ -15,20 +11,20 @@ import org.apache.commons.lang3.ClassUtils;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import static me.jezza.oc.api.config.Config.*;
+import static me.jezza.oc.common.core.config.Config.ConfigAnnotation;
+import static me.jezza.oc.common.core.config.Config.Controller;
 
-public final class ConfigHandler implements IConfigRegistry {
+public final class ConfigHandler {
 	private static ConfigHandler INSTANCE;
 
 	// After 3rd party mod annotations have been added.
-	private static boolean registrarsProcessed = false;
+	private static boolean annotationsRegistered = false;
 	// After all annotated fields have been located, processed, and cached.
 	private static boolean postProcessed = false;
 
@@ -42,85 +38,74 @@ public final class ConfigHandler implements IConfigRegistry {
 		INSTANCE.parseControllers();
 	}
 
-	static {
-		internalRegister(ConfigBoolean.class, CEBoolean.class);
-		internalRegister(ConfigBooleanArray.class, CEBooleanArray.class);
-		internalRegister(ConfigInteger.class, CEInteger.class);
-		internalRegister(ConfigIntegerArray.class, CEIntegerArray.class);
-		internalRegister(ConfigFloat.class, CEFloat.class);
-		internalRegister(ConfigDouble.class, CEDouble.class);
-		internalRegister(ConfigDoubleArray.class, CEDoubleArray.class);
-		internalRegister(ConfigString.class, CEString.class);
-		internalRegister(ConfigStringArray.class, CEStringArray.class);
-		internalRegister(ConfigEnum.class, CEEnum.class);
-	}
+//	static {
+//		internalRegister(ConfigBoolean.class, CEBoolean.class);
+//		internalRegister(ConfigBooleanArray.class, CEBooleanArray.class);
+//		internalRegister(ConfigInteger.class, CEInteger.class);
+//		internalRegister(ConfigIntegerArray.class, CEIntegerArray.class);
+//		internalRegister(ConfigFloat.class, CEFloat.class);
+//		internalRegister(ConfigDouble.class, CEDouble.class);
+//		internalRegister(ConfigDoubleArray.class, CEDoubleArray.class);
+//		internalRegister(ConfigString.class, CEString.class);
+//		internalRegister(ConfigStringArray.class, CEStringArray.class);
+//		internalRegister(ConfigEnum.class, CEEnum.class);
+//	}
 
 	private ConfigHandler() {
+		throw new IllegalStateException();
 	}
 
-	private ConfigHandler parseControllers() {
+	private void parseControllers() {
 		Set<ASMData> dataSet = ASM.dataTable(Controller.class);
 
-		// Filters out all controller annotations and places them with their associated mod.
+		// Maps all the controller annotations to their associated mod.
 		for (ASMData data : dataSet) {
 			final String packageName = ClassUtils.getPackageName(data.getClassName());
 			String modId = ASM.findOwner(packageName).getModId();
 			ConfigData configData = configMap.get(modId);
 			if (configData == null) {
-				Set<String> classes = ASM.ownedClasses(packageName);
-				configData = new ConfigData(modId, classes);
+				configData = new ConfigData(modId, ASM.ownedClasses(packageName));
 				configMap.put(modId, configData);
 			}
 			configData.addRoot(data);
 		}
 
-		// Process all potential registrars first.
-		for (Entry<ASMData, Method> entry : ASM.methodsWithExact(ConfigRegistrar.class, IConfigRegistry.class).entrySet()) {
-			Method method = entry.getValue();
-			if (!Modifier.isStatic(method.getModifiers()))
-				throw new IllegalStateException("Found a @" + ConfigRegistrar.class + " on a non-static method!");
-			Class<?>[] types = method.getParameterTypes();
-			if (types.length != 1)
-				throw new IllegalStateException("Found a @" + ConfigRegistrar.class + " on a method with an incorrect parameter count! Expected 1, found " + types.length);
-			if (types[0] != IConfigRegistry.class)
-				throw new IllegalStateException("Found a @" + ConfigRegistrar.class + " on a method with an incorrect parameter! Expected parameter of type IConfigRegistry, found " + types[0]);
-			try {
-				method.invoke(null, this);
-			} catch (IllegalAccessException | InvocationTargetException e) {
-				// Shouldn't happen.
-				throw Throwables.propagate(e);
-			}
+		// Process all config annotations.
+		for (Entry<ASMData, Class<?>> entry : ASM.classesWith(ConfigAnnotation.class).entrySet()) {
+			@SuppressWarnings("unchecked")
+			Class<? extends ConfigEntry<? extends Annotation, ?>> configEntry = (Class<? extends ConfigEntry<? extends Annotation, ?>>) entry.getKey().getAnnotationInfo().get("value");
+			@SuppressWarnings("unchecked")
+			Class<? extends Annotation> value = (Class<? extends Annotation>) entry.getValue();
+			if (!Modifier.isAbstract(configEntry.getModifiers()))
+				internalRegister(value, configEntry);
 		}
-		registrarsProcessed = true;
+		annotationsRegistered = true;
 
+		// Begin the processing.
 		for (ConfigData configData : configMap.values()) {
-			// Organise all sub-packages.
-			configData.processRoots();
-
-			// Process all current classes associated with the ConfigContainer.
-			configData.processConfigContainers(annotationMap.values());
+			// Organise all sub-packages, and process all classes associated with the ConfigContainer.
+			configData.processRoots().processConfigContainers(annotationMap.values());
 		}
 		postProcessed = true;
-		return this;
 	}
 
-	@Override
-	public <A extends Annotation, T extends ConfigEntry<A, ?>> boolean registerAnnotation(Class<A> clazz, Class<T> configEntry) {
-		return !(registrarsProcessed || Modifier.isAbstract(configEntry.getModifiers())) && internalRegister(clazz, configEntry);
+	public static <A extends Annotation, T extends ConfigEntry<A, ?>> boolean registerAnnotation(Class<A> annotationClazz, Class<T> configEntry) {
+		return !(annotationsRegistered || Modifier.isAbstract(configEntry.getModifiers())) && internalRegister(annotationClazz, configEntry);
 	}
 
-	private static <A extends Annotation, T extends ConfigEntry<A, ?>> boolean internalRegister(Class<A> clazz, Class<T> configEntry) {
-		String canonicalName = clazz.getCanonicalName();
+	private static boolean internalRegister(Class<? extends Annotation> annotationClazz, Class<? extends ConfigEntry<? extends Annotation, ?>> configEntry) {
+		String canonicalName = annotationClazz.getCanonicalName();
 		if (!annotationMap.containsKey(canonicalName)) {
-			annotationMap.put(canonicalName, createFactory(clazz, configEntry));
+			annotationMap.put(canonicalName, createFactory(annotationClazz, configEntry));
 			return true;
 		}
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
-	private static <A extends Annotation, T extends ConfigEntry<A, ?>> ICEFactory<A, T> createFactory(final Class<A> annotationClazz, final Class<T> configClazz) {
-		for (final Constructor<T> constructor : (Constructor<T>[]) configClazz.getDeclaredConstructors()) {
+	private static <A extends Annotation, T extends ConfigEntry<A, ?>> ICEFactory<A, T> createFactory(final Class<A> annotationClazz, final Class<? extends ConfigEntry<? extends Annotation, ?>> configClazz) {
+		@SuppressWarnings("unchecked")
+		Constructor<T>[] constructors = (Constructor<T>[]) configClazz.getDeclaredConstructors();
+		for (final Constructor<T> constructor : constructors) {
 			if (constructor.getParameterCount() == 1 && constructor.getParameterTypes()[0] == Configuration.class) {
 				constructor.setAccessible(true);
 				return new ICEFactory<A, T>() {
@@ -130,8 +115,9 @@ public final class ConfigHandler implements IConfigRegistry {
 					}
 
 					@Override
-					public Class<A> annotationClazz() {
-						return annotationClazz;
+					@SuppressWarnings("unchecked")
+					public Class<A> annotationClass() {
+						return (Class<A>) annotationClazz;
 					}
 				};
 			}

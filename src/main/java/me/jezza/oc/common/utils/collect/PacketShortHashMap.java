@@ -2,7 +2,7 @@ package me.jezza.oc.common.utils.collect;
 
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectShortHashMap;
-import me.jezza.oc.api.exceptions.ChannelException;
+import me.jezza.oc.common.core.channel.ChannelException;
 
 import static me.jezza.oc.common.utils.helpers.StringHelper.format;
 
@@ -16,7 +16,7 @@ public class PacketShortHashMap<T> {
 	private short nextIndex = 0;
 
 	public PacketShortHashMap() {
-		this(1 << 9, 16);
+		this(512, 16);
 	}
 
 	public PacketShortHashMap(int max) {
@@ -29,7 +29,7 @@ public class PacketShortHashMap<T> {
 		if (initialCapacity > max)
 			throw new IllegalStateException("Initial capacity is set to be above the max! " + initialCapacity + " > " + max);
 		this.max = max;
-		// Because you can't write a primitive short by itself.
+		// Because you can't write a primitive short.
 		short value = -1;
 		to = new TObjectShortHashMap<>(initialCapacity, 0.5F, value);
 		from = new TIntObjectHashMap<>(initialCapacity, 0.5F, -1);
@@ -58,14 +58,15 @@ public class PacketShortHashMap<T> {
 	public short get(T value) {
 		short i = to.get(value);
 		if (i < 0)
-			throw new ChannelException(format("Packet Class not found! {}", value));
+			throw new ChannelException(format("PacketClass not found! {}", value));
 		return i;
 	}
 
-	public boolean add(T value) {
+	public void add(T value) {
+		if (nextIndex >= max)
+			throw new ChannelException(format("Discriminator ({}) invalid! Maximum reached: {}", nextIndex, max));
 		from.put(nextIndex, value);
 		to.put(value, nextIndex++);
-		return false;
 	}
 
 	public void clear() {

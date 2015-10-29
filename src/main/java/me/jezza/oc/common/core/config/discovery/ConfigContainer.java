@@ -40,7 +40,7 @@ public class ConfigContainer {
 	public void processAllClasses(Collection<ICEFactory<?, ? extends ConfigEntry<? extends Annotation, ?>>> configEntryMap) {
 		for (ICEFactory<?, ? extends ConfigEntry<? extends Annotation, ?>> factory : configEntryMap) {
 			try {
-				annotationMap.put(factory.annotationClazz(), factory.create(config));
+				annotationMap.put(factory.annotationClass(), factory.create(config));
 			} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
 				CoreProperties.logger.fatal("Failed to create instance of the registered ConfigEntry!", e);
 			}

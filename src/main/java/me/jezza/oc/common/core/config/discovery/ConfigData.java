@@ -53,9 +53,10 @@ public class ConfigData {
 		}
 	}
 
-	public void processRoots() {
+	public ConfigData processRoots() {
 		for (String rootPackage : containerMap.keySet())
 			containerMap.get(rootPackage).setChildClasses(getAllChildClasses(rootPackage));
+		return this;
 	}
 
 	public void processConfigContainers(Collection<ICEFactory<?, ? extends ConfigEntry<? extends Annotation, ?>>> annotationMap) {

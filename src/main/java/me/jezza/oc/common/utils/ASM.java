@@ -81,8 +81,9 @@ public class ASM {
 				packages = Collections.unmodifiableSet(new HashSet<>(ownedPackages));
 			} else {
 				final String packageName = ClassUtils.getPackageName(mod.getClass());
-				Set<String> packageList = (Set<String>) Collections3.filter(ownedPackages, Sets.<String>newHashSetWithExpectedSize(ownedPackages.size()), startsWith(packageName));
-				packages = Collections.unmodifiableSet(packageList);
+				Set<String> packageSet = Sets.newHashSetWithExpectedSize(ownedPackages.size());
+				Collections3.filter(ownedPackages, packageSet, startsWith(packageName));
+				packages = Collections.unmodifiableSet(packageSet);
 			}
 			ASM.ownedPackages.put(modId, packages);
 		}
@@ -98,6 +99,18 @@ public class ASM {
 			packageOwners = builder.build();
 		}
 		return packageOwners;
+	}
+
+	public static LoadController loadController() {
+		if (loadController == null)
+			loadController = ReflectionHelper.getPrivateValue(Loader.class, Loader.instance(), "modController");
+		return loadController;
+	}
+
+	public static ModContainer overrideActiveContainer(ModContainer container) {
+		ModContainer oldContainer = ReflectionHelper.getPrivateValue(LoadController.class, loadController(), "activeContainer");
+		ReflectionHelper.setPrivateValue(LoadController.class, loadController(), container, "activeContainer");
+		return oldContainer;
 	}
 
 	public static ModDiscoverer discoverer() {
@@ -116,6 +129,20 @@ public class ASM {
 		return dataTable().getAll(annotationClass.getName());
 	}
 
+	public static Map<ASMData, Class<?>> classesWith(Class<? extends Annotation> annotationClass) {
+		Map<ASMData, Class<?>> classes = Maps.newHashMap();
+		for (ASMData data : dataTable(annotationClass))
+			classes.put(data, getClass(data));
+		return classes;
+	}
+
+	public static Map<ASMData, Field> fieldsWith(Class<? extends Annotation> annotationClass) {
+		Map<ASMData, Field> fields = Maps.newHashMap();
+		for (ASMData data : dataTable(annotationClass))
+			fields.put(data, getField(data));
+		return fields;
+	}
+
 	public static Map<ASMData, Method> methodsWith(Class<? extends Annotation> annotationClass) {
 		Map<ASMData, Method> methods = Maps.newHashMap();
 		for (ASMData data : dataTable(annotationClass))
@@ -130,19 +157,24 @@ public class ASM {
 		return methods;
 	}
 
-	public static Map<ASMData, Field> fieldsWith(Class<? extends Annotation> annotationClass) {
-		Map<ASMData, Field> fields = Maps.newHashMap();
-		for (ASMData data : dataTable(annotationClass))
-			fields.put(data, getField(data));
-		return fields;
+	public static Class<?> loadClass(String name) {
+		try {
+			return Class.forName(name, true, Loader.instance().getModClassLoader());
+		} catch (ClassNotFoundException e) {
+			throw Throwables.propagate(e);
+		}
+	}
+
+	public static Class<?> getClass(ASMData data) {
+		return loadClass(data.getClassName());
 	}
 
 	public static Field getField(ASMData data) {
 		try {
-			Field field = Class.forName(data.getClassName(), true, Loader.instance().getModClassLoader()).getDeclaredField(data.getObjectName());
+			Field field = loadClass(data.getClassName()).getDeclaredField(data.getObjectName());
 			field.setAccessible(true);
 			return field;
-		} catch (NoSuchFieldException | ClassNotFoundException e) {
+		} catch (NoSuchFieldException e) {
 			throw Throwables.propagate(e);
 		}
 	}
@@ -153,38 +185,35 @@ public class ASM {
 		int secondPar = objectName.indexOf(')');
 		String methodName = objectName.substring(0, firstPar);
 		List<String> args = ARG_SPLITTER.splitToList(objectName.substring(firstPar + 1, secondPar));
-		String returnType = objectName.substring(secondPar + 1);
-		try {
-			Class<?> clazz = Class.forName(data.getClassName(), true, Loader.instance().getModClassLoader());
-			for (Method method : clazz.getDeclaredMethods()) {
-				if (methodName.equals(method.getName())) {
-					Class<?>[] parameters = method.getParameterTypes();
-					if (parameters.length == args.size()) {
-						if (parameters.length == 0) {
+		// String returnType = objectName.substring(secondPar + 1);
+		Class<?> clazz = loadClass(data.getClassName());
+		for (Method method : clazz.getDeclaredMethods()) {
+			if (methodName.equals(method.getName())) {
+				Class<?>[] parameters = method.getParameterTypes();
+				if (parameters.length == args.size()) {
+					if (parameters.length == 0) {
+						method.setAccessible(true);
+						return method;
+					}
+					for (int i = 0; i < args.size(); i++) {
+						if (args.get(i).replace("/", ".").substring(1).equals(parameters[i].getCanonicalName())) {
 							method.setAccessible(true);
 							return method;
-						}
-						for (int i = 0; i < args.size(); i++) {
-							if (args.get(i).replace("/", ".").substring(1).equals(parameters[i].getCanonicalName())) {
-								method.setAccessible(true);
-								return method;
-							}
 						}
 					}
 				}
 			}
-		} catch (ClassNotFoundException e) {
-			throw Throwables.propagate(e);
 		}
 		throw new RuntimeException(new NoSuchMethodException(data.getClassName() + '.' + objectName));
 	}
 
 	public static Method getMethodWithExact(ASMData data, Class<?>... parameterTypes) {
 		try {
-			Class<?> clazz = Class.forName(data.getClassName(), true, Loader.instance().getModClassLoader());
 			String objectName = data.getObjectName();
-			return clazz.getDeclaredMethod(objectName.substring(0, objectName.indexOf('(')), parameterTypes);
-		} catch (ClassNotFoundException | NoSuchMethodException e) {
+			Method method = loadClass(data.getClassName()).getDeclaredMethod(objectName.substring(0, objectName.indexOf('(')), parameterTypes);
+			method.setAccessible(true);
+			return method;
+		} catch (NoSuchMethodException e) {
 			throw Throwables.propagate(e);
 		}
 	}

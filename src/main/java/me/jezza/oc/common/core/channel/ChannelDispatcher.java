@@ -1,5 +1,6 @@
 package me.jezza.oc.common.core.channel;
 
+import com.google.common.base.Throwables;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
@@ -8,9 +9,9 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.network.FMLEmbeddedChannel;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.relauncher.Side;
-import me.jezza.oc.api.channel.IChannel;
-import me.jezza.oc.api.channel.SidedChannel;
-import me.jezza.oc.api.config.Config.ConfigDouble;
+import me.jezza.oc.common.interfaces.IChannel;
+import me.jezza.oc.common.interfaces.SidedChannel;
+import me.jezza.oc.common.core.config.Config.ConfigDouble;
 import me.jezza.oc.common.core.CoreProperties;
 import me.jezza.oc.common.utils.ASM;
 import me.jezza.oc.common.utils.helpers.ModHelper;
@@ -22,7 +23,6 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import static me.jezza.oc.common.utils.helpers.StringHelper.format;
 
@@ -30,6 +30,8 @@ import static me.jezza.oc.common.utils.helpers.StringHelper.format;
  * @author Jezza
  */
 public final class ChannelDispatcher {
+	public static final String OC_CHANNEL_SUFFIX = "|OC";
+
 	private static ChannelDispatcher INSTANCE;
 
 	@ConfigDouble(category = "Networking", minValue = 5, maxValue = 120, comment = "The default network update range.")
@@ -54,24 +56,21 @@ public final class ChannelDispatcher {
 	}
 
 	private void parseControllers() {
-		Set<ASMData> dataSet = ASM.dataTable(SidedChannel.class);
-
-		for (ASMData data : dataSet) {
+		for (Entry<ASMData, Field> entry : ASM.fieldsWith(SidedChannel.class).entrySet()) {
 			try {
-				Class<?> clazz = Class.forName(data.getClassName());
-				Field field = clazz.getDeclaredField(data.getObjectName());
-				if (!Modifier.isStatic(field.getModifiers())) {
+				Field field = entry.getValue();
+				int mods = field.getModifiers();
+				if (!Modifier.isStatic(mods)) {
 					CoreProperties.logger.warn(format("Discovered @{} on a non-static field. Skipping...", SidedChannel.class.getSimpleName()));
 					continue;
 				}
-				if (Modifier.isFinal(field.getModifiers())) {
+				if (Modifier.isFinal(mods)) {
 					CoreProperties.logger.warn(format("Discovered @{} on a final field. Skipping...", SidedChannel.class.getSimpleName()));
 					continue;
 				}
-				field.setAccessible(true);
-				field.set(null, channel(data.getAnnotationInfo().get("value").toString()));
-			} catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException impossible) {
-				throw new IllegalStateException(impossible);
+				field.set(null, channel(entry.getKey().getAnnotationInfo().get("value").toString()));
+			} catch (IllegalAccessException e) {
+				throw Throwables.propagate(e);
 			}
 		}
 	}
@@ -98,7 +97,7 @@ public final class ChannelDispatcher {
 			return channel;
 		ModContainer mod = ModHelper.getIndexedModMap().get(modId);
 		OmnisCodec codec = new OmnisCodec();
-		EnumMap<Side, FMLEmbeddedChannel> sidedChannelMap = NetworkRegistry.INSTANCE.newChannel(mod, modId + "|OmnisCodec", codec);
+		EnumMap<Side, FMLEmbeddedChannel> sidedChannelMap = NetworkRegistry.INSTANCE.newChannel(mod, modId + OC_CHANNEL_SUFFIX, codec);
 		for (Entry<Side, FMLEmbeddedChannel> entry : sidedChannelMap.entrySet())
 			channelMap.get(entry.getKey()).put(modId, new OmnisChannel(entry.getValue(), codec));
 		return channelMap.get(source).get(modId);

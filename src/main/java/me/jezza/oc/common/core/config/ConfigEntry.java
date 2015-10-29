@@ -1,8 +1,8 @@
 package me.jezza.oc.common.core.config;
 
-import com.google.common.base.Strings;
-import me.jezza.oc.api.exceptions.ConfigurationException;
 import me.jezza.oc.common.core.CoreProperties;
+import me.jezza.oc.common.core.config.discovery.AnnotatedField;
+import me.jezza.oc.common.utils.helpers.StringHelper;
 import me.jezza.oc.common.utils.maths.Maths;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
@@ -16,11 +16,12 @@ import java.util.regex.Pattern;
 
 import static me.jezza.oc.common.utils.helpers.StringHelper.format;
 import static me.jezza.oc.common.utils.helpers.StringHelper.translateWithFallback;
+import static me.jezza.oc.common.utils.helpers.StringHelper.useable;
 import static net.minecraftforge.common.config.Property.Type.STRING;
 
 public abstract class ConfigEntry<T extends Annotation, V> {
 
-	protected final Map<String, AnnotatedField<T, V>> configMap = new LinkedHashMap<>();
+	protected final Map<String, AnnotatedField<T, V>> configMap = new LinkedHashMap<>(4);
 	protected final Configuration config;
 
 	public ConfigEntry(Configuration config) {
@@ -29,9 +30,8 @@ public abstract class ConfigEntry<T extends Annotation, V> {
 
 	public void add(Field field, T annotation) {
 		String fieldName = field.getDeclaringClass().getCanonicalName() + '.' + field.getName();
-		if (!checkField(field, annotation)) {
+		if (!checkField(field, annotation))
 			throw error(format("@{} threw an error on {}! Please confirm the field type.", annotation.annotationType().getSimpleName(), fieldName));
-		}
 		if (!configMap.containsKey(fieldName))
 			configMap.put(fieldName, new AnnotatedField<T, V>(field, annotation));
 	}
@@ -44,20 +44,19 @@ public abstract class ConfigEntry<T extends Annotation, V> {
 	public void processFields(boolean saveFlag) {
 		for (Map.Entry<String, AnnotatedField<T, V>> entry : configMap.entrySet()) {
 			AnnotatedField<T, V> wrapper = entry.getValue();
-
+			config.load();
 			try {
 				if (!saveFlag) {
-					Object object = loadAnnotation(config, wrapper.field, wrapper.fieldName, wrapper.annotation, wrapper.currentValue(), wrapper.defaultValue);
-					wrapper.field.set(null, object);
+					Object object = loadAnnotation(config, wrapper.field(), wrapper.fieldName(), wrapper.annotation(), wrapper.currentValue(), wrapper.defaultValue());
+					wrapper.field().set(null, object);
 				} else {
-					saveAnnotation(config, wrapper.field, wrapper.fieldName, wrapper.annotation, wrapper.currentValue(), wrapper.defaultValue);
+					saveAnnotation(config, wrapper.field(), wrapper.fieldName(), wrapper.annotation(), wrapper.currentValue(), wrapper.defaultValue());
 				}
 			} catch (Exception e) {
-				CoreProperties.logger.log(Level.FATAL, String.format("Failed to configure field: %s, with annotated type: %s", wrapper.fieldName, wrapper.annotation.annotationType().getSimpleName()), e);
+				CoreProperties.logger.log(Level.FATAL, format("Failed to configure field: %s, with annotated type: %s", wrapper.fieldName(), wrapper.annotation().annotationType().getSimpleName()), e);
 			} finally {
-				if (config.hasChanged()) {
+				if (config.hasChanged())
 					config.save();
-				}
 			}
 		}
 	}
@@ -69,19 +68,36 @@ public abstract class ConfigEntry<T extends Annotation, V> {
 	 * @param comments - The comments in question.
 	 * @return - The coherent "fully localised"* string. *Unless it fails... :/
 	 */
-	public String processComment(String... comments) {
+	protected String processComment(String... comments) {
 		if (comments.length == 0)
 			return "";
 		StringBuilder builder = new StringBuilder();
 		for (String comment : comments) {
-			if (!Strings.isNullOrEmpty(comment)) {
-				String translated = translateWithFallback(comment);
-				if (!Strings.isNullOrEmpty(translated)) {
-					builder.append(comment).append(System.lineSeparator());
-				}
+			if (useable(comment)) {
+				String translation = translateWithFallback(comment);
+				if (useable(translation))
+					builder.append(translation).append(System.lineSeparator());
 			}
 		}
 		return builder.toString();
+	}
+
+	/**
+	 * Finds the first useable string.
+	 * @param first - The first String to check.
+	 * @param second - The second String to check.
+	 * @param others - The rest to check.
+	 * @return - the first String that passes {@link StringHelper#useable(CharSequence)}, null otherwise.
+	 */
+	protected String useableOr(String first, String second, String... others) {
+		if (useable(first))
+			return first;
+		if (useable(second))
+			return second;
+		for (String other : others)
+			if (useable(other))
+				return other;
+		return null;
 	}
 
 	/**
@@ -90,7 +106,7 @@ public abstract class ConfigEntry<T extends Annotation, V> {
 	 * @param fieldName    -   The name of the field that has the annotation. Typically used for the key in the config file.
 	 * @param annotation   -   The annotation type that was applied to the field.
 	 * @param currentValue -   The value, if any, already assigned to the field. Can be the same as defaultValue
-	 * @param defaultValue -   The default value, if any, already assigned to the field.
+	 * @param defaultValue -   The default value, if any, assigned to the field on startup.
 	 * @return -   The object to set the field to. Can be null.
 	 */
 	public abstract Object loadAnnotation(Configuration config, Field field, String fieldName, T annotation, V currentValue, V defaultValue);
@@ -101,12 +117,16 @@ public abstract class ConfigEntry<T extends Annotation, V> {
 	 * @param fieldName    -   The name of the field that has the annotation. Typically used for the key in the config file.
 	 * @param annotation   -   The annotation type that was applied to the field.
 	 * @param currentValue -   The value, if any, already assigned to the field. Can be the same as defaultValue
-	 * @param defaultValue -   The default value, if any, already assigned to the field.
+	 * @param defaultValue -   The default value, if any, assigned to the field on startup.
 	 */
 	public abstract void saveAnnotation(Configuration config, Field field, String fieldName, T annotation, V currentValue, V defaultValue);
 
 	protected ConfigurationException error(String message) {
 		return new ConfigurationException(message);
+	}
+
+	protected ConfigurationException error(String message, Object... params) {
+		return new ConfigurationException(StringHelper.format(message, params));
 	}
 
 	/**

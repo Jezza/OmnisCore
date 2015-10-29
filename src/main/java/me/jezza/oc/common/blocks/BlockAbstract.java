@@ -1,12 +1,12 @@
 package me.jezza.oc.common.blocks;
 
-import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.common.interfaces.IBlockInteract;
 import me.jezza.oc.common.interfaces.IBlockNotifier;
 import me.jezza.oc.common.interfaces.ITileProvider;
+import me.jezza.oc.common.utils.ASM;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -26,7 +26,7 @@ public abstract class BlockAbstract extends Block {
 
 	public BlockAbstract(Material material, String name) {
 		super(material);
-		modIdentifier = Loader.instance().activeModContainer().getModId() + ":";
+		modIdentifier = ASM.findOwner(getClass()).getModId() + ':';
 		setName(name);
 		register(name);
 	}
@@ -37,21 +37,20 @@ public abstract class BlockAbstract extends Block {
 		return this;
 	}
 
-	public BlockAbstract setTextureless() {
-		this.textureReg = false;
+	public BlockAbstract register(String name) {
+		GameRegistry.registerBlock(this, name);
 		return this;
 	}
 
-
-	public BlockAbstract register(String name) {
-		GameRegistry.registerBlock(this, name);
+	protected BlockAbstract textureless(boolean textureless) {
+		textureReg = !textureless;
 		return this;
 	}
 
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int side, float hitVecX, float hitVecY, float hitVecZ) {
 		TileEntity tileEntity = world.getTileEntity(x, y, z);
-		return tileEntity instanceof IBlockInteract && ((IBlockInteract) tileEntity).onActivated(world, x, y, z, player, side, hitVecX, hitVecY, hitVecZ);
+		return tileEntity instanceof IBlockInteract && ((IBlockInteract) tileEntity).onActivated(player, side, hitVecX, hitVecY, hitVecZ);
 	}
 
 	@Override
@@ -64,39 +63,34 @@ public abstract class BlockAbstract extends Block {
 	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entityLiving, ItemStack itemStack) {
 		TileEntity tileEntity = world.getTileEntity(x, y, z);
 		if (tileEntity instanceof IBlockNotifier)
-			((IBlockNotifier) tileEntity).onBlockAdded(entityLiving, world, x, y, z, itemStack);
+			((IBlockNotifier) tileEntity).onBlockAdded(entityLiving, itemStack);
 	}
 
 	@Override
 	public void onBlockExploded(World world, int x, int y, int z, Explosion explosion) {
-		onBlockRemoval(world, x, y, z);
-		super.onBlockExploded(world, x, y, z, explosion);
+		TileEntity tileEntity = world.getTileEntity(x, y, z);
+		if (!(tileEntity instanceof IBlockNotifier && ((IBlockNotifier) tileEntity).onBlockExplosion(explosion)))
+			super.onBlockExploded(world, x, y, z, explosion);
 	}
 
 	@Override
 	public boolean removedByPlayer(World world, EntityPlayer player, int x, int y, int z, boolean willHarvest) {
-		onBlockRemoval(world, x, y, z);
-		return super.removedByPlayer(world, player, x, y, z, willHarvest);
-	}
-
-	public void onBlockRemoval(World world, int x, int y, int z) {
 		TileEntity tileEntity = world.getTileEntity(x, y, z);
-		if (tileEntity instanceof IBlockNotifier)
-			((IBlockNotifier) tileEntity).onBlockRemoval(world, x, y, z);
+		return !(tileEntity instanceof IBlockNotifier && ((IBlockNotifier) tileEntity).removedByPlayer(willHarvest)) && super.removedByPlayer(world, player, x, y, z, willHarvest);
 	}
 
 	@Override
 	public void onNeighborBlockChange(World world, int x, int y, int z, Block block) {
 		TileEntity tileEntity = world.getTileEntity(x, y, z);
 		if (tileEntity instanceof IBlockNotifier)
-			((IBlockNotifier) tileEntity).onNeighbourBlockChanged(world, x, y, z, block);
+			((IBlockNotifier) tileEntity).onNeighbourBlockChanged(block);
 	}
 
 	@Override
 	public void onNeighborChange(IBlockAccess world, int x, int y, int z, int tileX, int tileY, int tileZ) {
 		TileEntity tileEntity = world.getTileEntity(x, y, z);
 		if (tileEntity instanceof IBlockNotifier)
-			((IBlockNotifier) tileEntity).onNeighbourTileChanged(world, x, y, z, tileX, tileY, tileZ);
+			((IBlockNotifier) tileEntity).onNeighbourTileChanged(tileX, tileY, tileZ);
 	}
 
 	@Override

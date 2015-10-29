@@ -65,11 +65,11 @@ public class Maths {
 		return a + (b - a) * d;
 	}
 
-	public static double interpolate(double a, double b, double d) {
+	public static float interpolate(float a, float b, float d) {
 		return a + (b - a) * d;
 	}
 
-	public static float interpolate(float a, float b, float d) {
+	public static double interpolate(double a, double b, double d) {
 		return a + (b - a) * d;
 	}
 }

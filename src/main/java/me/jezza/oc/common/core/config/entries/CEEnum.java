@@ -1,7 +1,7 @@
 package me.jezza.oc.common.core.config.entries;
 
 import com.google.common.base.Joiner;
-import me.jezza.oc.api.config.Config.ConfigEnum;
+import me.jezza.oc.common.core.config.Config.ConfigEnum;
 import me.jezza.oc.common.core.config.ConfigEntry;
 import me.jezza.oc.common.utils.helpers.StringHelper;
 import net.minecraftforge.common.config.Configuration;
@@ -27,7 +27,7 @@ public class CEEnum extends ConfigEntry<ConfigEnum, Enum<?>> {
 	@Override
 	public Object loadAnnotation(Configuration config, Field field, String fieldName, ConfigEnum annotation, Enum<?> currentValue, Enum<?> defaultValue) {
 		String comment = processComment(annotation.comment());
-		String value = getString(annotation.category(), fieldName, defaultValue.name(), comment);
+		String value = getString(annotation.category(), useableOr(annotation.name(), fieldName), defaultValue.name(), comment);
 		if (StringHelper.nullOrEmpty(value))
 			return defaultValue;
 		for (Enum constant : (Enum[]) field.getType().getEnumConstants()) {
@@ -41,7 +41,7 @@ public class CEEnum extends ConfigEntry<ConfigEnum, Enum<?>> {
 	@Override
 	public void saveAnnotation(Configuration config, Field field, String fieldName, ConfigEnum annotation, Enum<?> currentValue, Enum<?> defaultValue) {
 		String comment = processComment(annotation.comment());
-		Property prop = getStringProperty(annotation.category(), fieldName, defaultValue.name(), comment);
+		Property prop = getStringProperty(annotation.category(), useableOr(annotation.name(), fieldName), defaultValue.name(), comment);
 		prop.set(currentValue.name());
 		StringBuilder enumComment = new StringBuilder(comment).append(" [values: ");
 		COMMENT_JOINER.appendTo(enumComment, field.getType().getEnumConstants());

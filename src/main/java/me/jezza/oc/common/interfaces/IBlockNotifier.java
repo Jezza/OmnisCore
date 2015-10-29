@@ -3,20 +3,30 @@ package me.jezza.oc.common.interfaces;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
+import net.minecraft.world.Explosion;
 
 /**
  * Implement on a TileEntity
  */
 public interface IBlockNotifier {
+	/**
+	 * @param explosion - the explosion in question.
+	 * @return true, if the explosion was handled.
+	 */
+	boolean onBlockExplosion(Explosion explosion);
 
-	public void onBlockRemoval(World world, int x, int y, int z);
+	/**
+	 * Don't remove the block and return false, this might have unintended side-effects.
+	 *
+	 * @param willHarvest - if it should be harvested, or just broken.
+	 * @return true - if the block should be properly removed.
+	 */
+	boolean removedByPlayer(boolean willHarvest);
 
-	public void onBlockAdded(EntityLivingBase entityLivingBase, World world, int x, int y, int z, ItemStack itemStack);
+	void onBlockAdded(EntityLivingBase entityLivingBase, ItemStack itemStack);
 
-	public void onNeighbourBlockChanged(World world, int x, int y, int z, Block block);
+	void onNeighbourBlockChanged(Block block);
 
-	public void onNeighbourTileChanged(IBlockAccess world, int x, int y, int z, int tileX, int tileY, int tileZ);
+	void onNeighbourTileChanged(int tileX, int tileY, int tileZ);
 
 }

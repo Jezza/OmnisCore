@@ -6,7 +6,7 @@ public abstract class BlockAbstractModel extends BlockAbstractGlass {
 
 	public BlockAbstractModel(Material material, String name) {
 		super(material, name);
-		setTextureless();
+		textureless(true);
 	}
 
 	@Override

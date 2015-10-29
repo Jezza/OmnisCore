@@ -1,6 +1,6 @@
 package me.jezza.oc.common.core.config.entries;
 
-import me.jezza.oc.api.config.Config.ConfigBoolean;
+import me.jezza.oc.common.core.config.Config.ConfigBoolean;
 import me.jezza.oc.common.core.config.ConfigEntry;
 import net.minecraftforge.common.config.Configuration;
 
@@ -13,11 +13,11 @@ public class CEBoolean extends ConfigEntry<ConfigBoolean, Boolean> {
 
 	@Override
 	public Object loadAnnotation(Configuration config, Field field, String fieldName, ConfigBoolean annotation, Boolean currentValue, Boolean defaultValue) {
-		return getBoolean(annotation.category(), fieldName, defaultValue, processComment(annotation.comment()));
+		return getBoolean(annotation.category(), useableOr(annotation.name(), fieldName), defaultValue, processComment(annotation.comment()));
 	}
 
 	@Override
 	public void saveAnnotation(Configuration config, Field field, String fieldName, ConfigBoolean annotation, Boolean currentValue, Boolean defaultValue) {
-		getBooleanProperty(annotation.category(), fieldName, defaultValue, processComment(annotation.comment())).set(currentValue);
+		getBooleanProperty(annotation.category(), useableOr(annotation.name(), fieldName), defaultValue, processComment(annotation.comment())).set(currentValue);
 	}
 }

@@ -1,6 +1,6 @@
 package me.jezza.oc.common.utils.helpers;
 
-import me.jezza.oc.api.config.Config.ConfigBoolean;
+import me.jezza.oc.common.core.config.Config.ConfigBoolean;
 
 import static me.jezza.oc.common.core.CoreProperties.logger;
 
