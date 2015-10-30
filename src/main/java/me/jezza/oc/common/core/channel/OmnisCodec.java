@@ -8,9 +8,9 @@ import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToMessageCodec;
-import me.jezza.oc.common.interfaces.IOmnisPacket;
-import me.jezza.oc.common.core.CoreProperties;
+import me.jezza.oc.OmnisCore;
 import me.jezza.oc.common.core.channel.internal.OmnisBuffer;
+import me.jezza.oc.common.interfaces.IOmnisPacket;
 import me.jezza.oc.common.utils.collect.PacketShortHashMap;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
@@ -42,7 +42,7 @@ public class OmnisCodec extends MessageToMessageCodec<FMLProxyPacket, IOmnisPack
 		try {
 			super.read(ctx);
 		} catch (RuntimeException e) {
-			CoreProperties.logger.error("Caught exception while trying to read from channel: ", e);
+			OmnisCore.logger.error("Caught exception while trying to read from channel: ", e);
 			throw e;
 		}
 	}
@@ -52,7 +52,7 @@ public class OmnisCodec extends MessageToMessageCodec<FMLProxyPacket, IOmnisPack
 		try {
 			super.write(ctx, msg, promise);
 		} catch (RuntimeException e) {
-			CoreProperties.logger.error("Caught exception while trying to read from channel: ", e);
+			OmnisCore.logger.error("Caught exception while trying to read from channel: ", e);
 			throw e;
 		}
 	}
@@ -90,7 +90,7 @@ public class OmnisCodec extends MessageToMessageCodec<FMLProxyPacket, IOmnisPack
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		CoreProperties.logger.catching(cause);
+		OmnisCore.logger.catching(cause);
 	}
 
 	@SideOnly(Side.CLIENT)

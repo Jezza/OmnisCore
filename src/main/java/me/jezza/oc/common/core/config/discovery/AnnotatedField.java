@@ -1,7 +1,7 @@
 package me.jezza.oc.common.core.config.discovery;
 
 import com.google.common.base.Throwables;
-import me.jezza.oc.common.core.CoreProperties;
+import me.jezza.oc.OmnisCore;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -52,10 +52,10 @@ public class AnnotatedField<T extends Annotation, V> {
 		try {
 			return (V) field.get(null);
 		} catch (IllegalAccessException e) {
-			CoreProperties.logger.error("Failed to get current value.");
+			OmnisCore.logger.error("Failed to get current value.");
 			throw Throwables.propagate(e);
 		} catch (ClassCastException e) {
-			CoreProperties.logger.error("Field with: " + annotation.annotationType() + " not of expected type:" + field.toGenericString());
+			OmnisCore.logger.error("Field with: " + annotation.annotationType() + " not of expected type:" + field.toGenericString());
 			throw Throwables.propagate(e);
 		}
 	}

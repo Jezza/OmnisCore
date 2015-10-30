@@ -52,7 +52,6 @@ public final class ConfigHandler {
 //	}
 
 	private ConfigHandler() {
-		throw new IllegalStateException();
 	}
 
 	private void parseControllers() {
@@ -73,9 +72,11 @@ public final class ConfigHandler {
 		// Process all config annotations.
 		for (Entry<ASMData, Class<?>> entry : ASM.classesWith(ConfigAnnotation.class).entrySet()) {
 			@SuppressWarnings("unchecked")
-			Class<? extends ConfigEntry<? extends Annotation, ?>> configEntry = (Class<? extends ConfigEntry<? extends Annotation, ?>>) entry.getKey().getAnnotationInfo().get("value");
-			@SuppressWarnings("unchecked")
 			Class<? extends Annotation> value = (Class<? extends Annotation>) entry.getValue();
+			ConfigAnnotation annotation = value.getAnnotation(ConfigAnnotation.class);
+			if (annotation == null)
+				continue;
+			Class<? extends ConfigEntry<? extends Annotation, ?>> configEntry = annotation.value();
 			if (!Modifier.isAbstract(configEntry.getModifiers()))
 				internalRegister(value, configEntry);
 		}

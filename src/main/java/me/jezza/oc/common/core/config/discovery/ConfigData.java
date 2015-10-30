@@ -2,7 +2,7 @@ package me.jezza.oc.common.core.config.discovery;
 
 import com.google.common.base.Strings;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
-import me.jezza.oc.common.core.CoreProperties;
+import me.jezza.oc.OmnisCore;
 import me.jezza.oc.common.core.config.ConfigEntry;
 import me.jezza.oc.common.core.config.ICEFactory;
 
@@ -43,13 +43,13 @@ public class ConfigData {
 			packageName = packageName.substring(0, pkgIndex);
 
 		if (!containerMap.containsKey(packageName)) {
-			CoreProperties.logger.info("Discovered config controller inside: {}", packageName);
+			OmnisCore.logger.info("Discovered config controller inside: {}", packageName);
 			File defaultConfig = getConfigForPackage(annotationInfo);
-			CoreProperties.logger.info("Setting config: {}", defaultConfig);
+			OmnisCore.logger.info("Setting config: {}", defaultConfig);
 			containerMap.put(packageName, new ConfigContainer(defaultConfig));
 		} else {
-			CoreProperties.logger.warn("Config controller discovered in the same root: {}. ", packageName);
-			CoreProperties.logger.warn("Ignoring {}", asmData.getClassName());
+			OmnisCore.logger.warn("Config controller discovered in the same root: {}. ", packageName);
+			OmnisCore.logger.warn("Ignoring {}", asmData.getClassName());
 		}
 	}
 

@@ -7,20 +7,19 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import me.jezza.oc.common.interfaces.IChannel;
-import me.jezza.oc.common.interfaces.SidedChannel;
-import me.jezza.oc.common.core.config.Config.Controller;
-import me.jezza.oc.common.core.network.search.SearchThread;
 import me.jezza.oc.common.CommonProxy;
 import me.jezza.oc.common.core.channel.ChannelDispatcher;
+import me.jezza.oc.common.core.config.Config.Controller;
 import me.jezza.oc.common.core.config.ConfigHandler;
-import me.jezza.oc.common.items.ItemAbstract;
+import me.jezza.oc.common.core.network.search.SearchThread;
+import me.jezza.oc.common.interfaces.IChannel;
+import me.jezza.oc.common.interfaces.SidedChannel;
 import me.jezza.oc.common.utils.helpers.DebugHelper;
-import net.minecraft.creativetab.CreativeTabs;
+import org.apache.logging.log4j.Logger;
 
 import static me.jezza.oc.common.core.CoreProperties.*;
 
-@Controller()
+@Controller
 @Mod(modid = MOD_ID, name = MOD_NAME, version = VERSION, dependencies = DEPENDENCIES)
 public class OmnisCore {
 
@@ -33,6 +32,8 @@ public class OmnisCore {
 	@SidedChannel(MOD_ID)
 	public static IChannel channel;
 
+	public static Logger logger; //  = LogManager.getLogger(MOD_ID);
+
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		logger = event.getModLog();
@@ -44,15 +45,6 @@ public class OmnisCore {
 		DebugHelper.checkSysOverrides();
 		logger.info("-- Configuring Internal Channels --");
 		ChannelDispatcher.init();
-		new ItemTest();
-	}
-
-	public static class ItemTest extends ItemAbstract {
-		public ItemTest() {
-			super("Test");
-			textureless(true);
-			setCreativeTab(CreativeTabs.tabMisc);
-		}
 	}
 
 	@EventHandler

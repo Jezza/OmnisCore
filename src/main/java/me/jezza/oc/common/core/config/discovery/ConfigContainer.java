@@ -2,7 +2,7 @@ package me.jezza.oc.common.core.config.discovery;
 
 import cpw.mods.fml.common.discovery.ASMDataTable;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
-import me.jezza.oc.common.core.CoreProperties;
+import me.jezza.oc.OmnisCore;
 import me.jezza.oc.common.core.config.ConfigEntry;
 import me.jezza.oc.common.core.config.ICEFactory;
 import me.jezza.oc.common.utils.ASM;
@@ -42,7 +42,7 @@ public class ConfigContainer {
 			try {
 				annotationMap.put(factory.annotationClass(), factory.create(config));
 			} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-				CoreProperties.logger.fatal("Failed to create instance of the registered ConfigEntry!", e);
+				OmnisCore.logger.fatal("Failed to create instance of the registered ConfigEntry!", e);
 			}
 		}
 
@@ -57,7 +57,7 @@ public class ConfigContainer {
 						processClass(Class.forName(className));
 					} catch (ClassNotFoundException e) {
 						// Should never happen seeing as we got it from the system.
-						CoreProperties.logger.fatal("Failed to find class!", e);
+						OmnisCore.logger.fatal("Failed to find class!", e);
 					}
 				}
 			}
@@ -72,11 +72,11 @@ public class ConfigContainer {
 				if (annotationMap.containsKey(annotationClazz)) {
 					int mods = field.getModifiers();
 					if (!Modifier.isStatic(mods)) {
-						CoreProperties.logger.warn("Found {} on a non-static field: {}.{}. Skipping...", annotationClazz.getCanonicalName(), field.getDeclaringClass(), field.getName());
+						OmnisCore.logger.warn("Found {} on a non-static field: {}.{}. Skipping...", annotationClazz.getCanonicalName(), field.getDeclaringClass(), field.getName());
 						continue;
 					}
 					if (Modifier.isFinal(mods)) {
-						CoreProperties.logger.warn("Found {} on a final field: {}.{}. Skipping...", annotationClazz.getCanonicalName(), field.getDeclaringClass(), field.getName());
+						OmnisCore.logger.warn("Found {} on a final field: {}.{}. Skipping...", annotationClazz.getCanonicalName(), field.getDeclaringClass(), field.getName());
 						continue;
 					}
 					field.setAccessible(true);

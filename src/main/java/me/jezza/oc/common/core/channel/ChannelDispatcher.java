@@ -9,10 +9,10 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.network.FMLEmbeddedChannel;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.relauncher.Side;
+import me.jezza.oc.OmnisCore;
+import me.jezza.oc.common.core.config.Config.ConfigDouble;
 import me.jezza.oc.common.interfaces.IChannel;
 import me.jezza.oc.common.interfaces.SidedChannel;
-import me.jezza.oc.common.core.config.Config.ConfigDouble;
-import me.jezza.oc.common.core.CoreProperties;
 import me.jezza.oc.common.utils.ASM;
 import me.jezza.oc.common.utils.helpers.ModHelper;
 import me.jezza.oc.common.utils.helpers.StringHelper;
@@ -61,11 +61,11 @@ public final class ChannelDispatcher {
 				Field field = entry.getValue();
 				int mods = field.getModifiers();
 				if (!Modifier.isStatic(mods)) {
-					CoreProperties.logger.warn(format("Discovered @{} on a non-static field. Skipping...", SidedChannel.class.getSimpleName()));
+					OmnisCore.logger.warn(format("Discovered @{} on a non-static field. Skipping...", SidedChannel.class.getSimpleName()));
 					continue;
 				}
 				if (Modifier.isFinal(mods)) {
-					CoreProperties.logger.warn(format("Discovered @{} on a final field. Skipping...", SidedChannel.class.getSimpleName()));
+					OmnisCore.logger.warn(format("Discovered @{} on a final field. Skipping...", SidedChannel.class.getSimpleName()));
 					continue;
 				}
 				field.set(null, channel(entry.getKey().getAnnotationInfo().get("value").toString()));
@@ -81,7 +81,7 @@ public final class ChannelDispatcher {
 
 	public static IChannel channel(String modId, Side source) {
 		if (!(StringHelper.useable(modId) && Loader.isModLoaded(modId))) {
-			CoreProperties.logger.warn("Something attempted to access a Channel for a mod that doesn't exist: " + String.valueOf(modId));
+			OmnisCore.logger.warn("Something attempted to access a Channel for a mod that doesn't exist: " + String.valueOf(modId));
 			return null;
 		}
 		if (modId.startsWith("MC|"))

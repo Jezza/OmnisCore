@@ -1,6 +1,6 @@
 package me.jezza.oc.common.core.config;
 
-import me.jezza.oc.common.core.CoreProperties;
+import me.jezza.oc.OmnisCore;
 import me.jezza.oc.common.core.config.discovery.AnnotatedField;
 import me.jezza.oc.common.utils.helpers.StringHelper;
 import me.jezza.oc.common.utils.maths.Maths;
@@ -14,9 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import static me.jezza.oc.common.utils.helpers.StringHelper.format;
-import static me.jezza.oc.common.utils.helpers.StringHelper.translateWithFallback;
-import static me.jezza.oc.common.utils.helpers.StringHelper.useable;
+import static me.jezza.oc.common.utils.helpers.StringHelper.*;
 import static net.minecraftforge.common.config.Property.Type.STRING;
 
 public abstract class ConfigEntry<T extends Annotation, V> {
@@ -53,7 +51,7 @@ public abstract class ConfigEntry<T extends Annotation, V> {
 					saveAnnotation(config, wrapper.field(), wrapper.fieldName(), wrapper.annotation(), wrapper.currentValue(), wrapper.defaultValue());
 				}
 			} catch (Exception e) {
-				CoreProperties.logger.log(Level.FATAL, format("Failed to configure field: %s, with annotated type: %s", wrapper.fieldName(), wrapper.annotation().annotationType().getSimpleName()), e);
+				OmnisCore.logger.log(Level.FATAL, format("Failed to configure field: %s, with annotated type: %s", wrapper.fieldName(), wrapper.annotation().annotationType().getSimpleName()), e);
 			} finally {
 				if (config.hasChanged())
 					config.save();

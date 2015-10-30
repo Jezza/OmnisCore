@@ -3,10 +3,10 @@ package me.jezza.oc.common.core.network;
 import com.google.common.collect.ImmutableList;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
+import me.jezza.oc.OmnisCore;
 import me.jezza.oc.common.core.network.NetworkResponse.MessageResponse;
 import me.jezza.oc.common.core.network.interfaces.*;
 import me.jezza.oc.common.core.network.search.SearchThread;
-import me.jezza.oc.common.core.CoreProperties;
 import me.jezza.oc.common.utils.collect.Graph;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
@@ -123,7 +123,7 @@ public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandl
 	@Override
 	public boolean postMessage(INetworkMessage<T> message) {
 		if (message.getOwner() == null) {
-			CoreProperties.logger.info("{} has no owner! It returned null!", message.getClass());
+			OmnisCore.logger.info("{} has no owner! It returned null!", message.getClass());
 			throw new NullPointerException();
 		}
 
@@ -137,7 +137,7 @@ public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandl
 		T owner = message.getOwner();
 
 		if (owner == null) {
-			CoreProperties.logger.info("{} has no owner! It returned null!", message.getClass());
+			OmnisCore.logger.info("{} has no owner! It returned null!", message.getClass());
 			throw new NullPointerException();
 		}
 
@@ -149,7 +149,7 @@ public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandl
 		try {
 			entity = entityClass.newInstance();
 		} catch (InstantiationException | IllegalAccessException e) {
-			CoreProperties.logger.info("Failed to instantiate entity from {}", entityClass);
+			OmnisCore.logger.info("Failed to instantiate entity from {}", entityClass);
 			throw new RuntimeException(e);
 		}
 
