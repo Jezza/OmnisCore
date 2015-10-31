@@ -6,7 +6,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.common.interfaces.Tooltip;
 import me.jezza.oc.common.interfaces.TooltipAdapter;
 import me.jezza.oc.common.utils.ASM;
-import me.jezza.oc.common.utils.helpers.EntityHelper;
+import me.jezza.oc.common.utils.RayTrace;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -62,8 +62,8 @@ public abstract class ItemAbstract extends Item {
 		return this;
 	}
 
-	public MovingObjectPosition getMOP(EntityLivingBase entity) {
-		return EntityHelper.getMOP(entity);
+	public MovingObjectPosition rayTrace(EntityLivingBase entity) {
+		return RayTrace.of(entity);
 	}
 
 	@Override
