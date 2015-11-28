@@ -6,6 +6,6 @@ import net.minecraft.item.ItemStack;
 /**
  * @author Jezza
  */
-public interface TooltipAdapter extends Tooltip {
+public interface TooltipPopulator extends Tooltip {
 	void postAddition(ItemStack stack, EntityPlayer player, boolean advancedItemTooltips);
 }

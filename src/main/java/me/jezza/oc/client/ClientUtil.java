@@ -9,7 +9,7 @@ import org.lwjgl.input.Keyboard;
 public class ClientUtil {
 
 	public static boolean hasPressedShift() {
-		return Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) || Keyboard.isKeyDown(Keyboard.KEY_RSHIFT);
+		return Minecraft.isRunningOnMac ? Keyboard.isKeyDown(219) || Keyboard.isKeyDown(220) : Keyboard.isKeyDown(29) || Keyboard.isKeyDown(157);
 	}
 
 	public static boolean hasPressedCtrl() {

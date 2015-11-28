@@ -27,7 +27,7 @@ public class RayTrace {
 	}
 
 	public RayTrace distance(double distance) {
-		this.distance = distance < 0.0D ? Double.MAX_VALUE : distance >= 3.0D ? distance : 3.0D;
+		this.distance = distance >= 3.0D ? distance : 3.0D;
 		return this;
 	}
 

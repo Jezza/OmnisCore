@@ -5,7 +5,7 @@ import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.common.interfaces.Tooltip;
-import me.jezza.oc.common.interfaces.TooltipAdapter;
+import me.jezza.oc.common.interfaces.TooltipPopulator;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -76,12 +76,12 @@ public abstract class ItemAbstractArmour extends ItemArmor {
 	@SideOnly(Side.CLIENT)
 	public final void addInformation(ItemStack stack, EntityPlayer player, List _list, boolean advancedItemTooltips) {
 		@SuppressWarnings("unchecked")
-		TooltipAdapter adapter = createTooltipAdapter((List<String>) _list);
-		addInformation(stack, player, adapter, advancedItemTooltips);
-		adapter.postAddition(stack, player, advancedItemTooltips);
+		TooltipPopulator populator = createTooltipPopulator((List<String>) _list);
+		addInformation(stack, player, populator, advancedItemTooltips);
+		populator.postAddition(stack, player, advancedItemTooltips);
 	}
 
-	protected TooltipAdapter createTooltipAdapter(List<String> tooltip) {
+	protected TooltipPopulator createTooltipPopulator(List<String> tooltip) {
 		return new ItemTooltipInformation(tooltip);
 	}
 

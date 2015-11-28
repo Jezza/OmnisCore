@@ -24,7 +24,7 @@ public abstract class GuiContainerAbstract extends GuiContainer implements IGuiR
 	public int middleX, middleY;
 	public ResourceLocation mainTexture;
 
-	private ArrayList<GuiWidget> buttonList;
+	protected List<GuiWidget> buttonList;
 	private int id = 0;
 
 	protected GuiContainerAbstract(EntityPlayer player) {
@@ -42,13 +42,9 @@ public abstract class GuiContainerAbstract extends GuiContainer implements IGuiR
 		buttonList = new ArrayList<>();
 	}
 
-	public GuiContainerAbstract setMainTexture(ResourceLocation mainTexture) {
+	public GuiContainerAbstract mainTexture(ResourceLocation mainTexture) {
 		this.mainTexture = mainTexture;
 		return this;
-	}
-
-	public ArrayList<GuiWidget> getButtonList() {
-		return buttonList;
 	}
 
 	public void bindTexture() {
@@ -98,12 +94,17 @@ public abstract class GuiContainerAbstract extends GuiContainer implements IGuiR
 	}
 
 	@Override
+	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+		super.drawGuiContainerForegroundLayer(mouseX, mouseY);
+	}
+
+	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int t) {
 		for (GuiWidget widget : buttonList)
 			if (widget.canClick(mouseX, mouseY)) {
 				widget.onClick(mouseX, mouseY, t);
 				onActionPerformed(widget, t);
-				//break;
+				// break;
 			}
 	}
 
@@ -121,6 +122,10 @@ public abstract class GuiContainerAbstract extends GuiContainer implements IGuiR
 	@Override
 	public void renderHoveringText(List list, int x, int y, FontRenderer font) {
 		drawHoveringText(list, x, y, font);
+	}
+
+	protected void drawString(String text, int xOffset, int yOffset, Colour colour) {
+		fontRendererObj.drawString(text, xOffset, yOffset, colour.getInt());
 	}
 
 	protected void drawCentredText(int xOffset, int yOffset, String text) {
@@ -151,5 +156,4 @@ public abstract class GuiContainerAbstract extends GuiContainer implements IGuiR
 	}
 
 	public abstract void onActionPerformed(GuiWidget widget, int mouse);
-
 }

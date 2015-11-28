@@ -43,7 +43,7 @@ public class OmnisCore {
 		ConfigHandler.init();
 		logger.info("-- Checking Debug Overrides --");
 		DebugHelper.checkSysOverrides();
-		logger.info("-- Configuring Internal Channels --");
+		logger.info("-- Configuring Channels --");
 		ChannelDispatcher.init();
 	}
 
@@ -57,7 +57,6 @@ public class OmnisCore {
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		logger.info("-- Post-Initialising --");
-		logger.info("-- Locking Channel packet registration. --");
-		ChannelDispatcher.lockdown(event);
+		ChannelDispatcher.lockdown();
 	}
 }

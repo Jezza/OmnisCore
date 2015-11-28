@@ -4,6 +4,8 @@ import io.netty.channel.ChannelHandlerContext;
 import net.minecraft.entity.player.EntityPlayer;
 
 /**
+ * To register a packet, simply place an @OmnisPacket on the class.
+ *
  * @author Jezza
  */
 public interface IOmnisPacket {

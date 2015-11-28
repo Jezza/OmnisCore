@@ -5,7 +5,6 @@ import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
-import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.network.FMLEmbeddedChannel;
 import cpw.mods.fml.common.network.NetworkRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -24,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import static cpw.mods.fml.common.LoaderState.POSTINITIALIZATION;
 import static me.jezza.oc.common.utils.helpers.StringHelper.format;
 
 /**
@@ -34,11 +34,12 @@ public final class ChannelDispatcher {
 
 	private static ChannelDispatcher INSTANCE;
 
+	private static boolean lockdown = false;
+
 	@ConfigDouble(category = "Networking", minValue = 5, maxValue = 120, comment = "The default network update range.")
 	protected static double NETWORK_UPDATE_RANGE = 60;
 
 	private static final Map<Side, Map<String, IChannel>> channelMap = new EnumMap<>(Side.class);
-	private static boolean lockdown = false;
 
 	static {
 		channelMap.put(Side.CLIENT, new HashMap<String, IChannel>());
@@ -68,7 +69,9 @@ public final class ChannelDispatcher {
 					OmnisCore.logger.warn(format("Discovered @{} on a final field. Skipping...", SidedChannel.class.getSimpleName()));
 					continue;
 				}
-				field.set(null, channel(entry.getKey().getAnnotationInfo().get("value").toString()));
+				String value = entry.getKey().getAnnotationInfo().get("value").toString();
+				OmnisCore.logger.warn(format("Injecting channel in {} with @{}({}).", field.getDeclaringClass().getCanonicalName() + '.' + field.getName(), SidedChannel.class.getSimpleName(), value));
+				field.set(null, channel(value));
 			} catch (IllegalAccessException e) {
 				throw Throwables.propagate(e);
 			}
@@ -85,22 +88,24 @@ public final class ChannelDispatcher {
 			return null;
 		}
 		if (modId.startsWith("MC|"))
-//            return minecraft();
-			return null;
+			return minecraft();
 		if (modId.startsWith("FML"))
-//            return fml();
-			return null;
+			return fml();
 		if (modId.startsWith("\u0001"))
 			throw new IllegalArgumentException("Not a valid channel name: " + modId);
 		IChannel channel = channelMap.get(source).get(modId);
 		if (lockdown || channel != null)
 			return channel;
-		ModContainer mod = ModHelper.getIndexedModMap().get(modId);
-		OmnisCodec codec = new OmnisCodec();
-		EnumMap<Side, FMLEmbeddedChannel> sidedChannelMap = NetworkRegistry.INSTANCE.newChannel(mod, modId + OC_CHANNEL_SUFFIX, codec);
+		ModContainer mod = ModHelper.getMod(modId);
+		EnumMap<Side, FMLEmbeddedChannel> sidedChannelMap = NetworkRegistry.INSTANCE.newChannel(mod, modId + OC_CHANNEL_SUFFIX, new OmnisCodec(modId));
 		for (Entry<Side, FMLEmbeddedChannel> entry : sidedChannelMap.entrySet())
-			channelMap.get(entry.getKey()).put(modId, new OmnisChannel(entry.getValue(), codec));
+			channelMap.get(entry.getKey()).put(modId, new OmnisChannel(entry.getValue()));
 		return channelMap.get(source).get(modId);
+	}
+
+	public static void lockdown() {
+		if (!lockdown && ASM.isInState(POSTINITIALIZATION))
+			lockdown = true;
 	}
 
 	public static IChannel minecraft() {
@@ -109,16 +114,6 @@ public final class ChannelDispatcher {
 
 	public static IChannel fml() {
 		throw new UnsupportedOperationException("Not Yet Implemented!");
-	}
-
-	public static void lockdown(FMLPostInitializationEvent event) {
-		if (!lockdown && event != null) {
-			for (IChannel channel : channelMap.get(Side.SERVER).values())
-				channel.lockdown();
-			for (IChannel channel : channelMap.get(Side.CLIENT).values())
-				channel.lockdown();
-			lockdown = true;
-		}
 	}
 
 	public static double networkUpdateRange() {

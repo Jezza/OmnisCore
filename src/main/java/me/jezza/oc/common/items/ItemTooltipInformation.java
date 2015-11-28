@@ -4,7 +4,7 @@ import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.client.ClientUtil;
 import me.jezza.oc.common.interfaces.Tooltip;
-import me.jezza.oc.common.interfaces.TooltipAdapter;
+import me.jezza.oc.common.interfaces.TooltipPopulator;
 import me.jezza.oc.common.utils.helpers.StringHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -13,7 +13,7 @@ import org.lwjgl.input.Keyboard;
 import java.util.List;
 
 @SideOnly(Side.CLIENT)
-public class ItemTooltipInformation implements TooltipAdapter {
+public class ItemTooltipInformation implements TooltipPopulator {
 	private final List<String> tooltip;
 
 	public ItemTooltipInformation(List<String> tooltip) {

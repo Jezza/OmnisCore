@@ -1,6 +1,8 @@
 package me.jezza.oc.common.core.channel;
 
+import com.google.common.base.Splitter;
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import cpw.mods.fml.common.network.internal.FMLProxyPacket;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
@@ -11,30 +13,65 @@ import io.netty.handler.codec.MessageToMessageCodec;
 import me.jezza.oc.OmnisCore;
 import me.jezza.oc.common.core.channel.internal.OmnisBuffer;
 import me.jezza.oc.common.interfaces.IOmnisPacket;
+import me.jezza.oc.common.interfaces.OmnisPacket;
+import me.jezza.oc.common.utils.ASM;
 import me.jezza.oc.common.utils.collect.PacketShortHashMap;
+import me.jezza.oc.common.utils.helpers.StringHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetHandlerPlayServer;
 
+import java.lang.reflect.Modifier;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import static cpw.mods.fml.common.network.NetworkRegistry.FML_CHANNEL;
 import static cpw.mods.fml.common.network.NetworkRegistry.NET_HANDLER;
+import static me.jezza.oc.common.interfaces.OmnisPacket.DEFAULT_SPLITTER;
+import static me.jezza.oc.common.utils.helpers.StringHelper.format;
+import static me.jezza.oc.common.utils.helpers.StringHelper.useable;
 
 /**
  * @author Jezza
  */
 @Sharable
 public class OmnisCodec extends MessageToMessageCodec<FMLProxyPacket, IOmnisPacket> {
+	private static Map<ASMData, Class<?>> dataMap;
+
 	private final PacketShortHashMap<Class<? extends IOmnisPacket>> packetMap = new PacketShortHashMap<>();
 
-	public OmnisCodec() {
+	protected OmnisCodec(String modId) {
+		for (Entry<ASMData, Class<?>> entry : dataMap().entrySet()) {
+			Class<?> clazz = entry.getValue();
+			if (!IOmnisPacket.class.isAssignableFrom(clazz))
+				throw new IllegalArgumentException(format("@{} was found on a class that doesn't implement {}.", OmnisPacket.class.getSimpleName(), IOmnisPacket.class.getCanonicalName()));
+			if (Modifier.isAbstract(clazz.getModifiers()))
+				throw new IllegalArgumentException(format("@{} was found on a class that was abstract.", OmnisPacket.class.getSimpleName()));
+			Map<String, Object> info = entry.getKey().getAnnotationInfo();
+			String splitter = (String) info.get("splitter");
+			if (!useable(splitter))
+				splitter = DEFAULT_SPLITTER;
+			String ids = info.get("value").toString();
+			if (!useable(ids))
+				throw new IllegalArgumentException(format("No valid ModID(s) found for {}", clazz.getCanonicalName()));
+			List<String> modIds = Splitter.on(splitter).trimResults().omitEmptyStrings().splitToList(ids);
+			if (modIds.isEmpty())
+				throw new IllegalArgumentException(format("No valid ModID(s) found for {}", clazz.getCanonicalName()));
+			if (modIds.contains(modId)) {
+				@SuppressWarnings("unchecked")
+				Class<? extends IOmnisPacket> packetClass = (Class<? extends IOmnisPacket>) clazz;
+				OmnisCore.logger.info(StringHelper.format("Discovered @{}({}) on {}", OmnisPacket.class.getSimpleName(), modId, packetClass.getCanonicalName()));
+				packetMap.add(packetClass);
+			}
+		}
 	}
 
-	protected boolean registerPacket(Class<? extends IOmnisPacket> packetClass) {
-		packetMap.add(packetClass);
-		return true;
+	private static Map<ASMData, Class<?>> dataMap() {
+		if (dataMap == null)
+			dataMap = ASM.classesWith(OmnisPacket.class);
+		return dataMap;
 	}
 
 	@Override

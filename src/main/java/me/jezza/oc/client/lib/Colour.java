@@ -101,9 +101,9 @@ public class Colour implements Cloneable {
 	protected final Colour clone() {
 		try {
 			return (Colour) super.clone();
-		} catch (CloneNotSupportedException ignored) {
+		} catch (CloneNotSupportedException e) {
+			throw new IllegalStateException(e);
 		}
-		return new Colour(r, g, b, a);
 	}
 
 	public int getInt() {

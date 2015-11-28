@@ -10,6 +10,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import cpw.mods.fml.common.LoadController;
 import cpw.mods.fml.common.Loader;
+import cpw.mods.fml.common.LoaderState;
 import cpw.mods.fml.common.ModContainer;
 import cpw.mods.fml.common.discovery.ASMDataTable;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
@@ -40,6 +41,7 @@ public class ASM {
 	private static ModDiscoverer discoverer;
 	private static ASMDataTable dataTable;
 	private static LoadController loadController;
+	private static Field acField;
 
 	private ASM() {
 		throw new IllegalStateException();
@@ -107,9 +109,19 @@ public class ASM {
 		return loadController;
 	}
 
-	public static ModContainer overrideActiveContainer(ModContainer container) {
-		ModContainer oldContainer = ReflectionHelper.getPrivateValue(LoadController.class, loadController(), "activeContainer");
-		ReflectionHelper.setPrivateValue(LoadController.class, loadController(), container, "activeContainer");
+	public static boolean isInState(LoaderState state) {
+		return Loader.instance().isInState(state);
+	}
+
+	public static boolean hasReachedState(LoaderState state) {
+		return Loader.instance().hasReachedState(state);
+	}
+
+	public static ModContainer overrideActiveContainer(ModContainer container) throws IllegalAccessException {
+		if (acField == null)
+			acField = ReflectionHelper.findField(LoadController.class, "activeContainer");
+		ModContainer oldContainer = (ModContainer) acField.get(loadController());
+		acField.set(loadController(), container);
 		return oldContainer;
 	}
 
