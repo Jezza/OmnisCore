@@ -30,5 +30,5 @@ public interface OutputBuffer {
 	OutputBuffer writeItemStack(ItemStack stack);
 	OutputBuffer writeFluidStack(FluidStack fluid);
 
-	ByteBuf buffer();
+	ByteBuf raw();
 }

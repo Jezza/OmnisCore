@@ -1,4 +1,4 @@
-package me.jezza.oc.common.core.channel.internal;
+package me.jezza.oc.common.core.channel;
 
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
@@ -265,7 +265,7 @@ public class OmnisBuffer implements InputBuffer, OutputBuffer {
 	}
 
 	@Override
-	public ByteBuf buffer() {
+	public ByteBuf raw() {
 		return buffer;
 	}
 

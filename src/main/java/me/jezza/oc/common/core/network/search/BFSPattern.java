@@ -26,12 +26,12 @@ public class BFSPattern<T extends INetworkNode<T>> implements ISearchPattern<T> 
 	}
 
 	@Override
-	public synchronized boolean hasFinished() {
+	public synchronized boolean finished() {
 		return finished;
 	}
 
 	@Override
-	public boolean searchForPath() {
+	public boolean search() {
 		if (startNode.equals(endNode)) {
 			finished = true;
 			return true;
@@ -74,7 +74,7 @@ public class BFSPattern<T extends INetworkNode<T>> implements ISearchPattern<T> 
 	}
 
 	@Override
-	public List<T> getPath() {
+	public List<T> path() {
 		if (!finished || path == null || path.isEmpty())
 			return Collections.<T>emptyList();
 		deletable = true;

@@ -12,7 +12,7 @@ public interface INetworkNode<T extends INetworkNode<T>> {
 	 *
 	 * @return all nearby network nodes; Nodes that are connected to this node.
 	 */
-	public Collection<T> getNearbyNodes();
+	Collection<T> getNearbyNodes();
 
 	/**
 	 * This is used to notify the node of any details that might have happened.
@@ -22,17 +22,17 @@ public interface INetworkNode<T extends INetworkNode<T>> {
 	 * @param data    - Used to pass in extra data.
 	 * @return Any object that the message requires. Can be null.
 	 */
-	public Object notifyNode(int id, int process, Object... data);
+	Object notifyNode(int id, int process, Object... data);
 
 	/**
 	 * Gets set when you pass in the node to be added.
 	 * This allows you to post messages easily from the node without referring to the main NetworkInstance.
 	 * If you decide, for some stupid reason, to override this value, at least make sure it's an instance of INetworkNodeHandler, or you're going to get an exception thrown at your face, because of your stupidity.
 	 */
-	public void setIMessageProcessor(IMessageProcessor<T> messageProcessor);
+	void setIMessageProcessor(IMessageProcessor<T> messageProcessor);
 
 	/**
 	 * @return The current world of the node.
 	 */
-	public World getWorld();
+	World getWorld();
 }

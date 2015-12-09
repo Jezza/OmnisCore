@@ -17,26 +17,26 @@ public interface INetworkMessage<T extends INetworkNode<T>> {
 	/**
 	 * @param node the node being passed ownership to.
 	 */
-	public void setOwner(T node);
+	void setOwner(T node);
 
 	/**
 	 * @return the current INetworkNode that is viewed as the node that sent out this message.
 	 */
-	public T getOwner();
+	T getOwner();
 
 	/**
 	 * Called when the message gets reposted upon completion and requires reposting.
 	 * <p/>
 	 * Use this to reset any values (if you want to reset anything) before the repost.
 	 */
-	public void resetMessage();
+	void resetMessage();
 
 	/**
 	 * The contents of this message were changed in some way.
 	 *
 	 * @param node The node that returned the INJECT state.
 	 */
-	public void onDataChanged(T node);
+	void onDataChanged(T node);
 
 	/**
 	 * Fired during the preProcessing Phase.
@@ -46,7 +46,7 @@ public interface INetworkMessage<T extends INetworkNode<T>> {
 	 * @param messageProcessor - The IMessageProcessor that handles this message.
 	 * @return Take a look at {@link me.jezza.oc.common.core.network.NetworkResponse.MessageResponse}
 	 */
-	public MessageResponse preProcessing(IMessageProcessor<T> messageProcessor);
+	MessageResponse preProcessing(IMessageProcessor<T> messageProcessor);
 
 	/**
 	 * Fired during the processing Phase.
@@ -58,7 +58,7 @@ public interface INetworkMessage<T extends INetworkNode<T>> {
 	 * @param node             - A node that exists as a part of the network.
 	 * @return Take a look at {@link me.jezza.oc.common.core.network.NetworkResponse.MessageResponse}
 	 */
-	public MessageResponse processNode(IMessageProcessor<T> messageProcessor, T node);
+	MessageResponse processNode(IMessageProcessor<T> messageProcessor, T node);
 
 	/**
 	 * Fired during the postProcessing Phase.
@@ -69,6 +69,6 @@ public interface INetworkMessage<T extends INetworkNode<T>> {
 	 * @param messageProcessor - The IMessageProcessor that handles this message.
 	 * @return Take a look at {@link me.jezza.oc.common.core.network.NetworkResponse.MessageResponse}
 	 */
-	public MessageResponse postProcessing(IMessageProcessor<T> messageProcessor);
+	MessageResponse postProcessing(IMessageProcessor<T> messageProcessor);
 
 }

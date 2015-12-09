@@ -41,7 +41,7 @@ public class SearchThread extends Thread {
 					continue;
 				}
 
-				boolean foundPath = pattern.searchForPath();
+				boolean foundPath = pattern.search();
 
 				if (foundPath)
 					completedPatterns.add(pattern);

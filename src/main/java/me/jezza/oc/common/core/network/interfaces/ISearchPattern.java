@@ -5,13 +5,13 @@ public interface ISearchPattern<T extends INetworkNode<T>> extends ISearchResult
 	/**
 	 * @return true if path was found.
 	 */
-	public boolean searchForPath();
+	boolean search();
 
 	/**
 	 * Used by the search thread to determine if the pattern can be deleted.
 	 *
 	 * @return true if it can be deleted.
 	 */
-	public boolean canDelete();
+	boolean canDelete();
 
 }

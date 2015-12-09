@@ -34,5 +34,5 @@ public interface InputBuffer {
 	ItemStack readItemStack();
 	FluidStack readFluidStack();
 
-	ByteBuf buffer();
+	ByteBuf raw();
 }

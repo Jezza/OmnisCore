@@ -73,6 +73,17 @@ public class ASM {
 		return classes;
 	}
 
+	public static ListMultimap<String, ModContainer> packageOwners() {
+		if (packageOwners == null) {
+			Builder<String, ModContainer> builder = ImmutableListMultimap.builder();
+			for (ModContainer container : ModHelper.getIndexedModMap().values())
+				for (String ownedPackage : ownedPackages(container))
+					builder.put(ownedPackage, container);
+			packageOwners = builder.build();
+		}
+		return packageOwners;
+	}
+
 	public static Set<String> ownedPackages(ModContainer container) {
 		String modId = container.getModId();
 		Set<String> packages = ownedPackages.get(modId);
@@ -90,17 +101,6 @@ public class ASM {
 			ASM.ownedPackages.put(modId, packages);
 		}
 		return packages;
-	}
-
-	public static ListMultimap<String, ModContainer> packageOwners() {
-		if (packageOwners == null) {
-			Builder<String, ModContainer> builder = ImmutableListMultimap.builder();
-			for (ModContainer container : ModHelper.getIndexedModMap().values())
-				for (String ownedPackage : ownedPackages(container))
-					builder.put(ownedPackage, container);
-			packageOwners = builder.build();
-		}
-		return packageOwners;
 	}
 
 	public static LoadController loadController() {

@@ -20,19 +20,19 @@ public interface INetworkNodeHandler<T extends INetworkNode<T>> {
 	 * @param node Node being added to the network
 	 * @return true if the node was added.
 	 */
-	public boolean addNetworkNode(T node);
+	boolean addNetworkNode(T node);
 
 	/**
 	 * @param node Node being removed from the network
 	 * @return true if the node was removed.
 	 */
-	public boolean removeNetworkNode(T node);
+	boolean removeNetworkNode(T node);
 
 	/**
 	 * @param nodes Collection of the nodes to retain.
 	 * @return true if the data structure was modified.
 	 */
-	public boolean retainAll(Collection<? extends T> nodes);
+	boolean retainAll(Collection<? extends T> nodes);
 
 	/**
 	 * Called by the main NetworkInstance to merge two or more networks into a master network, in the event that a node is placed between two networks.
@@ -41,18 +41,18 @@ public interface INetworkNodeHandler<T extends INetworkNode<T>> {
 	 *
 	 * @param nodeHandler The handler that needs to be merged.
 	 */
-	public void mergeNetwork(INetworkNodeHandler<T> nodeHandler);
+	void mergeNetwork(INetworkNodeHandler<T> nodeHandler);
 
 	/**
 	 * @return A map of all nodes and their connections. (the adjacency map)
 	 */
-	public Map<? extends T, ? extends Collection<T>> getNodeMap();
+	Map<? extends T, ? extends Collection<T>> getNodeMap();
 
 	/**
 	 * @param node the node in question
 	 * @return true if the network contains the node in question
 	 */
-	public boolean containsNode(T node);
+	boolean containsNode(T node);
 
 	/**
 	 * If you wish for this class to be registered with:
@@ -61,7 +61,7 @@ public interface INetworkNodeHandler<T extends INetworkNode<T>> {
 	 * <p/>
 	 * It will be unregistered if the instance is no longer required.
 	 */
-	public boolean requiresRegistration();
+	boolean requiresRegistration();
 
 	/**
 	 * The world that the network is in.
@@ -69,7 +69,7 @@ public interface INetworkNodeHandler<T extends INetworkNode<T>> {
 	 *
 	 * @param world The world to remove.
 	 */
-	public void addWorld(World world);
+	void addWorld(World world);
 
 	/**
 	 * The world that the network is no longer in.
@@ -77,27 +77,27 @@ public interface INetworkNodeHandler<T extends INetworkNode<T>> {
 	 *
 	 * @param world The world to remove.
 	 */
-	public void removeWorld(World world);
+	void removeWorld(World world);
 
 	/**
 	 * @return An immutable list of the worlds that it currently resides in.
 	 */
-	public List<World> getNetworkedWorlds();
+	List<World> getNetworkedWorlds();
 
 	/**
 	 * @return number of nodes in the network.
 	 */
-	public int size();
+	int size();
 
 	/**
 	 * @return true if there is no nodes currently in the network. (size() == 0;)
 	 */
-	public boolean isEmpty();
+	boolean isEmpty();
 
 	/**
 	 * Called when the instance is about to be deleted.
 	 * To be safe, it's probably best to clear any data structures and messaging systems that are running, so that garbage collection can grab it.
 	 */
-	public void destroy();
+	void destroy();
 
 }

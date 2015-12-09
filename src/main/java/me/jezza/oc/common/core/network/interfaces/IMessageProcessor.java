@@ -17,7 +17,7 @@ public interface IMessageProcessor<T extends INetworkNode<T>> {
 	 * @param message The message being posted.
 	 * @return true if the message was added.
 	 */
-	public boolean postMessage(INetworkMessage<T> message);
+	boolean postMessage(INetworkMessage<T> message);
 
 	/**
 	 * Method used to post entity messages
@@ -27,7 +27,7 @@ public interface IMessageProcessor<T extends INetworkNode<T>> {
 	 * @param message The message that was posted.
 	 * @return true if the message was added.
 	 */
-	public boolean postMessage(INetworkEntity<T> message);
+	boolean postMessage(INetworkEntity<T> message);
 
 	/**
 	 * If no path was found between pointA(from) and pointB(to) then an empty list will be returned.
@@ -38,11 +38,11 @@ public interface IMessageProcessor<T extends INetworkNode<T>> {
 	 * @param to   Finishing node
 	 * @return An ordered list starting at: from, and follows a path to: to
 	 */
-	public ISearchResult<T> getPathFrom(T from, T to);
+	ISearchResult<T> getPathFrom(T from, T to);
 
 	/**
 	 * @return An immutable list of the worlds that it currently resides in.
 	 */
-	public List<World> getNetworkedWorlds();
+	List<World> getNetworkedWorlds();
 
 }

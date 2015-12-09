@@ -1,8 +1,13 @@
 package me.jezza.oc.common.utils.helpers;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.MathHelper;
+import net.minecraft.util.StatCollector;
 import net.minecraftforge.common.util.ForgeDirection;
+
+import static org.apache.http.util.Args.notNull;
 
 public class EntityHelper {
 
@@ -24,5 +29,11 @@ public class EntityHelper {
 			default:
 				return ForgeDirection.UNKNOWN;
 		}
+	}
+
+	public static String name(Entity entity) {
+		notNull(entity, "entity");
+		String value = EntityList.getEntityString(entity);
+		return value != null ? StringHelper.translate("entity." + value + ".name") : "Unknown";
 	}
 }

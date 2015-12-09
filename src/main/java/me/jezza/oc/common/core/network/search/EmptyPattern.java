@@ -10,7 +10,7 @@ public class EmptyPattern implements ISearchPattern {
 	private boolean delete = false;
 
 	@Override
-	public boolean searchForPath() {
+	public boolean search() {
 		return true;
 	}
 
@@ -20,12 +20,12 @@ public class EmptyPattern implements ISearchPattern {
 	}
 
 	@Override
-	public boolean hasFinished() {
+	public boolean finished() {
 		return true;
 	}
 
 	@Override
-	public List<INetworkNode> getPath() {
+	public List<INetworkNode> path() {
 		delete = true;
 		return null;
 	}

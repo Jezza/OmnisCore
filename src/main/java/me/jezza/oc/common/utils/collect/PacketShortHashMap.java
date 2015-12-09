@@ -46,9 +46,9 @@ public class PacketShortHashMap<T> {
 	@SuppressWarnings("unchecked")
 	public T get(int key) {
 		if (key < 0 || key >= max)
-			throw new IndexOutOfBoundsException(format("A discriminator of {} is out of bounds; [{}, {})!", Integer.toString(key), 0, max));
+			throw new IndexOutOfBoundsException(format("The discriminator {} is out of bounds; [{}, {})!", Integer.toString(key), 0, max));
 		if (key >= nextIndex)
-			throw new IndexOutOfBoundsException(format("No packets have been registered with a discriminator of {}!", Integer.toString(key)));
+			throw new IndexOutOfBoundsException(format("No values have been registered with a discriminator of {}!", Integer.toString(key)));
 		T packet = from.get(key);
 		if (packet == null)
 			throw new ChannelException("No packet registered for discriminator: " + key);
@@ -58,15 +58,20 @@ public class PacketShortHashMap<T> {
 	public short get(T value) {
 		short i = to.get(value);
 		if (i < 0)
-			throw new ChannelException(format("PacketClass not found! {}", value));
+			throw new ChannelException(format("Discriminator for {} not found!", value));
 		return i;
 	}
 
 	public void add(T value) {
 		if (nextIndex >= max)
-			throw new ChannelException(format("Discriminator ({}) invalid! Maximum reached: {}", nextIndex, max));
+			throw new ChannelException(format("Maximum discriminator reached: ({})", max));
 		from.put(nextIndex, value);
 		to.put(value, nextIndex++);
+	}
+
+	public void addAll(Iterable<T> values) {
+		for (T value : values)
+			add(value);
 	}
 
 	public void clear() {

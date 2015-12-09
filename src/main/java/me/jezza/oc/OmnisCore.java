@@ -7,6 +7,7 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
+import me.jezza.oc.client.keyboard.Keyboard;
 import me.jezza.oc.common.CommonProxy;
 import me.jezza.oc.common.core.channel.ChannelDispatcher;
 import me.jezza.oc.common.core.config.Config.Controller;
@@ -52,6 +53,9 @@ public class OmnisCore {
 		logger.info("-- Initialising --");
 		logger.info("-- Starting OmnisCore|NST --");
 		SearchThread.getInstance().start();
+
+		logger.info("-- Initialising KeyboardRequest --");
+		Keyboard.init();
 	}
 
 	@EventHandler

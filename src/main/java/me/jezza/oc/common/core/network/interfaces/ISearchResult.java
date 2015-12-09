@@ -7,11 +7,11 @@ public interface ISearchResult<T extends INetworkNode<T>> {
 	/**
 	 * @return true if the search has successfully discovered a path.
 	 */
-	public boolean hasFinished();
+	boolean finished();
 
 	/**
 	 * @return the path that was discovered, else null.
 	 */
-	public List<T> getPath();
+	List<T> path();
 
 }
