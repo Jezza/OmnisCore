@@ -1,5 +1,7 @@
 package me.jezza.oc.client.renderer;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
@@ -7,6 +9,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
+@SideOnly(Side.CLIENT)
 public abstract class TileEntitySpecialRendererAbstract<T extends TileEntity> extends TileEntitySpecialRenderer {
 	protected TileEntityRendererDispatcher dispatcher;
 

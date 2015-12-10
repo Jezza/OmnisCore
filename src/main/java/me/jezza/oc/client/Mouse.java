@@ -1,5 +1,7 @@
 package me.jezza.oc.client;
 
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.OmnisCore;
 import me.jezza.oc.common.interfaces.MouseAdapter;
 import me.jezza.oc.common.interfaces.Request;
@@ -12,6 +14,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 /**
  * @author Jezza
  */
+@SideOnly(Side.CLIENT)
 public class Mouse {
 	private static final LinkedBlockingDeque<MouseRequest> REQUESTS = new LinkedBlockingDeque<>();
 	protected static final Mouse INSTANCE = new Mouse();

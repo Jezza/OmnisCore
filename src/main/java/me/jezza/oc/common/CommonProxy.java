@@ -10,4 +10,14 @@ public class CommonProxy {
 		return true;
 	}
 
+
+	public void preInit() {
+	}
+
+	public void init() {
+	}
+
+	public void postInit() {
+	}
+
 }

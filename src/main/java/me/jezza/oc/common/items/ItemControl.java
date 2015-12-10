@@ -33,11 +33,21 @@ public class ItemControl extends ItemAbstract implements MouseAdapter {
 	}
 
 	@Override
-	public void click(int x, int y, int key) {
+	public void onClick(int x, int y, int key) {
 		OmnisCore.logger.info("X:{}, Y:{}, Key:{}", x, y, key);
 		if (key == 1 && request != null) {
 			request.release();
 			request = null;
 		}
+	}
+
+	@Override
+	public void onRelease(int mouseX, int mouseY, int key) {
+
+	}
+
+	@Override
+	public void mouseChange(int mouseX, int mouseY) {
+
 	}
 }

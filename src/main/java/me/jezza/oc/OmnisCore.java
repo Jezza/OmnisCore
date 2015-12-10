@@ -7,7 +7,6 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import me.jezza.oc.client.ClientTickHandler;
 import me.jezza.oc.common.CommonProxy;
 import me.jezza.oc.common.core.channel.ChannelDispatcher;
 import me.jezza.oc.common.core.config.Config.Controller;
@@ -48,6 +47,7 @@ public class OmnisCore {
 		logger.info("-- Configuring Channels --");
 		ChannelDispatcher.init();
 		new ItemControl();
+		proxy.preInit();
 	}
 
 	@EventHandler
@@ -55,13 +55,12 @@ public class OmnisCore {
 		logger.info("-- Initialising --");
 		logger.info("-- Starting OmnisCore|NST --");
 		SearchThread.getInstance().start();
-
-		logger.info("-- Initialising ClientTickHandler --");
-		ClientTickHandler.init();
+		proxy.init();
 	}
 
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		logger.info("-- Post-Initialising --");
+		proxy.postInit();
 	}
 }
