@@ -1,10 +1,10 @@
-package me.jezza.oc.common.utils.helpers;
+package me.jezza.oc.common.utils;
 
 import me.jezza.oc.common.core.config.Config.ConfigBoolean;
 
 import static me.jezza.oc.OmnisCore.logger;
 
-public class DebugHelper {
+public class Debug {
 
 	@ConfigBoolean(category = "Debug")
 	private static boolean debugChat = false;
@@ -12,15 +12,15 @@ public class DebugHelper {
 	@ConfigBoolean(category = "Debug")
 	private static boolean debugConsole = false;
 
-	private DebugHelper() {
+	private Debug() {
 		throw new IllegalStateException();
 	}
 
-	public static boolean debugChat() {
+	public static boolean chat() {
 		return debugChat;
 	}
 
-	public static boolean debugConsole() {
+	public static boolean console() {
 		return debugConsole;
 	}
 

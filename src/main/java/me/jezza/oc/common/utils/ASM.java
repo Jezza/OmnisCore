@@ -42,6 +42,7 @@ public class ASM {
 	private static ASMDataTable dataTable;
 	private static LoadController loadController;
 	private static Field acField;
+	private static ModContainer minecraft;
 
 	private ASM() {
 		throw new IllegalStateException();
@@ -57,7 +58,7 @@ public class ASM {
 
 	public static ModContainer findOwner(String packageName) {
 		List<ModContainer> containers = packageOwners().get(packageName);
-		return containers != null ? containers.get(0) : Loader.instance().getMinecraftModContainer();
+		return containers != null ? containers.get(0) : minecraft();
 	}
 
 	public static Set<String> ownedClasses(String packageName) {
@@ -123,6 +124,12 @@ public class ASM {
 		ModContainer oldContainer = (ModContainer) acField.get(loadController());
 		acField.set(loadController(), container);
 		return oldContainer;
+	}
+
+	public static ModContainer minecraft() {
+		if (minecraft == null)
+			minecraft = Loader.instance().getMinecraftModContainer();
+		return minecraft;
 	}
 
 	public static ModDiscoverer discoverer() {

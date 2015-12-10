@@ -2,7 +2,7 @@ package me.jezza.oc.common.items;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import me.jezza.oc.client.ClientUtil;
+import me.jezza.oc.client.Client;
 import me.jezza.oc.common.interfaces.Tooltip;
 import me.jezza.oc.common.interfaces.TooltipPopulator;
 import me.jezza.oc.common.utils.helpers.StringHelper;
@@ -77,32 +77,32 @@ public class ItemTooltipInformation implements TooltipPopulator {
 
 	@Override
 	public boolean shift() {
-		return ClientUtil.hasPressedShift();
+		return Client.hasPressedShift();
 	}
 
 	@Override
 	public boolean shift(int key) {
-		return ClientUtil.hasPressedShift() && Keyboard.isKeyDown(key);
+		return Client.hasPressedShift() && Keyboard.isKeyDown(key);
 	}
 
 	@Override
 	public boolean ctrl() {
-		return ClientUtil.hasPressedCtrl();
+		return Client.hasPressedCtrl();
 	}
 
 	@Override
 	public boolean ctrl(int key) {
-		return ClientUtil.hasPressedCtrl() && Keyboard.isKeyDown(key);
+		return Client.hasPressedCtrl() && Keyboard.isKeyDown(key);
 	}
 
 	@Override
 	public boolean alt() {
-		return ClientUtil.hasPressedAlt();
+		return Client.hasPressedAlt();
 	}
 
 	@Override
 	public boolean alt(int key) {
-		return ClientUtil.hasPressedAlt() && Keyboard.isKeyDown(key);
+		return Client.hasPressedAlt() && Keyboard.isKeyDown(key);
 	}
 
 	@Override

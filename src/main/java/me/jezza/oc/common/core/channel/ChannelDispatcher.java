@@ -34,8 +34,6 @@ public final class ChannelDispatcher {
 
 	private static ChannelDispatcher INSTANCE;
 
-	private static boolean lockdown = false;
-
 	@ConfigDouble(category = "Networking", minValue = 5, maxValue = 120, comment = "The default network update range.")
 	protected static double NETWORK_UPDATE_RANGE = 60;
 
@@ -94,18 +92,13 @@ public final class ChannelDispatcher {
 		if (modId.startsWith("\u0001"))
 			throw new IllegalArgumentException("Not a valid channel name: " + modId);
 		IChannel channel = channelMap.get(source).get(modId);
-		if (lockdown || channel != null)
+		if (ASM.hasReachedState(POSTINITIALIZATION) || channel != null)
 			return channel;
 		ModContainer mod = ModHelper.getMod(modId);
 		EnumMap<Side, FMLEmbeddedChannel> sidedChannelMap = NetworkRegistry.INSTANCE.newChannel(mod, modId + OC_CHANNEL_SUFFIX, new OmnisCodec(modId));
 		for (Entry<Side, FMLEmbeddedChannel> entry : sidedChannelMap.entrySet())
 			channelMap.get(entry.getKey()).put(modId, new OmnisChannel(entry.getValue()));
 		return channelMap.get(source).get(modId);
-	}
-
-	public static void lockdown() {
-		if (!lockdown && ASM.isInState(POSTINITIALIZATION))
-			lockdown = true;
 	}
 
 	public static IChannel minecraft() {
@@ -116,7 +109,7 @@ public final class ChannelDispatcher {
 		throw new UnsupportedOperationException("Not Yet Implemented!");
 	}
 
-	public static double networkUpdateRange() {
+	public static double range() {
 		return NETWORK_UPDATE_RANGE;
 	}
 }

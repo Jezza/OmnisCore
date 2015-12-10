@@ -7,7 +7,7 @@ import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import me.jezza.oc.client.keyboard.Keyboard;
+import me.jezza.oc.client.ClientTickHandler;
 import me.jezza.oc.common.CommonProxy;
 import me.jezza.oc.common.core.channel.ChannelDispatcher;
 import me.jezza.oc.common.core.config.Config.Controller;
@@ -15,7 +15,8 @@ import me.jezza.oc.common.core.config.ConfigHandler;
 import me.jezza.oc.common.core.network.search.SearchThread;
 import me.jezza.oc.common.interfaces.IChannel;
 import me.jezza.oc.common.interfaces.SidedChannel;
-import me.jezza.oc.common.utils.helpers.DebugHelper;
+import me.jezza.oc.common.items.ItemControl;
+import me.jezza.oc.common.utils.Debug;
 import org.apache.logging.log4j.Logger;
 
 import static me.jezza.oc.common.core.CoreProperties.*;
@@ -43,9 +44,10 @@ public class OmnisCore {
 		logger.info("-- Initialising ConfigAnnotations --");
 		ConfigHandler.init();
 		logger.info("-- Checking Debug Overrides --");
-		DebugHelper.checkSysOverrides();
+		Debug.checkSysOverrides();
 		logger.info("-- Configuring Channels --");
 		ChannelDispatcher.init();
+		new ItemControl();
 	}
 
 	@EventHandler
@@ -54,13 +56,12 @@ public class OmnisCore {
 		logger.info("-- Starting OmnisCore|NST --");
 		SearchThread.getInstance().start();
 
-		logger.info("-- Initialising KeyboardRequest --");
-		Keyboard.init();
+		logger.info("-- Initialising ClientTickHandler --");
+		ClientTickHandler.init();
 	}
 
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		logger.info("-- Post-Initialising --");
-		ChannelDispatcher.lockdown();
 	}
 }

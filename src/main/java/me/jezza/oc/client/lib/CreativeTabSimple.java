@@ -1,4 +1,4 @@
-package me.jezza.oc.client;
+package me.jezza.oc.client.lib;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;

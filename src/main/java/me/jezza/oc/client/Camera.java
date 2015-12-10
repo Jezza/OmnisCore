@@ -1,4 +1,4 @@
-package me.jezza.oc.client.camera;
+package me.jezza.oc.client;
 
 import java.util.concurrent.Future;
 
