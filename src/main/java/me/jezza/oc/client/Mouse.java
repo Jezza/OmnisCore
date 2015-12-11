@@ -3,9 +3,9 @@ package me.jezza.oc.client;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.OmnisCore;
+import me.jezza.oc.client.lib.AbstractAdapterRequest;
+import me.jezza.oc.common.interfaces.AdapterRequest;
 import me.jezza.oc.common.interfaces.MouseAdapter;
-import me.jezza.oc.common.interfaces.Request;
-import me.jezza.oc.common.utils.ASM;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
 
@@ -25,14 +25,14 @@ public class Mouse {
 	private Mouse() {
 	}
 
-	private void onActive() {
-		OmnisCore.logger.info(active.modId + " activated Mouse control.");
+	private void activate() {
+		OmnisCore.logger.info(active.modId() + " activated Mouse control.");
 		Client.blurMouse();
 		Client.blurGame();
 	}
 
 	private void release() {
-		OmnisCore.logger.info(active.modId + " released Mouse control.");
+		OmnisCore.logger.info(active.modId() + " released Mouse control.");
 		Client.focusMouse();
 		Client.focusGame();
 		active = null;
@@ -42,7 +42,7 @@ public class Mouse {
 		if (active != null) {
 			if (!active.cancelled()) {
 				if (active.retrieved()) {
-					MouseAdapter adapter = active.adapter;
+					MouseAdapter adapter = active.adapter();
 					final ScaledResolution scaledresolution = new ScaledResolution(MC, MC.displayWidth, MC.displayHeight);
 					int scaledWidth = scaledresolution.getScaledWidth();
 					int scaledHeight = scaledresolution.getScaledHeight();
@@ -75,29 +75,25 @@ public class Mouse {
 			active = null;
 			return;
 		}
-		OmnisCore.logger.info(active.modId + " acquired Mouse control.");
+		OmnisCore.logger.info(active.modId() + " acquired Mouse control.");
 		active.acquired(true);
 	}
 
-	public static Request request(MouseAdapter adapter) {
+	public static AdapterRequest request(MouseAdapter adapter) {
 		MouseRequest request = new MouseRequest(adapter);
-		OmnisCore.logger.info(request.modId + " requested Mouse control.");
+		OmnisCore.logger.info(request.modId() + " requested Mouse control.");
 		REQUESTS.add(request);
 		return request;
 	}
 
-	public static class MouseRequest extends AbstractRequest {
-		private final MouseAdapter adapter;
-		private final String modId;
-
+	public static class MouseRequest extends AbstractAdapterRequest<MouseAdapter> {
 		public MouseRequest(MouseAdapter adapter) {
-			this.adapter = adapter;
-			modId = ASM.findOwner(adapter).getModId();
+			super(adapter);
 		}
 
 		@Override
 		protected void onAcquisition() {
-			INSTANCE.onActive();
+			INSTANCE.activate();
 		}
 
 		@Override

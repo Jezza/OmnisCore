@@ -3,7 +3,7 @@ package me.jezza.oc.common.items;
 import me.jezza.oc.OmnisCore;
 import me.jezza.oc.client.Mouse;
 import me.jezza.oc.common.interfaces.MouseAdapter;
-import me.jezza.oc.common.interfaces.Request;
+import me.jezza.oc.common.interfaces.AdapterRequest;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -14,7 +14,7 @@ import net.minecraft.world.World;
  */
 public class ItemControl extends ItemAbstract implements MouseAdapter {
 
-	private Request request;
+	private AdapterRequest request;
 
 	public ItemControl() {
 		super("controlItem");

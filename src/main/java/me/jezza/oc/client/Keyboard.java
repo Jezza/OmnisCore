@@ -3,9 +3,9 @@ package me.jezza.oc.client;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.OmnisCore;
+import me.jezza.oc.client.lib.AbstractAdapterRequest;
+import me.jezza.oc.common.interfaces.AdapterRequest;
 import me.jezza.oc.common.interfaces.KeyboardAdapter;
-import me.jezza.oc.common.interfaces.Request;
-import me.jezza.oc.common.utils.ASM;
 
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -22,13 +22,13 @@ public final class Keyboard {
 	private Keyboard() {
 	}
 
-	private void onActive() {
-		OmnisCore.logger.info(active.modId + " activated Keyboard control.");
+	private void activate() {
+		OmnisCore.logger.info(active.modId() + " activated Keyboard control.");
 		Client.blurKeyboard();
 	}
 
 	private void release() {
-		OmnisCore.logger.info(active.modId + " released Keyboard control.");
+		OmnisCore.logger.info(active.modId() + " released Keyboard control.");
 		active = null;
 	}
 
@@ -36,7 +36,7 @@ public final class Keyboard {
 		if (active != null) {
 			if (!active.cancelled()) {
 				if (active.retrieved()) {
-					KeyboardAdapter adapter = active.adapter;
+					KeyboardAdapter adapter = active.adapter();
 					while (org.lwjgl.input.Keyboard.next()) {
 						if (org.lwjgl.input.Keyboard.getEventKeyState())
 							adapter.keyPress(org.lwjgl.input.Keyboard.getEventCharacter(), org.lwjgl.input.Keyboard.getEventKey());
@@ -57,29 +57,25 @@ public final class Keyboard {
 			active = null;
 			return;
 		}
-		OmnisCore.logger.info(active.modId + " acquired Keyboard control.");
+		OmnisCore.logger.info(active.modId() + " acquired Keyboard control.");
 		active.acquired(true);
 	}
 
-	public static Request request(KeyboardAdapter adapter) {
+	public static AdapterRequest request(KeyboardAdapter adapter) {
 		KeyboardRequest request = new KeyboardRequest(adapter);
-		OmnisCore.logger.info(request.modId + " requested Keyboard control.");
+		OmnisCore.logger.info(request.modId() + " requested Keyboard control.");
 		REQUESTS.add(request);
 		return request;
 	}
 
-	public static class KeyboardRequest extends AbstractRequest {
-		private final KeyboardAdapter adapter;
-		private final String modId;
-
+	public static class KeyboardRequest extends AbstractAdapterRequest<KeyboardAdapter> {
 		public KeyboardRequest(KeyboardAdapter adapter) {
-			this.adapter = adapter;
-			modId = ASM.findOwner(adapter).getModId();
+			super(adapter);
 		}
 
 		@Override
 		protected void onAcquisition() {
-			INSTANCE.onActive();
+			INSTANCE.activate();
 		}
 
 		@Override
