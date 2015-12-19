@@ -1,4 +1,4 @@
-package me.jezza.oc.common.utils.helpers;
+package me.jezza.oc.common.utils.collect;
 
 import com.google.common.base.Predicate;
 

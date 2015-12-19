@@ -1,5 +1,7 @@
 package me.jezza.oc.client;
 
+import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.OmnisCore;
@@ -15,7 +17,7 @@ import java.util.concurrent.LinkedBlockingDeque;
  * @author Jezza
  */
 @SideOnly(Side.CLIENT)
-public class Mouse {
+public final class Mouse {
 	private static final LinkedBlockingDeque<MouseRequest> REQUESTS = new LinkedBlockingDeque<>();
 	protected static final Mouse INSTANCE = new Mouse();
 	protected static final Minecraft MC = Minecraft.getMinecraft();
@@ -38,7 +40,9 @@ public class Mouse {
 		active = null;
 	}
 
-	protected void tick() {
+	protected void tick(ClientTickEvent event) {
+		if (event.phase != Phase.START)
+			return;
 		if (active != null) {
 			if (!active.cancelled()) {
 				if (active.retrieved()) {

@@ -11,12 +11,17 @@ import net.minecraft.world.World;
 
 @SideOnly(Side.CLIENT)
 public abstract class TileEntitySpecialRendererAbstract<T extends TileEntity> extends TileEntitySpecialRenderer {
-	protected TileEntityRendererDispatcher dispatcher;
+	protected final Class<T> type;
+
+	public TileEntitySpecialRendererAbstract(Class<T> type) {
+		this.type = type;
+	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public void renderTileEntityAt(TileEntity tileEntity, double x, double y, double z, float tick) {
-		renderTileAt((T) tileEntity, x, y, z, tick);
+		if (type.isInstance(tileEntity))
+			renderTileAt((T) tileEntity, x, y, z, tick);
 	}
 
 	public abstract void renderTileAt(T tile, double x, double y, double z, float tick);
@@ -26,20 +31,19 @@ public abstract class TileEntitySpecialRendererAbstract<T extends TileEntity> ex
 		field_147501_a.field_147553_e.bindTexture(texture);
 	}
 
-	@Override
-	public void func_147497_a(TileEntityRendererDispatcher dispatcher) {
-		this.dispatcher = dispatcher;
+	protected final TileEntityRendererDispatcher dispatcher() {
+		return field_147501_a;
 	}
 
 	@Override
-	public void func_147496_a(World world) {
+	public final void func_147496_a(World world) {
 		setupRenderer(world);
 	}
 
 	public void setupRenderer(World world) {
 	}
 
-	public FontRenderer getFontRenderer() {
+	public FontRenderer fontRenderer() {
 		return func_147498_b();
 	}
 }

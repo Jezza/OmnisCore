@@ -13,7 +13,7 @@ import me.jezza.oc.common.core.config.Config.ConfigDouble;
 import me.jezza.oc.common.interfaces.IChannel;
 import me.jezza.oc.common.interfaces.SidedChannel;
 import me.jezza.oc.common.utils.ASM;
-import me.jezza.oc.common.utils.helpers.ModHelper;
+import me.jezza.oc.common.utils.Mods;
 import me.jezza.oc.common.utils.helpers.StringHelper;
 
 import java.lang.reflect.Field;
@@ -94,7 +94,7 @@ public final class ChannelDispatcher {
 		IChannel channel = channelMap.get(source).get(modId);
 		if (ASM.hasReachedState(POSTINITIALIZATION) || channel != null)
 			return channel;
-		ModContainer mod = ModHelper.getMod(modId);
+		ModContainer mod = Mods.get(modId);
 		EnumMap<Side, FMLEmbeddedChannel> sidedChannelMap = NetworkRegistry.INSTANCE.newChannel(mod, modId + OC_CHANNEL_SUFFIX, new OmnisCodec(modId));
 		for (Entry<Side, FMLEmbeddedChannel> entry : sidedChannelMap.entrySet())
 			channelMap.get(entry.getKey()).put(modId, new OmnisChannel(entry.getValue()));

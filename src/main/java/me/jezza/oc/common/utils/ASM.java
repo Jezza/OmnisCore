@@ -17,12 +17,12 @@ import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import cpw.mods.fml.common.discovery.ModCandidate;
 import cpw.mods.fml.common.discovery.ModDiscoverer;
 import cpw.mods.fml.relauncher.ReflectionHelper;
-import me.jezza.oc.common.utils.helpers.Collections3;
-import me.jezza.oc.common.utils.helpers.ModHelper;
+import me.jezza.oc.common.utils.collect.Collections3;
 import org.apache.commons.lang3.ClassUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -36,6 +36,7 @@ public class ASM {
 
 	private static final Map<String, Set<String>> ownedPackages = Maps.newHashMap();
 	private static final Map<String, Set<String>> subClasses = Maps.newHashMap();
+	private static final int CALLING_DEPTH = 5;
 
 	private static ListMultimap<String, ModContainer> packageOwners;
 	private static ModDiscoverer discoverer;
@@ -43,6 +44,7 @@ public class ASM {
 	private static LoadController loadController;
 	private static Field acField;
 	private static ModContainer minecraft;
+	private static Method callingStack;
 
 	private ASM() {
 		throw new IllegalStateException();
@@ -77,7 +79,7 @@ public class ASM {
 	public static ListMultimap<String, ModContainer> packageOwners() {
 		if (packageOwners == null) {
 			Builder<String, ModContainer> builder = ImmutableListMultimap.builder();
-			for (ModContainer container : ModHelper.getIndexedModMap().values())
+			for (ModContainer container : Mods.map().values())
 				for (String ownedPackage : ownedPackages(container))
 					builder.put(ownedPackage, container);
 			packageOwners = builder.build();
@@ -124,6 +126,31 @@ public class ASM {
 		ModContainer oldContainer = (ModContainer) acField.get(loadController());
 		acField.set(loadController(), container);
 		return oldContainer;
+	}
+
+	public static Class<?>[] callingStack() {
+		if (callingStack == null) {
+			try {
+				callingStack = LoadController.class.getDeclaredMethod("getCallingStack");
+				callingStack.setAccessible(true);
+			} catch (NoSuchMethodException e) {
+				throw Throwables.propagate(e);
+			}
+		}
+		try {
+			return (Class<?>[]) callingStack.invoke(loadController());
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			throw Throwables.propagate(e);
+		}
+	}
+
+	public static Class<?> callingClass() {
+		Class<?>[] classes = callingStack();
+		return classes[Math.min(CALLING_DEPTH, classes.length - 1)];
+	}
+
+	public static ModContainer callingMod() {
+		return findOwner(callingClass());
 	}
 
 	public static ModContainer minecraft() {

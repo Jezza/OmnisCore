@@ -1,10 +1,10 @@
 package me.jezza.oc.common.core.config;
 
-import com.google.common.base.Strings;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import me.jezza.oc.common.core.config.discovery.ConfigData;
 import me.jezza.oc.common.utils.ASM;
+import me.jezza.oc.common.utils.helpers.StringHelper;
 import net.minecraftforge.common.config.Configuration;
 import org.apache.commons.lang3.ClassUtils;
 
@@ -19,6 +19,7 @@ import java.util.Set;
 
 import static me.jezza.oc.common.core.config.Config.ConfigAnnotation;
 import static me.jezza.oc.common.core.config.Config.Controller;
+import static me.jezza.oc.common.utils.helpers.StringHelper.format;
 
 public final class ConfigHandler {
 	private static ConfigHandler INSTANCE;
@@ -75,7 +76,7 @@ public final class ConfigHandler {
 			Class<? extends Annotation> value = (Class<? extends Annotation>) entry.getValue();
 			ConfigAnnotation annotation = value.getAnnotation(ConfigAnnotation.class);
 			if (annotation == null)
-				continue;
+				throw new IllegalStateException(format("Configuration was supplied an invalid configuration annotation. {}"));
 			Class<? extends ConfigEntry<? extends Annotation, ?>> configEntry = annotation.value();
 			if (!Modifier.isAbstract(configEntry.getModifiers()))
 				internalRegister(value, configEntry);
@@ -94,40 +95,38 @@ public final class ConfigHandler {
 		return !(annotationsRegistered || Modifier.isAbstract(configEntry.getModifiers())) && internalRegister(annotationClazz, configEntry);
 	}
 
-	private static boolean internalRegister(Class<? extends Annotation> annotationClazz, Class<? extends ConfigEntry<? extends Annotation, ?>> configEntry) {
-		String canonicalName = annotationClazz.getCanonicalName();
+	private static boolean internalRegister(Class<? extends Annotation> annotationClass, Class<? extends ConfigEntry<? extends Annotation, ?>> configEntry) {
+		String canonicalName = annotationClass.getCanonicalName();
 		if (!annotationMap.containsKey(canonicalName)) {
-			annotationMap.put(canonicalName, createFactory(annotationClazz, configEntry));
+			annotationMap.put(canonicalName, createFactory(annotationClass, configEntry));
 			return true;
 		}
 		return false;
 	}
 
-	private static <A extends Annotation, T extends ConfigEntry<A, ?>> ICEFactory<A, T> createFactory(final Class<A> annotationClazz, final Class<? extends ConfigEntry<? extends Annotation, ?>> configClazz) {
-		@SuppressWarnings("unchecked")
-		Constructor<T>[] constructors = (Constructor<T>[]) configClazz.getDeclaredConstructors();
-		for (final Constructor<T> constructor : constructors) {
-			if (constructor.getParameterCount() == 1 && constructor.getParameterTypes()[0] == Configuration.class) {
-				constructor.setAccessible(true);
-				return new ICEFactory<A, T>() {
-					@Override
-					public T create(Object... params) throws InstantiationException, IllegalAccessException, InvocationTargetException {
-						return constructor.newInstance(params);
-					}
+	private static <A extends Annotation, T extends ConfigEntry<A, ?>> ICEFactory<A, T> createFactory(final Class<A> annotationClass, final Class<? extends ConfigEntry<? extends Annotation, ?>> configClass) {
+		try {
+			@SuppressWarnings("unchecked")
+			final Constructor<T> constructor = (Constructor<T>) configClass.getDeclaredConstructor(Configuration.class);
+			constructor.setAccessible(true);
+			return new ICEFactory<A, T>() {
+				@Override
+				public T create(Object... params) throws InstantiationException, IllegalAccessException, InvocationTargetException {
+					return constructor.newInstance(params);
+				}
 
-					@Override
-					@SuppressWarnings("unchecked")
-					public Class<A> annotationClass() {
-						return (Class<A>) annotationClazz;
-					}
-				};
-			}
+				@Override
+				public Class<A> annotationClass() {
+					return annotationClass;
+				}
+			};
+		} catch (NoSuchMethodException e) {
+			throw new ConfigurationException(format("Invalid constructor; Expected constructor with {} in {}.", Configuration.class.getCanonicalName(), configClass));
 		}
-		throw new ConfigurationException("Found no entry point for the ConfigClass: " + configClazz + "! Requires a constructor with one parameter: " + Configuration.class);
 	}
 
 	public static boolean load(String modID) {
-		if (postProcessed && !Strings.isNullOrEmpty(modID) && Loader.isModLoaded(modID)) {
+		if (postProcessed && !StringHelper.useable(modID) && Loader.isModLoaded(modID)) {
 			ConfigData configData = configMap.get(modID);
 			if (configData != null) {
 				configData.load();
@@ -138,7 +137,7 @@ public final class ConfigHandler {
 	}
 
 	public static boolean save(String modID) {
-		if (postProcessed && !Strings.isNullOrEmpty(modID) && Loader.isModLoaded(modID)) {
+		if (postProcessed && StringHelper.useable(modID) && Loader.isModLoaded(modID)) {
 			ConfigData configData = configMap.get(modID);
 			if (configData != null) {
 				configData.save();

@@ -1,5 +1,9 @@
 package me.jezza.oc.client;
 
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.RenderTickEvent;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
@@ -9,8 +13,31 @@ import org.lwjgl.input.Keyboard;
 import static org.lwjgl.input.Keyboard.*;
 
 @SideOnly(Side.CLIENT)
-public class Client {
+public final class Client {
 	private static final Minecraft MC = Minecraft.getMinecraft();
+	private static final Client INSTANCE = new Client();
+	private static boolean init = false;
+
+	public static void init() {
+		if (init)
+			return;
+		init = true;
+		FMLCommonHandler.instance().bus().register(INSTANCE);
+	}
+
+	private Client() {
+	}
+
+	@SubscribeEvent
+	public void tick(ClientTickEvent event) {
+		me.jezza.oc.client.Keyboard.INSTANCE.tick(event);
+		Mouse.INSTANCE.tick(event);
+	}
+
+	@SubscribeEvent
+	public void renderTick(RenderTickEvent event) {
+		Camera.INSTANCE.tick(event);
+	}
 
 	public static boolean hasPressedShift() {
 		return Minecraft.isRunningOnMac ? Keyboard.isKeyDown(KEY_LWIN) || Keyboard.isKeyDown(KEY_RMETA) : Keyboard.isKeyDown(KEY_LCONTROL) || Keyboard.isKeyDown(KEY_RCONTROL);

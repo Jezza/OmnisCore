@@ -1,25 +1,25 @@
 package me.jezza.oc.common.utils.helpers;
 
 import com.google.common.base.CaseFormat;
+import com.google.common.base.Splitter;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.StatCollector;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Jezza
  */
 public class StringHelper {
 	public static final char FORMATTING_CHAR = '$';
-	public static final Map<Character, EnumChatFormatting> formattingCodeMapping;
+	public static final Map<Character, EnumChatFormatting> COLOUR_MAP;
+	public static final String OBJECT_REP = "{}";
+	public static final Splitter WRAP_SPLITTER = Splitter.on(' ').omitEmptyStrings();
 
 	static {
 		Map<Character, EnumChatFormatting> formattingMap = ReflectionHelper.getPrivateValue(EnumChatFormatting.class, null, "formattingCodeMapping");
-		formattingCodeMapping = Collections.unmodifiableMap(formattingMap);
+		COLOUR_MAP = Collections.unmodifiableMap(formattingMap);
 	}
 
 	private StringHelper() {
@@ -52,10 +52,21 @@ public class StringHelper {
 	}
 
 	public static String format(String target, Object... params) {
-		if (params != null && params.length != 0)
-			for (Object param : params)
-				target = target.replaceFirst("\\{\\}", String.valueOf(param));
-		return target;
+		if (target == null)
+			return null;
+		if (!useable(target) || params == null || params.length == 0)
+			return target;
+		int index = target.indexOf(OBJECT_REP);
+		if (index < 0)
+			return target;
+		StringBuilder builder = new StringBuilder(target);
+		for (Object param : params) {
+			builder.replace(index, index + OBJECT_REP.length(), String.valueOf(param));
+			index = builder.indexOf(OBJECT_REP);
+			if (index < 0)
+				return builder.toString();
+		}
+		return builder.toString();
 	}
 
 	public static String translateWithFallback(String key) {
@@ -73,7 +84,7 @@ public class StringHelper {
 			if (c == FORMATTING_CHAR) {
 				if (i != 0 && builder.charAt(i - 1) == '\\')
 					continue;
-				EnumChatFormatting format = formattingCodeMapping.get(builder.charAt(i + 1));
+				EnumChatFormatting format = COLOUR_MAP.get(builder.charAt(i + 1));
 				if (format != null)
 					builder.replace(i, i + 2, format.toString());
 			}
@@ -99,54 +110,40 @@ public class StringHelper {
 	}
 
 	public static List<String> wrap(String text, int size, boolean ignoreNewlines) {
-		final List<String> lines;
-		StringBuilder sb;
-		String[] words;
-		String space;
-
+		final List<String> lines = new LinkedList<>();
 		if (ignoreNewlines) {
-			text = text.replaceAll(System.lineSeparator(), " ");
-			text = text.replaceAll("\\n", " ");
-
-			words = text.split(" ");
-			lines = new ArrayList<>(words.length);
-			sb = new StringBuilder();
-			space = "";
-			for (int i = 0; i < words.length; i++) {
-				String word = words[i];
-				if (i != 0 && sb.length() + space.length() + word.length() > size) {
-					lines.add(sb.toString());
-					sb.setLength(0);
-					space = "";
-				}
-				sb.append(space).append(word);
-				space = " ";
-			}
-			lines.add(sb.toString());
+			text = text.replace(System.lineSeparator(), " ");
+			text = text.replace('\n', ' ');
+			split(text, lines, size);
 			return lines;
 		}
-
-		lines = new ArrayList<>(6);
 		for (String part : text.split("\\n")) {
 			if (part.length() <= size) {
 				lines.add(part);
 			} else {
-				words = part.split(" ");
-				sb = new StringBuilder();
-				space = "";
-				for (int i = 0; i < words.length; i++) {
-					String word = words[i];
-					if (i != 0 && sb.length() + space.length() + word.length() > size) {
-						lines.add(sb.toString());
-						sb.setLength(0);
-						space = "";
-					}
-					sb.append(space).append(word);
-					space = " ";
-				}
-				lines.add(sb.toString());
+				split(part, lines, size);
 			}
 		}
 		return lines;
+	}
+
+	private static void split(String text, List<String> lines, int size) {
+		Iterator<String> it = WRAP_SPLITTER.split(text).iterator();
+		StringBuilder sb = new StringBuilder();
+		while (it.hasNext()) {
+			if (sb.length() == 0) {
+				sb.append(it.next());
+				continue;
+			}
+			String word = it.next();
+			if (sb.length() + word.length() + 1 > size) {
+				lines.add(sb.toString());
+				sb.setLength(0);
+			} else {
+				sb.append(' ');
+			}
+			sb.append(word);
+		}
+		lines.add(sb.toString());
 	}
 }

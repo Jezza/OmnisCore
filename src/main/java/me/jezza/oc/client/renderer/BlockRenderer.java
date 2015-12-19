@@ -10,7 +10,9 @@ import net.minecraftforge.common.util.ForgeDirection;
 import static org.lwjgl.opengl.GL11.*;
 
 @SideOnly(Side.CLIENT)
-public class BlockRenderer {
+public enum BlockRenderer {
+	;
+
 	public static final float OFFSET_1 = 0.0625F;
 	public static final float OFFSET_2 = 0.125F;
 	public static final float OFFSET_3 = 0.1875F;
@@ -32,9 +34,6 @@ public class BlockRenderer {
 	 */
 	public static final float[] DEFAULT_OFFSETS = new float[6];
 	private static Tessellator instance = Tessellator.instance;
-
-	private BlockRenderer() {
-	}
 
 	public static void bindTexture(ResourceLocation texture) {
 		Minecraft.getMinecraft().renderEngine.bindTexture(texture);

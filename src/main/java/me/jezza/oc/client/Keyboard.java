@@ -1,5 +1,7 @@
 package me.jezza.oc.client;
 
+import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.OmnisCore;
@@ -32,7 +34,9 @@ public final class Keyboard {
 		active = null;
 	}
 
-	protected void tick() {
+	protected void tick(ClientTickEvent event) {
+		if (event.phase != Phase.START)
+			return;
 		if (active != null) {
 			if (!active.cancelled()) {
 				if (active.retrieved()) {

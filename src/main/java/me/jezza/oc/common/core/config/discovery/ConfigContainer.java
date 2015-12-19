@@ -19,8 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * A main config container for all the config annotations.
- * This includes all sub-packages.
+ * A config container for all config annotations under a specified package (Includes all sub-packages).
  * Controlled by a ConfigData instance for a ModContainer.
  */
 public class ConfigContainer {
@@ -37,8 +36,8 @@ public class ConfigContainer {
 		this.childClasses = childClasses;
 	}
 
-	public void processAllClasses(Collection<ICEFactory<?, ? extends ConfigEntry<? extends Annotation, ?>>> configEntryMap) {
-		for (ICEFactory<?, ? extends ConfigEntry<? extends Annotation, ?>> factory : configEntryMap) {
+	public void processAllClasses(Collection<ICEFactory<?, ? extends ConfigEntry<? extends Annotation, ?>>> entries) {
+		for (ICEFactory<?, ? extends ConfigEntry<? extends Annotation, ?>> factory : entries) {
 			try {
 				annotationMap.put(factory.annotationClass(), factory.create(config));
 			} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {

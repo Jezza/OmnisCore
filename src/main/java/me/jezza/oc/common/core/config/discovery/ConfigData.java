@@ -11,7 +11,8 @@ import java.lang.annotation.Annotation;
 import java.util.*;
 
 /**
- * The config data manager for any given ModContainer.
+ * The config data for any given mod.
+ * Handles the loading and saving from each container within the mod.
  */
 public class ConfigData {
 	private static final File CONFIG_DIR = new File(".", "config");
