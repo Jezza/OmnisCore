@@ -2,24 +2,31 @@ package me.jezza.oc.common.core.config.entries;
 
 import me.jezza.oc.common.core.config.Config.ConfigDoubleArray;
 import me.jezza.oc.common.core.config.ConfigEntry;
-import net.minecraftforge.common.config.Configuration;
+import me.jezza.oc.common.core.config.OmnisConfiguration;
+import me.jezza.oc.common.utils.Classes;
+import me.jezza.oc.common.utils.helpers.StringHelper;
 
 import java.lang.reflect.Field;
 
 public class CEDoubleArray extends ConfigEntry<ConfigDoubleArray, double[]> {
-	public CEDoubleArray(Configuration config) {
+	public CEDoubleArray(OmnisConfiguration config) {
 		super(config);
 	}
 
 	@Override
-	public Object loadAnnotation(Configuration config, Field field, String fieldName, ConfigDoubleArray annotation, double[] currentValue, double[] defaultValue) {
-		String comment = processComment(annotation.comment());
-		return getDoubleArray(annotation.category(), useableOr(annotation.name(), fieldName), defaultValue, comment, annotation.minValue(), annotation.maxValue(), annotation.maxListLength());
+	protected boolean checkField(Field field) {
+		return Classes.isType(field.getType(), double.class, 1);
 	}
 
 	@Override
-	public void saveAnnotation(Configuration config, Field field, String fieldName, ConfigDoubleArray annotation, double[] currentValue, double[] defaultValue) {
+	public Object load(OmnisConfiguration config, Field field, String fieldName, ConfigDoubleArray annotation, double[] currentValue, double[] defaultValue) {
 		String comment = processComment(annotation.comment());
-		getDoubleArrayProperty(annotation.category(), useableOr(annotation.name(), fieldName), defaultValue, comment, annotation.minValue(), annotation.maxValue(), annotation.maxListLength()).set(currentValue);
+		return config.getDoubleArray(annotation.category(), StringHelper.firstUseable(annotation.name(), fieldName), defaultValue, comment, annotation.minValue(), annotation.maxValue(), annotation.maxListLength());
+	}
+
+	@Override
+	public void save(OmnisConfiguration config, Field field, String fieldName, ConfigDoubleArray annotation, double[] currentValue, double[] defaultValue) {
+		String comment = processComment(annotation.comment());
+		config.getDoubleArrayProperty(annotation.category(), StringHelper.firstUseable(annotation.name(), fieldName), defaultValue, comment, annotation.minValue(), annotation.maxValue(), annotation.maxListLength()).set(currentValue);
 	}
 }

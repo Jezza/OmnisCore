@@ -2,6 +2,7 @@ package me.jezza.oc.common.core.config.discovery;
 
 import com.google.common.base.Throwables;
 import me.jezza.oc.OmnisCore;
+import me.jezza.oc.common.core.config.Config.ConfigSync;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -16,6 +17,7 @@ public class AnnotatedField<T extends Annotation, V> {
 	protected final T annotation;
 	protected final V defaultValue;
 	protected final String fieldName;
+	protected transient Boolean sync = null;
 
 	/**
 	 * @param field      A static field
@@ -48,15 +50,26 @@ public class AnnotatedField<T extends Annotation, V> {
 	 * @return The value currently stored in the field, can be null.
 	 */
 	@SuppressWarnings("unchecked")
-	public V currentValue() {
+	public final V currentValue() {
 		try {
 			return (V) field.get(null);
 		} catch (IllegalAccessException e) {
-			OmnisCore.logger.error("Failed to get current value.");
+			OmnisCore.logger.error("Failed to retrieve current value.");
 			throw Throwables.propagate(e);
 		} catch (ClassCastException e) {
-			OmnisCore.logger.error("Field with: " + annotation.annotationType() + " not of expected type:" + field.toGenericString());
+			OmnisCore.logger.error("Field with: {} not of expected type: {}", annotation.annotationType(), field.toGenericString());
 			throw Throwables.propagate(e);
 		}
+	}
+
+	public boolean canSync() {
+		if (sync == null)
+			sync = field.isAnnotationPresent(ConfigSync.class);
+		return sync;
+	}
+
+	@Override
+	public final String toString() {
+		return field.getDeclaringClass().getCanonicalName() + '.' + fieldName + ", @" + annotation.annotationType().getSimpleName() + ", sync: " + canSync();
 	}
 }

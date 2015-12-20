@@ -34,7 +34,9 @@ public abstract class BlockAbstractMeta extends BlockAbstract {
 
 	@Override
 	@SideOnly(Side.CLIENT)
-	public void getSubBlocks(Item item, CreativeTabs tab, List list) {
+	@SuppressWarnings("unchecked")
+	public void getSubBlocks(Item item, CreativeTabs tab, List _list) {
+		List<ItemStack> list = (List) _list;
 		List<String> names = getNames();
 		for (int i = 0; i < names.size(); i++)
 			list.add(new ItemStack(item, 1, i));

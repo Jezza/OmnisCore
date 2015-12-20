@@ -11,19 +11,18 @@ import java.util.*;
 /**
  * @author Jezza
  */
-public class StringHelper {
+public enum StringHelper {
+	;
+
 	public static final char FORMATTING_CHAR = '$';
 	public static final Map<Character, EnumChatFormatting> COLOUR_MAP;
 	public static final String OBJECT_REP = "{}";
-	public static final Splitter WRAP_SPLITTER = Splitter.on(' ').omitEmptyStrings();
+	public static final Splitter WORD_SPLITTER = Splitter.on(' ').omitEmptyStrings();
+	public static final Splitter NEW_LINE_SPLITTER = Splitter.on('\n').omitEmptyStrings();
 
 	static {
 		Map<Character, EnumChatFormatting> formattingMap = ReflectionHelper.getPrivateValue(EnumChatFormatting.class, null, "formattingCodeMapping");
 		COLOUR_MAP = Collections.unmodifiableMap(formattingMap);
-	}
-
-	private StringHelper() {
-		throw new IllegalStateException();
 	}
 
 	public static boolean nullOrEmpty(CharSequence charSequence) {
@@ -114,21 +113,21 @@ public class StringHelper {
 		if (ignoreNewlines) {
 			text = text.replace(System.lineSeparator(), " ");
 			text = text.replace('\n', ' ');
-			split(text, lines, size);
+			split(lines, text, size);
 			return lines;
 		}
-		for (String part : text.split("\\n")) {
+		for (String part : NEW_LINE_SPLITTER.split(text)) {
 			if (part.length() <= size) {
 				lines.add(part);
 			} else {
-				split(part, lines, size);
+				split(lines, part, size);
 			}
 		}
 		return lines;
 	}
 
-	private static void split(String text, List<String> lines, int size) {
-		Iterator<String> it = WRAP_SPLITTER.split(text).iterator();
+	private static void split(List<String> lines, String text, int size) {
+		Iterator<String> it = WORD_SPLITTER.split(text).iterator();
 		StringBuilder sb = new StringBuilder();
 		while (it.hasNext()) {
 			if (sb.length() == 0) {
@@ -145,5 +144,24 @@ public class StringHelper {
 			sb.append(word);
 		}
 		lines.add(sb.toString());
+	}
+
+	/**
+	 * Finds the first useable string.
+	 *
+	 * @param first  - The first String to check.
+	 * @param second - The second String to check.
+	 * @param others - The rest to check.
+	 * @return - the first String that passes {@link StringHelper#useable(CharSequence)}, null otherwise.
+	 */
+	public static String firstUseable(String first, String second, String... others) {
+		if (useable(first))
+			return first;
+		if (useable(second))
+			return second;
+		for (String other : others)
+			if (useable(other))
+				return other;
+		return null;
 	}
 }

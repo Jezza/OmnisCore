@@ -2,24 +2,30 @@ package me.jezza.oc.common.core.config.entries;
 
 import me.jezza.oc.common.core.config.Config.ConfigString;
 import me.jezza.oc.common.core.config.ConfigEntry;
-import net.minecraftforge.common.config.Configuration;
+import me.jezza.oc.common.core.config.OmnisConfiguration;
+import me.jezza.oc.common.utils.helpers.StringHelper;
 
 import java.lang.reflect.Field;
 
 public class CEString extends ConfigEntry<ConfigString, String> {
-	public CEString(Configuration config) {
+	public CEString(OmnisConfiguration config) {
 		super(config);
 	}
 
 	@Override
-	public Object loadAnnotation(Configuration config, Field field, String fieldName, ConfigString annotation, String currentValue, String defaultValue) {
-		String comment = processComment(annotation.comment());
-		return getString(annotation.category(), useableOr(annotation.name(), fieldName), defaultValue, comment, annotation.validValues());
+	protected boolean checkField(Field field) {
+		return field.getType() == String.class;
 	}
 
 	@Override
-	public void saveAnnotation(Configuration config, Field field, String fieldName, ConfigString annotation, String currentValue, String defaultValue) {
+	public Object load(OmnisConfiguration config, Field field, String fieldName, ConfigString annotation, String currentValue, String defaultValue) {
 		String comment = processComment(annotation.comment());
-		getStringProperty(annotation.category(), useableOr(annotation.name(), fieldName), defaultValue, comment, annotation.validValues()).set(currentValue);
+		return config.getString(annotation.category(), StringHelper.firstUseable(annotation.name(), fieldName), defaultValue, comment, annotation.validValues());
+	}
+
+	@Override
+	public void save(OmnisConfiguration config, Field field, String fieldName, ConfigString annotation, String currentValue, String defaultValue) {
+		String comment = processComment(annotation.comment());
+		config.getStringProperty(annotation.category(), StringHelper.firstUseable(annotation.name(), fieldName), defaultValue, comment, annotation.validValues()).set(currentValue);
 	}
 }

@@ -1,97 +1,84 @@
 package me.jezza.oc.common.core.config.discovery;
 
-import cpw.mods.fml.common.discovery.ASMDataTable;
+import com.google.common.base.Throwables;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import me.jezza.oc.OmnisCore;
+import me.jezza.oc.common.core.channel.OmnisBuffer;
 import me.jezza.oc.common.core.config.ConfigEntry;
 import me.jezza.oc.common.core.config.ICEFactory;
+import me.jezza.oc.common.core.config.OmnisConfiguration;
 import me.jezza.oc.common.utils.ASM;
-import net.minecraftforge.common.config.Configuration;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * A config container for all config annotations under a specified package (Includes all sub-packages).
  * Controlled by a ConfigData instance for a ModContainer.
  */
 public class ConfigContainer {
-	private Map<Class<? extends Annotation>, ConfigEntry<? extends Annotation, ?>> annotationMap = new LinkedHashMap<>();
+	private final OmnisConfiguration config;
 
+	private Map<Class<? extends Annotation>, ConfigEntry<? extends Annotation, ?>> annotationMap = new LinkedHashMap<>();
 	private Collection<String> childClasses;
-	private Configuration config;
 
 	public ConfigContainer(File config) {
-		this.config = new Configuration(config);
+		this.config = new OmnisConfiguration(config);
 	}
 
-	public void setChildClasses(Collection<String> childClasses) {
+	public void childClasses(Collection<String> childClasses) {
 		this.childClasses = childClasses;
 	}
 
-	public void processAllClasses(Collection<ICEFactory<?, ? extends ConfigEntry<? extends Annotation, ?>>> entries) {
-		for (ICEFactory<?, ? extends ConfigEntry<? extends Annotation, ?>> factory : entries) {
-			try {
-				annotationMap.put(factory.annotationClass(), factory.create(config));
-			} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-				OmnisCore.logger.fatal("Failed to create instance of the registered ConfigEntry!", e);
-			}
-		}
-
-		ASMDataTable dataTable = ASM.dataTable();
-		ArrayList<String> processedClasses = new ArrayList<>();
-		for (Class<? extends Annotation> annotationClazz : annotationMap.keySet()) {
-			for (ASMData asmData : dataTable.getAll(annotationClazz.getName())) {
-				String className = asmData.getClassName();
-				if (childClasses.contains(className) && !processedClasses.contains(className)) {
-					processedClasses.add(className);
-					try {
-						processClass(Class.forName(className));
-					} catch (ClassNotFoundException e) {
-						// Should never happen seeing as we got it from the system.
-						OmnisCore.logger.fatal("Failed to find class!", e);
-					}
-				}
-			}
-		}
-	}
-
 	@SuppressWarnings("unchecked")
-	private void processClass(Class<?> clazz) {
-		for (final Field field : clazz.getDeclaredFields()) {
-			for (Annotation annotation : field.getAnnotations()) {
-				Class<? extends Annotation> annotationClazz = annotation.annotationType();
-				if (annotationMap.containsKey(annotationClazz)) {
-					int mods = field.getModifiers();
-					if (!Modifier.isStatic(mods)) {
-						OmnisCore.logger.warn("Found {} on a non-static field: {}.{}. Skipping...", annotationClazz.getCanonicalName(), field.getDeclaringClass(), field.getName());
-						continue;
-					}
-					if (Modifier.isFinal(mods)) {
-						OmnisCore.logger.warn("Found {} on a final field: {}.{}. Skipping...", annotationClazz.getCanonicalName(), field.getDeclaringClass(), field.getName());
-						continue;
-					}
-					field.setAccessible(true);
-					// Adds the field and the annotation to the ConfigEntry. No more annotations should be on the field, so break out of it and continue field iteration.
-					((ConfigEntry<Annotation, Object>) annotationMap.get(annotationClazz)).add(field, annotation);
-					break;
+	public <A extends Annotation, C extends ConfigEntry<A, ?>> ConfigContainer processAllClasses(Collection<ICEFactory<A, C>> entries) {
+		for (ICEFactory<A, C> factory : entries) {
+			Class<A> annotationClass = factory.annotationClass();
+			for (Entry<ASMData, Field> entry : ASM.fieldsWith(annotationClass).entrySet()) {
+				ASMData data = entry.getKey();
+				if (!childClasses.contains(data.getClassName()))
+					continue;
+				Field field = entry.getValue();
+				int mods = field.getModifiers();
+				if (!Modifier.isStatic(mods)) {
+					OmnisCore.logger.warn("Found @{} on a non-static field: {}.{}. Skipping...", annotationClass.getSimpleName(), field.getDeclaringClass(), field.getName());
+					continue;
 				}
+				if (Modifier.isFinal(mods)) {
+					OmnisCore.logger.warn("Found @{} on a final field: {}.{}. Skipping...", annotationClass.getSimpleName(), field.getDeclaringClass(), field.getName());
+					continue;
+				}
+				field.setAccessible(true);
+				C configEntry = (C) annotationMap.get(annotationClass);
+				if (configEntry == null) {
+					try {
+						configEntry = factory.create(config);
+						annotationMap.put(annotationClass, configEntry);
+					} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+						OmnisCore.logger.fatal("Failed to create instance of the registered ConfigEntry!", e);
+						throw Throwables.propagate(e);
+					}
+				}
+				configEntry.add(field, field.getAnnotation(annotationClass));
 			}
 		}
+		return this;
 	}
 
-	public void operateOnConfig(boolean saveFlag) {
-		config.load();
+	public void operate(boolean saveFlag) {
 		for (ConfigEntry<? extends Annotation, ?> configEntry : annotationMap.values())
 			configEntry.processFields(saveFlag);
-		if (config.hasChanged())
-			config.save();
+	}
+
+	public void sync(OmnisBuffer buffer, boolean write) {
+		for (ConfigEntry<? extends Annotation, ?> configEntry : annotationMap.values())
+			configEntry.syncFields(buffer, write);
 	}
 }

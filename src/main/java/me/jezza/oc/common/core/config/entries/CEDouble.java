@@ -2,24 +2,31 @@ package me.jezza.oc.common.core.config.entries;
 
 import me.jezza.oc.common.core.config.Config.ConfigDouble;
 import me.jezza.oc.common.core.config.ConfigEntry;
-import net.minecraftforge.common.config.Configuration;
+import me.jezza.oc.common.core.config.OmnisConfiguration;
+import me.jezza.oc.common.utils.Classes;
+import me.jezza.oc.common.utils.helpers.StringHelper;
 
 import java.lang.reflect.Field;
 
 public class CEDouble extends ConfigEntry<ConfigDouble, Double> {
-	public CEDouble(Configuration config) {
+	public CEDouble(OmnisConfiguration config) {
 		super(config);
 	}
 
 	@Override
-	public Object loadAnnotation(Configuration config, Field field, String fieldName, ConfigDouble annotation, Double currentValue, Double defaultValue) {
-		String comment = processComment(annotation.comment());
-		return getDouble(annotation.category(), useableOr(annotation.name(), fieldName), defaultValue, comment, annotation.minValue(), annotation.maxValue());
+	protected boolean checkField(Field field) {
+		return Classes.unwrap(field.getType()) == double.class;
 	}
 
 	@Override
-	public void saveAnnotation(Configuration config, Field field, String fieldName, ConfigDouble annotation, Double currentValue, Double defaultValue) {
+	public Object load(OmnisConfiguration config, Field field, String fieldName, ConfigDouble annotation, Double currentValue, Double defaultValue) {
 		String comment = processComment(annotation.comment());
-		getDoubleProperty(annotation.category(), useableOr(annotation.name(), fieldName), defaultValue, comment, annotation.minValue(), annotation.maxValue()).set(currentValue);
+		return config.getDouble(annotation.category(), StringHelper.firstUseable(annotation.name(), fieldName), defaultValue, comment, annotation.minValue(), annotation.maxValue());
+	}
+
+	@Override
+	public void save(OmnisConfiguration config, Field field, String fieldName, ConfigDouble annotation, Double currentValue, Double defaultValue) {
+		String comment = processComment(annotation.comment());
+		config.getDoubleProperty(annotation.category(), StringHelper.firstUseable(annotation.name(), fieldName), defaultValue, comment, annotation.minValue(), annotation.maxValue()).set(currentValue);
 	}
 }

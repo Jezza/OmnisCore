@@ -40,10 +40,10 @@ public class OmnisCore {
 		logger = event.getModLog();
 		logger.info("-- Pre-Initialising " + MOD_ID + " (" + VERSION + ") --");
 
+		logger.info("-- Checking Debug Overrides --");
+		Debug.checkOverrides();
 		logger.info("-- Initialising ConfigAnnotations --");
 		ConfigHandler.init();
-		logger.info("-- Checking Debug Overrides --");
-		Debug.checkSysOverrides();
 		logger.info("-- Configuring Channels --");
 		ChannelDispatcher.init();
 		new ItemControl();
@@ -51,7 +51,7 @@ public class OmnisCore {
 	}
 
 	@EventHandler
-	public void initialize(FMLInitializationEvent event) {
+	public void initialise(FMLInitializationEvent event) {
 		logger.info("-- Initialising --");
 		logger.info("-- Starting OmnisCore|NST --");
 		SearchThread.getInstance().start();

@@ -2,24 +2,31 @@ package me.jezza.oc.common.core.config.entries;
 
 import me.jezza.oc.common.core.config.Config.ConfigIntegerArray;
 import me.jezza.oc.common.core.config.ConfigEntry;
-import net.minecraftforge.common.config.Configuration;
+import me.jezza.oc.common.core.config.OmnisConfiguration;
+import me.jezza.oc.common.utils.Classes;
+import me.jezza.oc.common.utils.helpers.StringHelper;
 
 import java.lang.reflect.Field;
 
 public class CEIntegerArray extends ConfigEntry<ConfigIntegerArray, int[]> {
-	public CEIntegerArray(Configuration config) {
+	public CEIntegerArray(OmnisConfiguration config) {
 		super(config);
 	}
 
 	@Override
-	public Object loadAnnotation(Configuration config, Field field, String fieldName, ConfigIntegerArray annotation, int[] currentValue, int[] defaultValue) {
-		String comment = processComment(annotation.comment());
-		return getIntArray(annotation.category(), useableOr(annotation.name(), fieldName), defaultValue, comment, annotation.minValue(), annotation.maxValue(), annotation.maxListLength());
+	protected boolean checkField(Field field) {
+		return Classes.isType(field.getType(), int.class, 1);
 	}
 
 	@Override
-	public void saveAnnotation(Configuration config, Field field, String fieldName, ConfigIntegerArray annotation, int[] currentValue, int[] defaultValue) {
+	public Object load(OmnisConfiguration config, Field field, String fieldName, ConfigIntegerArray annotation, int[] currentValue, int[] defaultValue) {
 		String comment = processComment(annotation.comment());
-		getIntArrayProperty(annotation.category(), useableOr(annotation.name(), fieldName), defaultValue, comment, annotation.minValue(), annotation.maxValue(), annotation.maxListLength()).set(currentValue);
+		return config.getIntArray(annotation.category(), StringHelper.firstUseable(annotation.name(), fieldName), defaultValue, comment, annotation.minValue(), annotation.maxValue(), annotation.maxListLength());
+	}
+
+	@Override
+	public void save(OmnisConfiguration config, Field field, String fieldName, ConfigIntegerArray annotation, int[] currentValue, int[] defaultValue) {
+		String comment = processComment(annotation.comment());
+		config.getIntArrayProperty(annotation.category(), StringHelper.firstUseable(annotation.name(), fieldName), defaultValue, comment, annotation.minValue(), annotation.maxValue(), annotation.maxListLength()).set(currentValue);
 	}
 }

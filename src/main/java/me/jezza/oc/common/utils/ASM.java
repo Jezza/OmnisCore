@@ -3,11 +3,8 @@ package me.jezza.oc.common.utils;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.base.Throwables;
-import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.*;
 import com.google.common.collect.ImmutableListMultimap.Builder;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import cpw.mods.fml.common.LoadController;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.LoaderState;
@@ -17,7 +14,9 @@ import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import cpw.mods.fml.common.discovery.ModCandidate;
 import cpw.mods.fml.common.discovery.ModDiscoverer;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import me.jezza.oc.OmnisCore;
 import me.jezza.oc.common.utils.collect.Collections3;
+import me.jezza.oc.common.utils.helpers.StringHelper;
 import org.apache.commons.lang3.ClassUtils;
 
 import java.lang.annotation.Annotation;
@@ -31,11 +30,18 @@ import static me.jezza.oc.common.utils.helpers.PredicateHelper.startsWith;
 /**
  * @author Jezza
  */
-public class ASM {
+public enum ASM {
+	;
+
 	private static final Splitter ARG_SPLITTER = Splitter.on(";").omitEmptyStrings().trimResults();
 
 	private static final Map<String, Set<String>> ownedPackages = Maps.newHashMap();
 	private static final Map<String, Set<String>> subClasses = Maps.newHashMap();
+
+	private static final Map<Class<? extends Annotation>, Map<ASMData, Class<?>>> classCache = Maps.newHashMap();
+	private static final Map<Class<? extends Annotation>, Map<ASMData, Field>> fieldCache = Maps.newHashMap();
+	private static final Map<Class<? extends Annotation>, Map<ASMData, Method>> methodCache = Maps.newHashMap();
+
 	private static final int CALLING_DEPTH = 5;
 
 	private static ListMultimap<String, ModContainer> packageOwners;
@@ -45,10 +51,6 @@ public class ASM {
 	private static Field acField;
 	private static ModContainer minecraft;
 	private static Method callingStack;
-
-	private ASM() {
-		throw new IllegalStateException();
-	}
 
 	public static ModContainer findOwner(Object object) {
 		return findOwner(ClassUtils.getPackageName(object.getClass()));
@@ -176,24 +178,39 @@ public class ASM {
 	}
 
 	public static Map<ASMData, Class<?>> classesWith(Class<? extends Annotation> annotationClass) {
-		Map<ASMData, Class<?>> classes = Maps.newHashMap();
+		Map<ASMData, Class<?>> classes = classCache.get(annotationClass);
+		if (classes != null)
+			return Maps.newHashMap(classes);
+		ImmutableMap.Builder<ASMData, Class<?>> builder = ImmutableMap.builder();
 		for (ASMData data : dataTable(annotationClass))
-			classes.put(data, getClass(data));
-		return classes;
+			builder.put(data, getClass(data));
+		ImmutableMap<ASMData, Class<?>> map = builder.build();
+		classCache.put(annotationClass, map);
+		return Maps.newHashMap(map);
 	}
 
 	public static Map<ASMData, Field> fieldsWith(Class<? extends Annotation> annotationClass) {
-		Map<ASMData, Field> fields = Maps.newHashMap();
+		Map<ASMData, Field> fields = fieldCache.get(annotationClass);
+		if (fields != null)
+			return Maps.newHashMap(fields);
+		ImmutableMap.Builder<ASMData, Field> builder = ImmutableMap.builder();
 		for (ASMData data : dataTable(annotationClass))
-			fields.put(data, getField(data));
-		return fields;
+			builder.put(data, getField(data));
+		ImmutableMap<ASMData, Field> map = builder.build();
+		fieldCache.put(annotationClass, map);
+		return Maps.newHashMap(map);
 	}
 
 	public static Map<ASMData, Method> methodsWith(Class<? extends Annotation> annotationClass) {
-		Map<ASMData, Method> methods = Maps.newHashMap();
+		Map<ASMData, Method> methods = methodCache.get(annotationClass);
+		if (methods != null)
+			return Maps.newHashMap(methods);
+		ImmutableMap.Builder<ASMData, Method> builder = ImmutableMap.builder();
 		for (ASMData data : dataTable(annotationClass))
-			methods.put(data, getMethod(data));
-		return methods;
+			builder.put(data, getMethod(data));
+		ImmutableMap<ASMData, Method> map = builder.build();
+		methodCache.put(annotationClass, map);
+		return Maps.newHashMap(map);
 	}
 
 	public static Map<ASMData, Method> methodsWithExact(Class<? extends Annotation> annotationClass, Class<?>... parameterTypes) {
@@ -207,6 +224,7 @@ public class ASM {
 		try {
 			return Class.forName(name, true, Loader.instance().getModClassLoader());
 		} catch (ClassNotFoundException e) {
+			OmnisCore.logger.fatal(StringHelper.format("Failed to load class: {}!", name), e);
 			throw Throwables.propagate(e);
 		}
 	}
@@ -231,7 +249,6 @@ public class ASM {
 		int secondPar = objectName.indexOf(')');
 		String methodName = objectName.substring(0, firstPar);
 		List<String> args = ARG_SPLITTER.splitToList(objectName.substring(firstPar + 1, secondPar));
-		// String returnType = objectName.substring(secondPar + 1);
 		Class<?> clazz = loadClass(data.getClassName());
 		for (Method method : clazz.getDeclaredMethods()) {
 			if (methodName.equals(method.getName())) {

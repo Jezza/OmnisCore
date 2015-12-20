@@ -2,24 +2,31 @@ package me.jezza.oc.common.core.config.entries;
 
 import me.jezza.oc.common.core.config.Config.ConfigInteger;
 import me.jezza.oc.common.core.config.ConfigEntry;
-import net.minecraftforge.common.config.Configuration;
+import me.jezza.oc.common.core.config.OmnisConfiguration;
+import me.jezza.oc.common.utils.Classes;
+import me.jezza.oc.common.utils.helpers.StringHelper;
 
 import java.lang.reflect.Field;
 
 public class CEInteger extends ConfigEntry<ConfigInteger, Integer> {
-	public CEInteger(Configuration config) {
+	public CEInteger(OmnisConfiguration config) {
 		super(config);
 	}
 
 	@Override
-	public Object loadAnnotation(Configuration config, Field field, String fieldName, ConfigInteger annotation, Integer currentValue, Integer defaultValue) {
-		String comment = processComment(annotation.comment());
-		return getInt(annotation.category(), useableOr(annotation.name(), fieldName), defaultValue, annotation.minValue(), annotation.maxValue(), comment);
+	protected boolean checkField(Field field) {
+		return Classes.unwrap(field.getType()) == int.class;
 	}
 
 	@Override
-	public void saveAnnotation(Configuration config, Field field, String fieldName, ConfigInteger annotation, Integer currentValue, Integer defaultValue) {
+	public Object load(OmnisConfiguration config, Field field, String fieldName, ConfigInteger annotation, Integer currentValue, Integer defaultValue) {
 		String comment = processComment(annotation.comment());
-		getIntProperty(annotation.category(), useableOr(annotation.name(), fieldName), defaultValue, annotation.minValue(), annotation.maxValue(), comment).set(currentValue);
+		return config.getInt(annotation.category(), StringHelper.firstUseable(annotation.name(), fieldName), defaultValue, annotation.minValue(), annotation.maxValue(), comment);
+	}
+
+	@Override
+	public void save(OmnisConfiguration config, Field field, String fieldName, ConfigInteger annotation, Integer currentValue, Integer defaultValue) {
+		String comment = processComment(annotation.comment());
+		config.getIntProperty(annotation.category(), StringHelper.firstUseable(annotation.name(), fieldName), defaultValue, annotation.minValue(), annotation.maxValue(), comment).set(currentValue);
 	}
 }

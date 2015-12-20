@@ -1,14 +1,18 @@
 package me.jezza.oc.common.core.config.discovery;
 
-import com.google.common.base.Strings;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import me.jezza.oc.OmnisCore;
+import me.jezza.oc.common.core.channel.OmnisBuffer;
 import me.jezza.oc.common.core.config.ConfigEntry;
 import me.jezza.oc.common.core.config.ICEFactory;
+import org.apache.commons.lang3.ClassUtils;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.util.*;
+import java.util.Map.Entry;
+
+import static me.jezza.oc.common.utils.helpers.StringHelper.useable;
 
 /**
  * The config data for any given mod.
@@ -19,7 +23,7 @@ public class ConfigData {
 
 	private final String modId;
 	private Collection<String> ownedClasses;
-	TreeMap<String, ConfigContainer> containerMap;
+	private Map<String, ConfigContainer> containerMap;
 
 	public ConfigData(String modId, Collection<String> ownedClasses) {
 		this.modId = modId;
@@ -32,68 +36,61 @@ public class ConfigData {
 		for (String s : ownedClasses)
 			if (!sortedClasses.contains(s))
 				sortedClasses.add(s);
+		sortedClasses.trimToSize();
 		this.ownedClasses = sortedClasses;
 	}
 
-	public void addRoot(ASMData asmData) {
-		Map<String, Object> annotationInfo = asmData.getAnnotationInfo();
-		String packageName = asmData.getClassName();
-
-		int pkgIndex = packageName.lastIndexOf('.');
-		if (pkgIndex > -1)
-			packageName = packageName.substring(0, pkgIndex);
-
+	public void addRoot(ASMData data) {
+		String packageName = ClassUtils.getPackageName(data.getClassName());
 		if (!containerMap.containsKey(packageName)) {
 			OmnisCore.logger.info("Discovered config controller inside: {}", packageName);
-			File defaultConfig = getConfigForPackage(annotationInfo);
-			OmnisCore.logger.info("Setting config: {}", defaultConfig);
-			containerMap.put(packageName, new ConfigContainer(defaultConfig));
+			File config = configForPackage(data.getAnnotationInfo());
+			OmnisCore.logger.info("Setting config: {}", config);
+			containerMap.put(packageName, new ConfigContainer(config));
 		} else {
 			OmnisCore.logger.warn("Config controller discovered in the same root: {}. ", packageName);
-			OmnisCore.logger.warn("Ignoring {}", asmData.getClassName());
+			OmnisCore.logger.warn("Ignoring {}", data.getClassName());
 		}
 	}
 
 	public ConfigData processRoots() {
-		for (String rootPackage : containerMap.keySet())
-			containerMap.get(rootPackage).setChildClasses(getAllChildClasses(rootPackage));
+		for (Entry<String, ConfigContainer> entry : containerMap.entrySet())
+			entry.getValue().childClasses(classes(entry.getKey()));
 		return this;
 	}
 
-	public void processConfigContainers(Collection<ICEFactory<?, ? extends ConfigEntry<? extends Annotation, ?>>> annotationMap) {
-		for (ConfigContainer configContainer : containerMap.values()) {
-			configContainer.processAllClasses(annotationMap);
-			configContainer.operateOnConfig(false);
-		}
-	}
-
-	public void load() {
+	public <A extends Annotation, C extends ConfigEntry<A, ?>> void processConfigContainers(Collection<ICEFactory<A, C>> annotationMap) {
 		for (ConfigContainer configContainer : containerMap.values())
-			configContainer.operateOnConfig(false);
+			configContainer.processAllClasses(annotationMap).operate(false);
 	}
 
-	public void save() {
+	public void operate(boolean saveFlag) {
 		for (ConfigContainer configContainer : containerMap.values())
-			configContainer.operateOnConfig(true);
+			configContainer.operate(saveFlag);
 	}
 
-	private File getConfigForPackage(Map<String, Object> annotationInfo) {
+	public void sync(OmnisBuffer buffer, boolean write) {
+		for (ConfigContainer configContainer : containerMap.values())
+			configContainer.sync(buffer, write);
+	}
+
+	private File configForPackage(Map<String, Object> annotationInfo) {
 		String configFile = (String) annotationInfo.get("configFile");
-		if (Strings.isNullOrEmpty(configFile))
+		if (!useable(configFile))
 			return new File(CONFIG_DIR, modId + ".cfg");
 		if (!configFile.endsWith(".cfg"))
 			configFile += ".cfg";
 		return new File(CONFIG_DIR, configFile);
 	}
 
-	private Collection<String> getAllChildClasses(String rootPackage) {
-		ArrayList<String> children = new ArrayList<>();
-		Iterator<String> iterator = ownedClasses.iterator();
-		while (iterator.hasNext()) {
-			String s = iterator.next();
+	private Collection<String> classes(String rootPackage) {
+		List<String> children = new ArrayList<>(8);
+		Iterator<String> it = ownedClasses.iterator();
+		while (it.hasNext()) {
+			String s = it.next();
 			if (s.startsWith(rootPackage)) {
-				iterator.remove();
-				children.add(s.replace("/", "."));
+				it.remove();
+				children.add(s.replace('/', '.'));
 			}
 		}
 		return children;
