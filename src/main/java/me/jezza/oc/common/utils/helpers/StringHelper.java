@@ -145,23 +145,4 @@ public enum StringHelper {
 		}
 		lines.add(sb.toString());
 	}
-
-	/**
-	 * Finds the first useable string.
-	 *
-	 * @param first  - The first String to check.
-	 * @param second - The second String to check.
-	 * @param others - The rest to check.
-	 * @return - the first String that passes {@link StringHelper#useable(CharSequence)}, null otherwise.
-	 */
-	public static String firstUseable(String first, String second, String... others) {
-		if (useable(first))
-			return first;
-		if (useable(second))
-			return second;
-		for (String other : others)
-			if (useable(other))
-				return other;
-		return null;
-	}
 }

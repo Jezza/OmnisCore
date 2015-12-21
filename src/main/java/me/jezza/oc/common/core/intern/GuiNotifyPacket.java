@@ -1,4 +1,4 @@
-package me.jezza.oc.common.core.channel;
+package me.jezza.oc.common.core.intern;
 
 import io.netty.channel.ChannelHandlerContext;
 import me.jezza.oc.client.gui.interfaces.IGuiMessageHandler;

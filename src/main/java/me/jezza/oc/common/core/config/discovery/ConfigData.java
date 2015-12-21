@@ -2,9 +2,11 @@ package me.jezza.oc.common.core.config.discovery;
 
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import me.jezza.oc.OmnisCore;
-import me.jezza.oc.common.core.channel.OmnisBuffer;
 import me.jezza.oc.common.core.config.ConfigEntry;
 import me.jezza.oc.common.core.config.ICEFactory;
+import me.jezza.oc.common.interfaces.InputBuffer;
+import me.jezza.oc.common.interfaces.OutputBuffer;
+import net.minecraft.entity.player.EntityPlayer;
 import org.apache.commons.lang3.ClassUtils;
 
 import java.io.File;
@@ -69,9 +71,14 @@ public class ConfigData {
 			configContainer.operate(saveFlag);
 	}
 
-	public void sync(OmnisBuffer buffer, boolean write) {
+	public void writeSync(EntityPlayer player, OutputBuffer buffer) {
 		for (ConfigContainer configContainer : containerMap.values())
-			configContainer.sync(buffer, write);
+			configContainer.writeSync(player, buffer);
+	}
+
+	public void readSync(InputBuffer buffer) {
+		for (ConfigContainer configContainer : containerMap.values())
+			configContainer.readSync(buffer);
 	}
 
 	private File configForPackage(Map<String, Object> annotationInfo) {

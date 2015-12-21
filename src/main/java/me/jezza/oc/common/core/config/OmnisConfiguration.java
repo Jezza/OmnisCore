@@ -93,7 +93,7 @@ public class OmnisConfiguration extends Configuration {
 	}
 
 	public double getDouble(String category, String key, double defaultValue) {
-		return getDoubleProperty(category, key, defaultValue, (String) null, Double.MIN_VALUE, Double.MAX_VALUE).getDouble();
+		return getDoubleProperty(category, key, defaultValue, null, Double.MIN_VALUE, Double.MAX_VALUE).getDouble();
 	}
 
 	public double getDouble(String category, String key, double defaultValue, String comment) {
@@ -105,7 +105,7 @@ public class OmnisConfiguration extends Configuration {
 	}
 
 	public Property getDoubleProperty(String category, String key, double defaultValue) {
-		return getDoubleProperty(category, key, defaultValue, (String) null, Double.MIN_VALUE, Double.MAX_VALUE);
+		return getDoubleProperty(category, key, defaultValue, null, Double.MIN_VALUE, Double.MAX_VALUE);
 	}
 
 	public Property getDoubleProperty(String category, String key, double defaultValue, String comment) {

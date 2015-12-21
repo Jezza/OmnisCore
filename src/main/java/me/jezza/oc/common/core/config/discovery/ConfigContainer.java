@@ -3,11 +3,13 @@ package me.jezza.oc.common.core.config.discovery;
 import com.google.common.base.Throwables;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import me.jezza.oc.OmnisCore;
-import me.jezza.oc.common.core.channel.OmnisBuffer;
 import me.jezza.oc.common.core.config.ConfigEntry;
 import me.jezza.oc.common.core.config.ICEFactory;
 import me.jezza.oc.common.core.config.OmnisConfiguration;
+import me.jezza.oc.common.interfaces.InputBuffer;
+import me.jezza.oc.common.interfaces.OutputBuffer;
 import me.jezza.oc.common.utils.ASM;
+import net.minecraft.entity.player.EntityPlayer;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
@@ -77,8 +79,13 @@ public class ConfigContainer {
 			configEntry.processFields(saveFlag);
 	}
 
-	public void sync(OmnisBuffer buffer, boolean write) {
+	public void writeSync(EntityPlayer player, OutputBuffer buffer) {
 		for (ConfigEntry<? extends Annotation, ?> configEntry : annotationMap.values())
-			configEntry.syncFields(buffer, write);
+			configEntry.writeSync(player, buffer);
+	}
+
+	public void readSync(InputBuffer buffer) {
+		for (ConfigEntry<? extends Annotation, ?> configEntry : annotationMap.values())
+			configEntry.readSync(buffer);
 	}
 }

@@ -5,9 +5,16 @@ import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
+import cpw.mods.fml.common.network.FMLNetworkEvent.ClientDisconnectionFromServerEvent;
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.OmnisCore;
 import me.jezza.oc.common.core.config.discovery.ConfigData;
+import me.jezza.oc.common.core.intern.ConfigSyncPacket;
+import me.jezza.oc.common.interfaces.InputBuffer;
+import me.jezza.oc.common.interfaces.OutputBuffer;
 import me.jezza.oc.common.utils.ASM;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.config.Configuration;
 import org.apache.commons.lang3.ClassUtils;
 
@@ -37,8 +44,7 @@ public final class ConfigHandler {
 			return;
 		INSTANCE = new ConfigHandler();
 		INSTANCE.parseControllers();
-		if (OmnisCore.proxy.isServer())
-			FMLCommonHandler.instance().bus().register(INSTANCE);
+		FMLCommonHandler.instance().bus().register(INSTANCE);
 	}
 
 	private ConfigHandler() {
@@ -119,9 +125,27 @@ public final class ConfigHandler {
 	}
 
 	@SubscribeEvent
+	@SideOnly(Side.SERVER)
 	public void onPlayerLogin(PlayerLoggedInEvent event) {
-//		for (ConfigData configData : configMap.values())
-//			configData.sync(buffer, true);
+		EntityPlayer player = event.player;
+		OmnisCore.channel.sendTo(new ConfigSyncPacket(player), player);
+	}
+
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onClientDisconnect(ClientDisconnectionFromServerEvent event) {
+		for (ConfigData configData : configMap.values())
+			configData.operate(false);
+	}
+
+	public static void writeSync(EntityPlayer player, OutputBuffer output) {
+		for (ConfigData configData : configMap.values())
+			configData.writeSync(player, output);
+	}
+
+	public static void readSync(InputBuffer output) {
+		for (ConfigData configData : configMap.values())
+			configData.readSync(output);
 	}
 
 	@Override

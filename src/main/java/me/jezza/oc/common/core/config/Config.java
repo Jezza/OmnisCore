@@ -38,6 +38,12 @@ public class Config {
 
 	@Target(ElementType.FIELD)
 	@Retention(RetentionPolicy.RUNTIME)
+	public @interface ConfigKey {
+		String value();
+	}
+
+	@Target(ElementType.FIELD)
+	@Retention(RetentionPolicy.RUNTIME)
 	@ConfigAnnotation(CEBoolean.class)
 	public @interface ConfigBoolean {
 		String category();

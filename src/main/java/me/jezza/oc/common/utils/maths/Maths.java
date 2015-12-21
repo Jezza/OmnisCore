@@ -61,11 +61,23 @@ public class Maths {
 		return value < min ? min : value > max ? max : value;
 	}
 
-	public static int interpolate(int a, int b, int d) {
+	public static float interpolate(int a, int b, float d) {
+		return a + (b - a) * d;
+	}
+
+	public static double interpolate(int a, int b, double d) {
 		return a + (b - a) * d;
 	}
 
 	public static float interpolate(float a, float b, float d) {
+		return a + (b - a) * d;
+	}
+
+	public static double interpolate(float a, float b, double d) {
+		return a + (b - a) * d;
+	}
+
+	public static double interpolate(double a, double b, float d) {
 		return a + (b - a) * d;
 	}
 

@@ -3,9 +3,14 @@ package me.jezza.oc.common.core.config.entries;
 import me.jezza.oc.common.core.config.Config.ConfigString;
 import me.jezza.oc.common.core.config.ConfigEntry;
 import me.jezza.oc.common.core.config.OmnisConfiguration;
-import me.jezza.oc.common.utils.helpers.StringHelper;
+import me.jezza.oc.common.core.config.discovery.AnnotatedField;
+import me.jezza.oc.common.interfaces.InputBuffer;
+import me.jezza.oc.common.interfaces.OutputBuffer;
+import net.minecraft.entity.player.EntityPlayer;
 
 import java.lang.reflect.Field;
+
+import static me.jezza.oc.common.utils.helpers.StringHelper.useable;
 
 public class CEString extends ConfigEntry<ConfigString, String> {
 	public CEString(OmnisConfiguration config) {
@@ -18,14 +23,30 @@ public class CEString extends ConfigEntry<ConfigString, String> {
 	}
 
 	@Override
-	public Object load(OmnisConfiguration config, Field field, String fieldName, ConfigString annotation, String currentValue, String defaultValue) {
-		String comment = processComment(annotation.comment());
-		return config.getString(annotation.category(), StringHelper.firstUseable(annotation.name(), fieldName), defaultValue, comment, annotation.validValues());
+	protected String fieldName(Field field, ConfigString annotation) {
+		String name = annotation.name();
+		return useable(name) ? name : super.fieldName(field, annotation);
 	}
 
 	@Override
-	public void save(OmnisConfiguration config, Field field, String fieldName, ConfigString annotation, String currentValue, String defaultValue) {
+	public Object load(OmnisConfiguration config, Field field, String name, ConfigString annotation, String currentValue, String defaultValue) {
 		String comment = processComment(annotation.comment());
-		config.getStringProperty(annotation.category(), StringHelper.firstUseable(annotation.name(), fieldName), defaultValue, comment, annotation.validValues()).set(currentValue);
+		return config.getString(annotation.category(), name, defaultValue, comment, annotation.validValues());
+	}
+
+	@Override
+	public void save(OmnisConfiguration config, Field field, String name, ConfigString annotation, String currentValue, String defaultValue) {
+		String comment = processComment(annotation.comment());
+		config.getStringProperty(annotation.category(), name, defaultValue, comment, annotation.validValues()).set(currentValue);
+	}
+
+	@Override
+	protected void writeField(EntityPlayer player, OutputBuffer buffer, AnnotatedField<ConfigString, String> wrapper) {
+		buffer.writeString(wrapper.currentValue());
+	}
+
+	@Override
+	protected void readField(InputBuffer buffer, AnnotatedField<ConfigString, String> wrapper) {
+		wrapper.set(buffer.readString());
 	}
 }
