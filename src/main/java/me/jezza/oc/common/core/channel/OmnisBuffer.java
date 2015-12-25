@@ -12,6 +12,8 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 
+import java.util.BitSet;
+
 /**
  * @author Jezza
  */
@@ -97,6 +99,16 @@ public class OmnisBuffer implements InputBuffer, OutputBuffer {
 	}
 
 	@Override
+	public boolean[] readBooleans(int length) {
+		byte[] bytes = readBytes((int) Math.ceil((double) length / 8D));
+		BitSet set = BitSet.valueOf(bytes);
+		boolean[] values = new boolean[length];
+		for (int i = 0; i < length; i++)
+			values[i] = set.get(i);
+		return values;
+	}
+
+	@Override
 	public byte[] readBytes(int length) {
 		return buffer.readBytes(length).array();
 	}
@@ -114,6 +126,14 @@ public class OmnisBuffer implements InputBuffer, OutputBuffer {
 		int[] values = new int[length];
 		for (int i = 0; i < length; i++)
 			values[i] = buffer.readInt();
+		return values;
+	}
+
+	@Override
+	public double[] readDoubles(int length) {
+		double[] values = new double[length];
+		for (int i = 0; i < length; i++)
+			values[i] = buffer.readDouble();
 		return values;
 	}
 
@@ -208,6 +228,15 @@ public class OmnisBuffer implements InputBuffer, OutputBuffer {
 	}
 
 	@Override
+	public OutputBuffer writeBooleans(boolean[] array) {
+		BitSet set = new BitSet(array.length);
+		for (int i = 0; i < array.length; i++)
+			set.set(i, array[i]);
+		buffer.writeBytes(set.toByteArray());
+		return this;
+	}
+
+	@Override
 	public OutputBuffer writeBytes(byte[] array) {
 		buffer.writeBytes(array);
 		return this;
@@ -232,6 +261,13 @@ public class OmnisBuffer implements InputBuffer, OutputBuffer {
 		buffer.writeInt(x);
 		buffer.writeInt(y);
 		buffer.writeInt(z);
+		return this;
+	}
+
+	@Override
+	public OutputBuffer writeDoubles(double[] array) {
+		for (double value : array)
+			buffer.writeDouble(value);
 		return this;
 	}
 

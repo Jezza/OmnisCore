@@ -3,7 +3,11 @@ package me.jezza.oc.common.core.config.entries;
 import me.jezza.oc.common.core.config.Config.ConfigIntegerArray;
 import me.jezza.oc.common.core.config.ConfigEntry;
 import me.jezza.oc.common.core.config.OmnisConfiguration;
+import me.jezza.oc.common.core.config.discovery.AnnotatedField;
+import me.jezza.oc.common.interfaces.InputBuffer;
+import me.jezza.oc.common.interfaces.OutputBuffer;
 import me.jezza.oc.common.utils.Classes;
+import net.minecraft.entity.player.EntityPlayer;
 
 import java.lang.reflect.Field;
 
@@ -26,14 +30,28 @@ public class CEIntegerArray extends ConfigEntry<ConfigIntegerArray, int[]> {
 	}
 
 	@Override
-	public Object load(OmnisConfiguration config, Field field, String name, ConfigIntegerArray annotation, int[] currentValue, int[] defaultValue) {
+	protected int[] load(OmnisConfiguration config, AnnotatedField<ConfigIntegerArray, int[]> field) {
+		ConfigIntegerArray annotation = field.annotation();
 		String comment = processComment(annotation.comment());
-		return config.getIntArray(annotation.category(), name, defaultValue, comment, annotation.minValue(), annotation.maxValue(), annotation.maxListLength());
+		return config.getIntArray(annotation.category(), field.name(), field.defaultValue(), comment, annotation.minValue(), annotation.maxValue(), annotation.maxListLength());
 	}
 
 	@Override
-	public void save(OmnisConfiguration config, Field field, String name, ConfigIntegerArray annotation, int[] currentValue, int[] defaultValue) {
+	protected void save(OmnisConfiguration config, AnnotatedField<ConfigIntegerArray, int[]> field) {
+		ConfigIntegerArray annotation = field.annotation();
 		String comment = processComment(annotation.comment());
-		config.getIntArrayProperty(annotation.category(), name, defaultValue, comment, annotation.minValue(), annotation.maxValue(), annotation.maxListLength()).set(currentValue);
+		config.getIntArrayProperty(annotation.category(), field.name(), field.defaultValue(), comment, annotation.minValue(), annotation.maxValue(), annotation.maxListLength()).set(field.currentValue());
+	}
+
+	@Override
+	protected void writeField(EntityPlayer player, OutputBuffer buffer, AnnotatedField<ConfigIntegerArray, int[]> field) {
+		int[] array = field.currentValue();
+		buffer.writeInt(array.length);
+		buffer.writeInts(array);
+	}
+
+	@Override
+	protected int[] readField(InputBuffer buffer, AnnotatedField<ConfigIntegerArray, int[]> field) {
+		return buffer.readInts(buffer.readInt());
 	}
 }

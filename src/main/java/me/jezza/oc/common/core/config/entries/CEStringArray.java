@@ -3,6 +3,10 @@ package me.jezza.oc.common.core.config.entries;
 import me.jezza.oc.common.core.config.Config.ConfigStringArray;
 import me.jezza.oc.common.core.config.ConfigEntry;
 import me.jezza.oc.common.core.config.OmnisConfiguration;
+import me.jezza.oc.common.core.config.discovery.AnnotatedField;
+import me.jezza.oc.common.interfaces.InputBuffer;
+import me.jezza.oc.common.interfaces.OutputBuffer;
+import net.minecraft.entity.player.EntityPlayer;
 
 import java.lang.reflect.Field;
 
@@ -25,14 +29,33 @@ public class CEStringArray extends ConfigEntry<ConfigStringArray, String[]> {
 	}
 
 	@Override
-	public Object load(OmnisConfiguration config, Field field, String name, ConfigStringArray annotation, String[] currentValue, String[] defaultValue) {
+	protected String[] load(OmnisConfiguration config, AnnotatedField<ConfigStringArray, String[]> field) {
+		ConfigStringArray annotation = field.annotation();
 		String comment = processComment(annotation.comment());
-		return config.getStringArray(annotation.category(), name, defaultValue, comment);
+		return config.getStringArray(annotation.category(), field.name(), field.defaultValue(), comment);
 	}
 
 	@Override
-	public void save(OmnisConfiguration config, Field field, String name, ConfigStringArray annotation, String[] currentValue, String[] defaultValue) {
+	protected void save(OmnisConfiguration config, AnnotatedField<ConfigStringArray, String[]> field) {
+		ConfigStringArray annotation = field.annotation();
 		String comment = processComment(annotation.comment());
-		config.getStringArrayProperty(annotation.category(), name, defaultValue, comment).set(currentValue);
+		config.getStringArrayProperty(annotation.category(), field.name(), field.defaultValue(), comment).set(field.currentValue());
+	}
+
+	@Override
+	protected void writeField(EntityPlayer player, OutputBuffer buffer, AnnotatedField<ConfigStringArray, String[]> field) {
+		String[] array = field.currentValue();
+		buffer.writeInt(array.length);
+		for (String value : array)
+			buffer.writeString(value);
+	}
+
+	@Override
+	protected String[] readField(InputBuffer buffer, AnnotatedField<ConfigStringArray, String[]> field) {
+		int length = buffer.readInt();
+		String[] array = new String[length];
+		for (int i = 0; i < length; i++)
+			array[i] = buffer.readString();
+		return array;
 	}
 }

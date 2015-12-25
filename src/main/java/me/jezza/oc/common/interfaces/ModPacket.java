@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used to register a IOmnisPacket.
+ * Used to register a {@link IOmnisPacket}.
  * The value is splitted on the return value from splitter().
  * The values are then treated as mod ids, and the class is registered with those specific channels.
  *
@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Packet {
+public @interface ModPacket {
 	String DEFAULT_SPLITTER = ":";
 
 	/**

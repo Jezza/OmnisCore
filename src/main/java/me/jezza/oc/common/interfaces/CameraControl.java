@@ -14,6 +14,10 @@ public interface CameraControl {
 
 	void onEnd();
 
+	CameraProperties properties();
+
+	CameraProperties properties(int flags);
+
 	void lookAt(double x, double y, double z);
 
 	void execute();

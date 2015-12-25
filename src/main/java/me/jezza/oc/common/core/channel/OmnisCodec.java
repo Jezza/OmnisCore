@@ -14,7 +14,7 @@ import io.netty.channel.ChannelPromise;
 import io.netty.handler.codec.MessageToMessageCodec;
 import me.jezza.oc.OmnisCore;
 import me.jezza.oc.common.interfaces.IOmnisPacket;
-import me.jezza.oc.common.interfaces.Packet;
+import me.jezza.oc.common.interfaces.ModPacket;
 import me.jezza.oc.common.utils.ASM;
 import me.jezza.oc.common.utils.collect.PacketShortHashMap;
 import me.jezza.oc.common.utils.helpers.StringHelper;
@@ -30,7 +30,7 @@ import java.util.Map.Entry;
 
 import static cpw.mods.fml.common.network.NetworkRegistry.FML_CHANNEL;
 import static cpw.mods.fml.common.network.NetworkRegistry.NET_HANDLER;
-import static me.jezza.oc.common.interfaces.Packet.DEFAULT_SPLITTER;
+import static me.jezza.oc.common.interfaces.ModPacket.DEFAULT_SPLITTER;
 import static me.jezza.oc.common.utils.helpers.StringHelper.format;
 import static me.jezza.oc.common.utils.helpers.StringHelper.useable;
 
@@ -45,7 +45,7 @@ public class OmnisCodec extends MessageToMessageCodec<FMLProxyPacket, IOmnisPack
 	protected OmnisCodec(String modId) {
 		List<Class<? extends IOmnisPacket>> classes = dataMap().get(modId);
 		if (classes.isEmpty()) {
-			OmnisCore.logger.info(format("No packet classes found for {}. Please annotate the desired packet classes with @{}", modId, Packet.class.getSimpleName()));
+			OmnisCore.logger.info(format("No packet classes found for {}. Please annotate the desired packet classes with @{}", modId, ModPacket.class.getSimpleName()));
 		} else {
 			packetMap.addAll(classes);
 		}
@@ -54,12 +54,12 @@ public class OmnisCodec extends MessageToMessageCodec<FMLProxyPacket, IOmnisPack
 	private static ListMultimap<String, Class<? extends IOmnisPacket>> dataMap() {
 		if (classMap == null) {
 			classMap = ArrayListMultimap.create();
-			for (Entry<ASMData, Class<?>> entry : ASM.classesWith(Packet.class).entrySet()) {
+			for (Entry<ASMData, Class<?>> entry : ASM.classesWith(ModPacket.class).entrySet()) {
 				Class<?> clazz = entry.getValue();
 				if (!IOmnisPacket.class.isAssignableFrom(clazz))
-					throw new IllegalArgumentException(format("@{} was found on a class that doesn't implement {}.", Packet.class.getSimpleName(), IOmnisPacket.class.getCanonicalName()));
+					throw new IllegalArgumentException(format("@{} was found on a class that doesn't implement {}.", ModPacket.class.getSimpleName(), IOmnisPacket.class.getCanonicalName()));
 				if (Modifier.isAbstract(clazz.getModifiers()))
-					throw new IllegalArgumentException(format("@{} was found on a class that was abstract.", Packet.class.getSimpleName()));
+					throw new IllegalArgumentException(format("@{} was found on a class that was abstract.", ModPacket.class.getSimpleName()));
 				Map<String, Object> info = entry.getKey().getAnnotationInfo();
 				String splitter = (String) info.get("splitter");
 				if (!useable(splitter))
@@ -73,7 +73,7 @@ public class OmnisCodec extends MessageToMessageCodec<FMLProxyPacket, IOmnisPack
 				for (String modId : modIds) {
 					@SuppressWarnings("unchecked")
 					Class<? extends IOmnisPacket> packetClass = (Class<? extends IOmnisPacket>) clazz;
-					OmnisCore.logger.info(StringHelper.format("Discovered @{}({}) on {}", Packet.class.getSimpleName(), modId, packetClass.getCanonicalName()));
+					OmnisCore.logger.info(StringHelper.format("Discovered @{}({}) on {}", ModPacket.class.getSimpleName(), modId, packetClass.getCanonicalName()));
 					classMap.put(modId, packetClass);
 				}
 			}

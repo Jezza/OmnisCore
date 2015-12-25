@@ -3,7 +3,6 @@ package me.jezza.oc.common.utils;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 
@@ -51,24 +50,24 @@ public class RayTrace {
 		Vec3 pos = createPositionVector();
 		Vec3 magnitude = createMagnitudeVector(pos);
 		MovingObjectPosition mop = entity.worldObj.rayTraceBlocks(pos, magnitude, false);
-
 		// Reset position vector, because something changes it.
 		pos = createPositionVector();
-		Vec3 look = entity.getLookVec();
 
+		Vec3 look = entity.getLookVec();
 		Entity hit = null;
 		@SuppressWarnings("unchecked")
 		List<Entity> list = (List<Entity>) entity.worldObj.getEntitiesWithinAABBExcludingEntity(entity, entity.boundingBox.addCoord(look.xCoord * distance, look.yCoord * distance, look.zCoord * distance).expand(1.0D, 1.0D, 1.0D));
-		double smallest = 0.0D;
+		double smallest = Double.MAX_VALUE;
+		if (mop != null)
+			smallest = pos.squareDistanceTo(mop.hitVec); // .squareDistanceTo(mop.blockX, mop.blockY, mop.blockZ);
 		for (int j = list.size() - 1; j >= 0; --j) {
 			Entity potential = list.get(j);
 			if (potential.canBeCollidedWith()) {
 				double borderSize = potential.getCollisionBorderSize();
-				AxisAlignedBB boundingBox = potential.boundingBox.expand(borderSize, borderSize, borderSize);
-				MovingObjectPosition intercept = boundingBox.calculateIntercept(pos, magnitude);
+				MovingObjectPosition intercept = potential.boundingBox.expand(borderSize, borderSize, borderSize).calculateIntercept(pos, magnitude);
 				if (intercept != null) {
-					double distanceTo = pos.distanceTo(intercept.hitVec);
-					if (distanceTo < smallest || smallest == 0.0D) {
+					double distanceTo = pos.squareDistanceTo(intercept.hitVec);
+					if (distanceTo < smallest) {
 						hit = potential;
 						smallest = distanceTo;
 					}

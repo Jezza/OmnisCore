@@ -18,38 +18,39 @@ import java.util.Map;
 
 import static me.jezza.oc.common.utils.helpers.StringHelper.*;
 
-public abstract class ConfigEntry<T extends Annotation, V> {
-	protected final Map<String, AnnotatedField<T, V>> configMap = new LinkedHashMap<>(8);
+public abstract class ConfigEntry<A extends Annotation, V> {
+	protected final Map<String, AnnotatedField<A, V>> configMap = new LinkedHashMap<>(8);
 	protected final OmnisConfiguration config;
 
 	public ConfigEntry(OmnisConfiguration config) {
 		this.config = config;
 	}
 
-	public void add(Field field, T annotation) {
-		String name = field.getDeclaringClass().getCanonicalName() + '.' + field.getName();
+	public void add(Field field, A annotation) {
+		String canonicalName = field.getDeclaringClass().getCanonicalName() + '.' + field.getName();
 		if (!checkField(field))
-			throw error(format("@{} threw an error on {}! Invalid field type.", annotation.annotationType().getSimpleName(), name));
-		if (!configMap.containsKey(name)) {
-			String fieldName = fieldName(field, annotation);
-			configMap.put(name, new AnnotatedField<T, V>(field, annotation, fieldName));
-		}
+			throw error(format("@{} threw an error on {}! Invalid field type.", annotation.annotationType().getSimpleName(), canonicalName));
+		if (!configMap.containsKey(canonicalName))
+			configMap.put(canonicalName, newAnnotatedField(field, annotation, fieldName(field, annotation)));
+	}
+
+	protected AnnotatedField<A, V> newAnnotatedField(Field field, A annotation, String name) {
+		return new AnnotatedField<>(field, annotation, name);
 	}
 
 	public void processFields(boolean saveFlag) {
-		for (AnnotatedField<T, V> wrapper : configMap.values()) {
+		for (AnnotatedField<A, V> field : configMap.values()) {
 			if (Debug.console())
-				OmnisCore.logger.info("Operating on: " + wrapper);
+				OmnisCore.logger.info("Operating on: " + field);
 			config.load();
 			try {
-				if (!saveFlag) {
-					Object object = load(config, wrapper.field(), wrapper.name(), wrapper.annotation(), wrapper.currentValue(), wrapper.defaultValue());
-					wrapper.field().set(null, object);
+				if (saveFlag) {
+					save(config, field);
 				} else {
-					save(config, wrapper.field(), wrapper.name(), wrapper.annotation(), wrapper.currentValue(), wrapper.defaultValue());
+					field.set(load(config, field));
 				}
 			} catch (Exception e) {
-				OmnisCore.logger.log(Level.FATAL, format("Failed to configure field: {}", wrapper), e);
+				OmnisCore.logger.log(Level.FATAL, format("Failed to configure field: {}", field), e);
 			} finally {
 				if (config.hasChanged())
 					config.save();
@@ -58,17 +59,15 @@ public abstract class ConfigEntry<T extends Annotation, V> {
 	}
 
 	public void writeSync(EntityPlayer player, OutputBuffer buffer) {
-		for (AnnotatedField<T, V> wrapper : configMap.values()) {
-			if (canSync(wrapper))
-				writeField(player, buffer, wrapper);
-		}
+		for (AnnotatedField<A, V> field : configMap.values())
+			if (canSync(field))
+				writeField(player, buffer, field);
 	}
 
 	public void readSync(InputBuffer buffer) {
-		for (AnnotatedField<T, V> wrapper : configMap.values()) {
-			if (canSync(wrapper))
-				readField(buffer, wrapper);
-		}
+		for (AnnotatedField<A, V> field : configMap.values())
+			if (canSync(field))
+				field.set(readField(buffer, field));
 	}
 
 	/**
@@ -78,7 +77,7 @@ public abstract class ConfigEntry<T extends Annotation, V> {
 	 * @param annotation - The annotation that is attached to the field.
 	 * @return - The name that the field should be known by.
 	 */
-	protected String fieldName(Field field, T annotation) {
+	protected String fieldName(Field field, A annotation) {
 		ConfigKey key = field.getAnnotation(ConfigKey.class);
 		return key != null ? key.value() : StringHelper.convertToLowerSnakeCase(field.getName());
 	}
@@ -88,11 +87,11 @@ public abstract class ConfigEntry<T extends Annotation, V> {
 	 * and {@link #readField(InputBuffer, AnnotatedField)} are overridden.
 	 * By default, it passes the entire method off to {@link AnnotatedField#canSync()}.
 	 *
-	 * @param wrapper - The wrapper object that is used for handling the field and the attached annotation.
+	 * @param field - The object that is used for handling the field and the attached annotation.
 	 * @return - true, if the field can be sent to the client.
 	 */
-	protected boolean canSync(AnnotatedField<T, V> wrapper) {
-		return wrapper.canSync();
+	protected boolean canSync(AnnotatedField<A, V> field) {
+		return field.canSync();
 	}
 
 	/**
@@ -148,31 +147,37 @@ public abstract class ConfigEntry<T extends Annotation, V> {
 	protected abstract boolean checkField(Field field);
 
 	/**
-	 * @param config       -   The config instance of the file that the system determined was the correct hierarchy
-	 * @param field        -   The field that has the annotation.
-	 * @param name         -   The name of the field that has the annotation. Typically used for the key in the config file.
-	 * @param annotation   -   The annotation type that was applied to the field.
-	 * @param currentValue -   The value, if any, already assigned to the field. Can be the same as defaultValue
-	 * @param defaultValue -   The default value, if any, assigned to the field on startup.
-	 * @return -   The field is set to this value. It can be null.
+	 * @param config - The config instance of the file that the system determined was the correct hierarchy
+	 * @param field  - The field that was annotated.
+	 * @return - The field is set to this value. It can be null.
 	 */
-	protected abstract Object load(OmnisConfiguration config, Field field, String name, T annotation, V currentValue, V defaultValue);
+	protected abstract V load(OmnisConfiguration config, AnnotatedField<A, V> field);
 
 	/**
-	 * @param config       -   The config instance of the file that the system determined was the correct hierarchy
-	 * @param field        -   The field that has the annotation.
-	 * @param name         -   The name of the field that has the annotation. Typically used for the key in the config file.
-	 * @param annotation   -   The annotation type that was applied to the field.
-	 * @param currentValue -   The value, if any, already assigned to the field.
-	 * @param defaultValue -   The default value, if any, assigned to the field on startup.
+	 * @param config - The config instance of the file that the system determined was the correct hierarchy
+	 * @param field  - The field that was annotated.
 	 */
-	protected abstract void save(OmnisConfiguration config, Field field, String name, T annotation, V currentValue, V defaultValue);
+	protected abstract void save(OmnisConfiguration config, AnnotatedField<A, V> field);
 
-	protected void writeField(EntityPlayer player, OutputBuffer buffer, AnnotatedField<T, V> wrapper) {
-		throw error("@{} writeField has not implemented on @{}.", ConfigSync.class.getSimpleName(), wrapper.annotation().annotationType().getSimpleName());
+	/**
+	 * Used to write the fields value to an {@link OutputBuffer}, so it can be read and set on the client.
+	 *
+	 * @param player - The player that was logging on.
+	 * @param buffer - The buffer to write to.
+	 * @param field  - The field that is being sent.
+	 */
+	protected void writeField(EntityPlayer player, OutputBuffer buffer, AnnotatedField<A, V> field) {
+		throw error("@{} writeField has not implemented on @{}.", ConfigSync.class.getSimpleName(), field.annotation().annotationType().getSimpleName());
 	}
 
-	protected void readField(InputBuffer buffer, AnnotatedField<T, V> wrapper) {
-		throw error("@{} readField has not implemented on @{}.", ConfigSync.class.getSimpleName(), wrapper.annotation().annotationType().getSimpleName());
+	/**
+	 * Used to set the field from the values read out of an {@link InputBuffer}.
+	 *
+	 * @param buffer - The buffer to read from.
+	 * @param field  - The field that is being read.
+	 * @return - the value to set the field.
+	 */
+	protected V readField(InputBuffer buffer, AnnotatedField<A, V> field) {
+		throw error("@{} readField has not implemented on @{}.", ConfigSync.class.getSimpleName(), field.annotation().annotationType().getSimpleName());
 	}
 }

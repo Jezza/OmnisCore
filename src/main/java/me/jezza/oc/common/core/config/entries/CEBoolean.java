@@ -3,7 +3,11 @@ package me.jezza.oc.common.core.config.entries;
 import me.jezza.oc.common.core.config.Config.ConfigBoolean;
 import me.jezza.oc.common.core.config.ConfigEntry;
 import me.jezza.oc.common.core.config.OmnisConfiguration;
+import me.jezza.oc.common.core.config.discovery.AnnotatedField;
+import me.jezza.oc.common.interfaces.InputBuffer;
+import me.jezza.oc.common.interfaces.OutputBuffer;
 import me.jezza.oc.common.utils.Classes;
+import net.minecraft.entity.player.EntityPlayer;
 
 import java.lang.reflect.Field;
 
@@ -26,12 +30,24 @@ public class CEBoolean extends ConfigEntry<ConfigBoolean, Boolean> {
 	}
 
 	@Override
-	public Object load(OmnisConfiguration config, Field field, String name, ConfigBoolean annotation, Boolean currentValue, Boolean defaultValue) {
-		return config.getBoolean(annotation.category(), name, defaultValue, processComment(annotation.comment()));
+	public Boolean load(OmnisConfiguration config, AnnotatedField<ConfigBoolean, Boolean> field) {
+		ConfigBoolean annotation = field.annotation();
+		return config.getBoolean(annotation.category(), field.name(), field.defaultValue(), processComment(annotation.comment()));
 	}
 
 	@Override
-	public void save(OmnisConfiguration config, Field field, String name, ConfigBoolean annotation, Boolean currentValue, Boolean defaultValue) {
-		config.getBooleanProperty(annotation.category(), name, defaultValue, processComment(annotation.comment())).set(currentValue);
+	public void save(OmnisConfiguration config, AnnotatedField<ConfigBoolean, Boolean> field) {
+		ConfigBoolean annotation = field.annotation();
+		config.getBooleanProperty(annotation.category(), field.name(), field.defaultValue(), processComment(annotation.comment())).set(field.currentValue());
+	}
+
+	@Override
+	protected void writeField(EntityPlayer player, OutputBuffer buffer, AnnotatedField<ConfigBoolean, Boolean> field) {
+		buffer.writeBoolean(field.currentValue());
+	}
+
+	@Override
+	protected Boolean readField(InputBuffer buffer, AnnotatedField<ConfigBoolean, Boolean> field) {
+		return buffer.readBoolean();
 	}
 }

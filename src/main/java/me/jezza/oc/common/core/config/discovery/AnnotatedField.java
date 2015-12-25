@@ -1,6 +1,7 @@
 package me.jezza.oc.common.core.config.discovery;
 
 import com.google.common.base.Throwables;
+import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.OmnisCore;
 import me.jezza.oc.common.core.config.Config.ConfigSync;
 
@@ -35,22 +36,15 @@ public class AnnotatedField<T extends Annotation, V> {
 	/**
 	 * @return - The field that has been annotated.
 	 */
-	public final Field field() {
+	public final Field raw() {
 		return field;
 	}
 
 	/**
-	 * @return - The annotation that is attached to the field.
+	 * @return - The declared type of the field.
 	 */
-	public final T annotation() {
-		return annotation;
-	}
-
-	/**
-	 * @return - The value of the field at time of startup.
-	 */
-	public final V defaultValue() {
-		return defaultValue;
+	public final Class<?> type() {
+		return field.getType();
 	}
 
 	/**
@@ -61,7 +55,21 @@ public class AnnotatedField<T extends Annotation, V> {
 	}
 
 	/**
-	 * @return The value currently stored in the field, can be null.
+	 * @return - The annotation that is attached to the field.
+	 */
+	public final T annotation() {
+		return annotation;
+	}
+
+	/**
+	 * @return - The default value, if any, assigned to the field on startup.
+	 */
+	public final V defaultValue() {
+		return defaultValue;
+	}
+
+	/**
+	 * @return - The value, if any, currently assigned to the field, can be null.
 	 */
 	@SuppressWarnings("unchecked")
 	public final V currentValue() {
@@ -76,6 +84,9 @@ public class AnnotatedField<T extends Annotation, V> {
 		}
 	}
 
+	/**
+	 * @param value - Assigns the value to the field.
+	 */
 	public final void set(V value) {
 		try {
 			field.set(null, value);
@@ -86,18 +97,27 @@ public class AnnotatedField<T extends Annotation, V> {
 	}
 
 	/**
-	 * Lazily checks if the field has a {@link ConfigSync} has been attached.
+	 * Lazily checks if the field can be synchronised.
 	 *
-	 * @return - true, if {@link ConfigSync} is present on the field.
+	 * @return - true, if the field should be sent to the client.
 	 */
-	public boolean canSync() {
+	public final boolean canSync() {
 		if (sync == null)
-			sync = field.isAnnotationPresent(ConfigSync.class);
+			sync = calculateSync();
 		return sync;
 	}
 
+	/**
+	 * Override this, if you wish to specify another means the field uses to identify its ability to be sent to the client.
+	 *
+	 * @return - True, if the field can be sent to the client.
+	 */
+	protected boolean calculateSync() {
+		return !field.isAnnotationPresent(SideOnly.class) && field.isAnnotationPresent(ConfigSync.class);
+	}
+
 	@Override
-	public final String toString() {
+	public String toString() {
 		return field.getDeclaringClass().getCanonicalName() + '.' + field.getName() + ", @" + annotation.annotationType().getSimpleName() + ", sync: " + canSync();
 	}
 }

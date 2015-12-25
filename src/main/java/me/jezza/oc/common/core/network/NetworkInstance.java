@@ -17,18 +17,17 @@ import static me.jezza.oc.common.core.network.NetworkResponse.*;
  * Used to add and remove nodes to your network.
  */
 public class NetworkInstance<T extends INetworkNode<T>> {
-
-	private ArrayList<INetworkNodeHandler<T>> networks;
-	private Class<? extends INetworkNodeHandler<T>> nodeHandlerClazz;
+	private List<INetworkNodeHandler<T>> networks;
+	private Class<? extends INetworkNodeHandler<T>> nodeHandlerClass;
 
 	@SuppressWarnings("unchecked")
 	public NetworkInstance() {
 		this((Class) NetworkCore.class);
 	}
 
-	public NetworkInstance(Class<? extends INetworkNodeHandler<T>> nodeHandlerClazz) {
+	public NetworkInstance(Class<? extends INetworkNodeHandler<T>> nodeHandlerClass) {
 		this.networks = new ArrayList<>();
-		this.nodeHandlerClazz = nodeHandlerClazz;
+		this.nodeHandlerClass = nodeHandlerClass;
 	}
 
 	public NodeAdded addNetworkNode(T node) throws NetworkException {
@@ -191,9 +190,9 @@ public class NetworkInstance<T extends INetworkNode<T>> {
 	private INetworkNodeHandler<T> createNodeHandler() throws NetworkCreationException {
 		INetworkNodeHandler<T> nodeHandler;
 		try {
-			nodeHandler = nodeHandlerClazz.newInstance();
+			nodeHandler = nodeHandlerClass.newInstance();
 		} catch (Exception e) {
-			throw new NetworkCreationException(e, "Failed to created INetworkNodeHandler. Class %s", nodeHandlerClazz);
+			throw new NetworkCreationException(e, "Failed to created INetworkNodeHandler. Class %s", nodeHandlerClass);
 		}
 		if (nodeHandler.requiresRegistration())
 			FMLCommonHandler.instance().bus().register(nodeHandler);

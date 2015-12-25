@@ -9,9 +9,6 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import me.jezza.oc.common.CommonProxy;
 import me.jezza.oc.common.core.channel.ChannelDispatcher;
-import me.jezza.oc.common.core.config.Config.ConfigKey;
-import me.jezza.oc.common.core.config.Config.ConfigString;
-import me.jezza.oc.common.core.config.Config.ConfigSync;
 import me.jezza.oc.common.core.config.Config.Controller;
 import me.jezza.oc.common.core.config.ConfigHandler;
 import me.jezza.oc.common.core.network.search.SearchThread;
@@ -35,11 +32,6 @@ public class OmnisCore {
 
 	@SidedChannel(MOD_ID)
 	public static IChannel channel;
-
-	@ConfigSync
-	@ConfigKey("test_field")
-	@ConfigString(category = "testSync")
-	public static String testField = "ThisIsATestForSync";
 
 	public static Logger logger; //  = LogManager.getLogger(MOD_ID);
 

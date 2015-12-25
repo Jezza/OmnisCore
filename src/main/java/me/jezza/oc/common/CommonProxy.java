@@ -1,7 +1,5 @@
 package me.jezza.oc.common;
 
-import me.jezza.oc.OmnisCore;
-
 public class CommonProxy {
 
 	public boolean isClient() {
@@ -20,6 +18,5 @@ public class CommonProxy {
 	}
 
 	public void postInit() {
-		OmnisCore.testField = "Ok, it has appeared to have worked!";
 	}
 }

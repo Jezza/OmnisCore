@@ -5,12 +5,12 @@ import me.jezza.oc.client.gui.interfaces.IGuiMessageHandler;
 import me.jezza.oc.common.interfaces.IOmnisPacket;
 import me.jezza.oc.common.interfaces.InputBuffer;
 import me.jezza.oc.common.interfaces.OutputBuffer;
-import me.jezza.oc.common.interfaces.Packet;
+import me.jezza.oc.common.interfaces.ModPacket;
 import net.minecraft.entity.player.EntityPlayer;
 
 import static me.jezza.oc.common.core.CoreProperties.MOD_ID;
 
-@Packet(MOD_ID)
+@ModPacket(MOD_ID)
 public class GuiNotifyPacket implements IOmnisPacket {
 
 	private int id, process;

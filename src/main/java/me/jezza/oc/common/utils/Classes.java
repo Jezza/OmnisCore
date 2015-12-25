@@ -15,6 +15,8 @@ public enum Classes {
 	}
 
 	public static boolean isType(Class<?> target, Class<?> type, int arrayDepth) {
+		if (arrayDepth < 0)
+			return false;
 		if (target.isArray())
 			return isType(target.getComponentType(), type, arrayDepth - 1);
 		return Primitives.wrap(target) == Primitives.wrap(target);

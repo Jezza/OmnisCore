@@ -29,24 +29,26 @@ public class CEString extends ConfigEntry<ConfigString, String> {
 	}
 
 	@Override
-	public Object load(OmnisConfiguration config, Field field, String name, ConfigString annotation, String currentValue, String defaultValue) {
+	protected String load(OmnisConfiguration config, AnnotatedField<ConfigString, String> field) {
+		ConfigString annotation = field.annotation();
 		String comment = processComment(annotation.comment());
-		return config.getString(annotation.category(), name, defaultValue, comment, annotation.validValues());
+		return config.getString(annotation.category(), field.name(), field.defaultValue(), comment, annotation.validValues());
 	}
 
 	@Override
-	public void save(OmnisConfiguration config, Field field, String name, ConfigString annotation, String currentValue, String defaultValue) {
+	protected void save(OmnisConfiguration config, AnnotatedField<ConfigString, String> field) {
+		ConfigString annotation = field.annotation();
 		String comment = processComment(annotation.comment());
-		config.getStringProperty(annotation.category(), name, defaultValue, comment, annotation.validValues()).set(currentValue);
+		config.getStringProperty(annotation.category(), field.name(), field.defaultValue(), comment, annotation.validValues()).set(field.currentValue());
 	}
 
 	@Override
-	protected void writeField(EntityPlayer player, OutputBuffer buffer, AnnotatedField<ConfigString, String> wrapper) {
-		buffer.writeString(wrapper.currentValue());
+	protected void writeField(EntityPlayer player, OutputBuffer buffer, AnnotatedField<ConfigString, String> field) {
+		buffer.writeString(field.currentValue());
 	}
 
 	@Override
-	protected void readField(InputBuffer buffer, AnnotatedField<ConfigString, String> wrapper) {
-		wrapper.set(buffer.readString());
+	protected String readField(InputBuffer buffer, AnnotatedField<ConfigString, String> field) {
+		return buffer.readString();
 	}
 }

@@ -3,7 +3,11 @@ package me.jezza.oc.common.core.config.entries;
 import me.jezza.oc.common.core.config.Config.ConfigFloat;
 import me.jezza.oc.common.core.config.ConfigEntry;
 import me.jezza.oc.common.core.config.OmnisConfiguration;
+import me.jezza.oc.common.core.config.discovery.AnnotatedField;
+import me.jezza.oc.common.interfaces.InputBuffer;
+import me.jezza.oc.common.interfaces.OutputBuffer;
 import me.jezza.oc.common.utils.Classes;
+import net.minecraft.entity.player.EntityPlayer;
 
 import java.lang.reflect.Field;
 
@@ -26,14 +30,26 @@ public class CEFloat extends ConfigEntry<ConfigFloat, Float> {
 	}
 
 	@Override
-	public Object load(OmnisConfiguration config, Field field, String name, ConfigFloat annotation, Float currentValue, Float defaultValue) {
+	protected Float load(OmnisConfiguration config, AnnotatedField<ConfigFloat, Float> field) {
+		ConfigFloat annotation = field.annotation();
 		String comment = processComment(annotation.comment());
-		return config.getFloat(annotation.category(), name, defaultValue, annotation.minValue(), annotation.maxValue(), comment);
+		return config.getFloat(annotation.category(), field.name(), field.defaultValue(), annotation.minValue(), annotation.maxValue(), comment);
 	}
 
 	@Override
-	public void save(OmnisConfiguration config, Field field, String name, ConfigFloat annotation, Float currentValue, Float defaultValue) {
+	protected void save(OmnisConfiguration config, AnnotatedField<ConfigFloat, Float> field) {
+		ConfigFloat annotation = field.annotation();
 		String comment = processComment(annotation.comment());
-		config.getFloatProperty(annotation.category(), name, defaultValue, annotation.minValue(), annotation.maxValue(), comment).set(currentValue);
+		config.getFloatProperty(annotation.category(), field.name(), field.defaultValue(), annotation.minValue(), annotation.maxValue(), comment).set(field.currentValue());
+	}
+
+	@Override
+	protected void writeField(EntityPlayer player, OutputBuffer buffer, AnnotatedField<ConfigFloat, Float> field) {
+		buffer.writeFloat(field.currentValue());
+	}
+
+	@Override
+	protected Float readField(InputBuffer buffer, AnnotatedField<ConfigFloat, Float> field) {
+		return buffer.readFloat();
 	}
 }

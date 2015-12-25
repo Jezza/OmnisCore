@@ -3,7 +3,11 @@ package me.jezza.oc.common.core.config.entries;
 import me.jezza.oc.common.core.config.Config.ConfigDouble;
 import me.jezza.oc.common.core.config.ConfigEntry;
 import me.jezza.oc.common.core.config.OmnisConfiguration;
+import me.jezza.oc.common.core.config.discovery.AnnotatedField;
+import me.jezza.oc.common.interfaces.InputBuffer;
+import me.jezza.oc.common.interfaces.OutputBuffer;
 import me.jezza.oc.common.utils.Classes;
+import net.minecraft.entity.player.EntityPlayer;
 
 import java.lang.reflect.Field;
 
@@ -26,14 +30,26 @@ public class CEDouble extends ConfigEntry<ConfigDouble, Double> {
 	}
 
 	@Override
-	public Object load(OmnisConfiguration config, Field field, String name, ConfigDouble annotation, Double currentValue, Double defaultValue) {
+	protected Double load(OmnisConfiguration config, AnnotatedField<ConfigDouble, Double> field) {
+		ConfigDouble annotation = field.annotation();
 		String comment = processComment(annotation.comment());
-		return config.getDouble(annotation.category(), name, defaultValue, comment, annotation.minValue(), annotation.maxValue());
+		return config.getDouble(annotation.category(), field.name(), field.defaultValue(), comment, annotation.minValue(), annotation.maxValue());
 	}
 
 	@Override
-	public void save(OmnisConfiguration config, Field field, String name, ConfigDouble annotation, Double currentValue, Double defaultValue) {
+	protected void save(OmnisConfiguration config, AnnotatedField<ConfigDouble, Double> field) {
+		ConfigDouble annotation = field.annotation();
 		String comment = processComment(annotation.comment());
-		config.getDoubleProperty(annotation.category(), name, defaultValue, comment, annotation.minValue(), annotation.maxValue()).set(currentValue);
+		config.getDoubleProperty(annotation.category(), field.name(), field.defaultValue(), comment, annotation.minValue(), annotation.maxValue()).set(field.currentValue());
+	}
+
+	@Override
+	protected void writeField(EntityPlayer player, OutputBuffer buffer, AnnotatedField<ConfigDouble, Double> field) {
+		buffer.writeDouble(field.currentValue());
+	}
+
+	@Override
+	protected Double readField(InputBuffer buffer, AnnotatedField<ConfigDouble, Double> field) {
+		return buffer.readDouble();
 	}
 }

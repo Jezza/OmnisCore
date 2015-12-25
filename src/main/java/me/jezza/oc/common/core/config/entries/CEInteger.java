@@ -3,7 +3,11 @@ package me.jezza.oc.common.core.config.entries;
 import me.jezza.oc.common.core.config.Config.ConfigInteger;
 import me.jezza.oc.common.core.config.ConfigEntry;
 import me.jezza.oc.common.core.config.OmnisConfiguration;
+import me.jezza.oc.common.core.config.discovery.AnnotatedField;
+import me.jezza.oc.common.interfaces.InputBuffer;
+import me.jezza.oc.common.interfaces.OutputBuffer;
 import me.jezza.oc.common.utils.Classes;
+import net.minecraft.entity.player.EntityPlayer;
 
 import java.lang.reflect.Field;
 
@@ -26,14 +30,26 @@ public class CEInteger extends ConfigEntry<ConfigInteger, Integer> {
 	}
 
 	@Override
-	public Object load(OmnisConfiguration config, Field field, String name, ConfigInteger annotation, Integer currentValue, Integer defaultValue) {
+	protected Integer load(OmnisConfiguration config, AnnotatedField<ConfigInteger, Integer> field) {
+		ConfigInteger annotation = field.annotation();
 		String comment = processComment(annotation.comment());
-		return config.getInt(annotation.category(), name, defaultValue, annotation.minValue(), annotation.maxValue(), comment);
+		return config.getInt(annotation.category(), field.name(), field.defaultValue(), annotation.minValue(), annotation.maxValue(), comment);
 	}
 
 	@Override
-	public void save(OmnisConfiguration config, Field field, String name, ConfigInteger annotation, Integer currentValue, Integer defaultValue) {
+	protected void save(OmnisConfiguration config, AnnotatedField<ConfigInteger, Integer> field) {
+		ConfigInteger annotation = field.annotation();
 		String comment = processComment(annotation.comment());
-		config.getIntProperty(annotation.category(), name, defaultValue, annotation.minValue(), annotation.maxValue(), comment).set(currentValue);
+		config.getIntProperty(annotation.category(), field.name(), field.defaultValue(), annotation.minValue(), annotation.maxValue(), comment).set(field.currentValue());
+	}
+
+	@Override
+	protected void writeField(EntityPlayer player, OutputBuffer buffer, AnnotatedField<ConfigInteger, Integer> field) {
+		buffer.writeInt(field.currentValue());
+	}
+
+	@Override
+	protected Integer readField(InputBuffer buffer, AnnotatedField<ConfigInteger, Integer> field) {
+		return buffer.readInt();
 	}
 }
