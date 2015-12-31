@@ -1,18 +1,19 @@
 package me.jezza.oc.client.lib;
 
+import me.jezza.oc.common.interfaces.Resource;
 import me.jezza.oc.common.interfaces.ResourceRequest;
 
 /**
  * @author Jezza
  */
-public abstract class AbstractResourceRequest<T> extends AbstractRequest implements ResourceRequest<T> {
+public abstract class AbstractResourceRequest<T extends Resource> extends AbstractRequest implements ResourceRequest<T> {
 	private T resource;
 
 	protected AbstractResourceRequest() {
 	}
 
 	@Override
-	protected boolean validAcquisition() {
+	public boolean acquired() {
 		return resource != null;
 	}
 
@@ -29,6 +30,7 @@ public abstract class AbstractResourceRequest<T> extends AbstractRequest impleme
 	@Override
 	public void release() {
 		super.release();
+		resource.invalidate();
 		resource = null;
 	}
 }

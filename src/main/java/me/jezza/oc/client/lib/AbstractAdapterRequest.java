@@ -26,11 +26,11 @@ public abstract class AbstractAdapterRequest<T> extends AbstractRequest implemen
 	}
 
 	@Override
-	protected boolean validAcquisition() {
+	public boolean acquired() {
 		return acquired;
 	}
 
-	public void acquired(boolean acquired) {
+	protected void acquired(boolean acquired) {
 		this.acquired = acquired;
 	}
 

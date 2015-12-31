@@ -2,27 +2,17 @@ package me.jezza.oc.common.utils.collect;
 
 import java.util.*;
 
-/**
- * Built around a linkedHashMap, this data structure exists as an non-intrusive, unweighted, undirected graph.
- * <p/>
- * non-intrusive: Without relying on the nodes to track their connections.
- * Note: I don't create an object to represent a node, but LinkedHashMap does.
- *
- * @param <T>
- */
 public class Graph<T> {
-
-	protected LinkedHashMap<T, Collection<T>> nodeMap;
-	protected int keySize = 0;
+	protected LinkedHashMap<T, Collection<T>> nodeMap = new LinkedHashMap<>();
+	protected int size = 0;
 
 	public Graph() {
-		nodeMap = new LinkedHashMap<>();
 	}
 
 	public boolean addNode(T node) {
 		if (containsNode(node))
 			return false;
-		keySize++;
+		size++;
 		nodeMap.put(node, new ArrayList<T>());
 		return containsNode(node);
 	}
@@ -30,7 +20,7 @@ public class Graph<T> {
 	public boolean removeNode(T node) {
 		if (!containsNode(node))
 			return false;
-		keySize--;
+		size--;
 		Collection<T> nodes = nodeMap.remove(node);
 		for (T adjacentNode : nodes)
 			nodeMap.get(adjacentNode).remove(node);
@@ -68,7 +58,7 @@ public class Graph<T> {
 	}
 
 	public void clear() {
-		keySize = 0;
+		size = 0;
 		nodeMap.clear();
 	}
 
@@ -76,14 +66,14 @@ public class Graph<T> {
 	 * @return number of nodes
 	 */
 	public int size() {
-		return keySize;
+		return size;
 	}
 
 	/**
-	 * @return keySize == 0;
+	 * @return true, if there are no nodes.
 	 */
 	public boolean isEmpty() {
-		return keySize == 0;
+		return size == 0;
 	}
 
 	/**
@@ -99,7 +89,7 @@ public class Graph<T> {
 	 */
 	public void addAll(Map<? extends T, ? extends Collection<T>> map) {
 		nodeMap.putAll(map);
-		keySize = nodeMap.keySet().size();
+		size = nodeMap.keySet().size();
 	}
 
 	/**
@@ -129,7 +119,7 @@ public class Graph<T> {
 				modified = true;
 			}
 		}
-		keySize = keySet.size();
+		size = keySet.size();
 		return modified;
 	}
 
@@ -160,4 +150,9 @@ public class Graph<T> {
 	public String toString() {
 		return nodeMap.toString();
 	}
+
+	private class Node {
+
+	}
+
 }

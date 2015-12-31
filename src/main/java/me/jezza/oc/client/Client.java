@@ -1,6 +1,7 @@
 package me.jezza.oc.client;
 
 import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.RenderTickEvent;
@@ -28,13 +29,14 @@ public final class Client {
 	private Client() {
 	}
 
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void tick(ClientTickEvent event) {
+		Camera.INSTANCE.tick(event);
 		me.jezza.oc.client.Keyboard.INSTANCE.tick(event);
 		Mouse.INSTANCE.tick(event);
 	}
 
-	@SubscribeEvent
+	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void renderTick(RenderTickEvent event) {
 		Camera.INSTANCE.tick(event);
 	}
@@ -75,7 +77,7 @@ public final class Client {
 		MC.mouseHelper.grabMouseCursor();
 	}
 
-	public static void clear() {
+	public static void clearScreen() {
 		MC.displayGuiScreen(null);
 	}
 }

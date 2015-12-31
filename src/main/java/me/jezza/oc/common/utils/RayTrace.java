@@ -59,7 +59,7 @@ public class RayTrace {
 		List<Entity> list = (List<Entity>) entity.worldObj.getEntitiesWithinAABBExcludingEntity(entity, entity.boundingBox.addCoord(look.xCoord * distance, look.yCoord * distance, look.zCoord * distance).expand(1.0D, 1.0D, 1.0D));
 		double smallest = Double.MAX_VALUE;
 		if (mop != null)
-			smallest = pos.squareDistanceTo(mop.hitVec); // .squareDistanceTo(mop.blockX, mop.blockY, mop.blockZ);
+			smallest = pos.squareDistanceTo(mop.hitVec);
 		for (int j = list.size() - 1; j >= 0; --j) {
 			Entity potential = list.get(j);
 			if (potential.canBeCollidedWith()) {

@@ -83,8 +83,13 @@ public final class Keyboard {
 		}
 
 		@Override
-		public void onRelease() {
+		protected void onRelease() {
 			INSTANCE.release();
+		}
+
+		@Override
+		protected void acquired(boolean acquired) {
+			super.acquired(acquired);
 		}
 	}
 }

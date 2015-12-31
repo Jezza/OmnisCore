@@ -104,5 +104,10 @@ public final class Mouse {
 		public void onRelease() {
 			INSTANCE.release();
 		}
+
+		@Override
+		protected void acquired(boolean acquired) {
+			super.acquired(acquired);
+		}
 	}
 }
