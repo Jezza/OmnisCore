@@ -15,7 +15,7 @@ import io.netty.handler.codec.MessageToMessageCodec;
 import me.jezza.oc.OmnisCore;
 import me.jezza.oc.common.interfaces.IOmnisPacket;
 import me.jezza.oc.common.interfaces.ModPacket;
-import me.jezza.oc.common.utils.ASM;
+import me.jezza.oc.common.utils.reflect.ASM;
 import me.jezza.oc.common.utils.collect.PacketShortHashMap;
 import me.jezza.oc.common.utils.helpers.StringHelper;
 import net.minecraft.client.Minecraft;
@@ -96,7 +96,7 @@ public class OmnisCodec extends MessageToMessageCodec<FMLProxyPacket, IOmnisPack
 		try {
 			super.write(ctx, msg, promise);
 		} catch (RuntimeException e) {
-			OmnisCore.logger.error("Caught exception while trying to read from channel: ", e);
+			OmnisCore.logger.error("Caught exception while trying to write to channel: ", e);
 			throw e;
 		}
 	}

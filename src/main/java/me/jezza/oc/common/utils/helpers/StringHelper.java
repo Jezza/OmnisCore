@@ -3,7 +3,9 @@ package me.jezza.oc.common.utils.helpers;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Splitter;
 import cpw.mods.fml.relauncher.ReflectionHelper;
+import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.StatCollector;
 
 import java.util.*;
@@ -17,7 +19,7 @@ public enum StringHelper {
 	public static final char FORMATTING_CHAR = '$';
 	public static final Map<Character, EnumChatFormatting> COLOUR_MAP;
 	public static final String OBJECT_REP = "{}";
-	public static final Splitter WORD_SPLITTER = Splitter.on(' ').omitEmptyStrings();
+	public static final Splitter WORD_SPLITTER = Splitter.on(" ").trimResults().omitEmptyStrings();
 	public static final Splitter NEW_LINE_SPLITTER = Splitter.on('\n').omitEmptyStrings();
 
 	static {
@@ -144,5 +146,53 @@ public enum StringHelper {
 			sb.append(word);
 		}
 		lines.add(sb.toString());
+	}
+
+	public static String[] split(String target) {
+		List<String> strings = WORD_SPLITTER.splitToList(target);
+		return strings.toArray(new String[0]);
+	}
+
+	/**
+	 * Oxford/Serial comma.
+	 * joinNiceString("Science", "Art", "Religion") returns "Science, Art, and Religion"
+	 */
+	public static String joinNiceString(Object[] objects) {
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < objects.length; ++i) {
+			if (i > 0) {
+				builder.append(", ");
+				if (i == objects.length - 1)
+					builder.append("and ");
+			}
+			builder.append(String.valueOf(objects[i]));
+		}
+		return builder.toString();
+	}
+
+	/**
+	 * Oxford/Serial comma.
+	 * joinNiceString("Science", "Art", "Religion") returns "Science, Art, and Religion"
+	 */
+	public static IChatComponent joinNiceString(IChatComponent[] components) {
+		ChatComponentText component = new ChatComponentText("");
+		for (int i = 0; i < components.length; ++i) {
+			if (i > 0) {
+				component.appendText(", ");
+				if (i == components.length - 1)
+					component.appendText("and ");
+			}
+			component.appendSibling(components[i]);
+		}
+		return component;
+	}
+
+	public static boolean startsWith(String[] target, String[] with) {
+		if (with.length > target.length)
+			return false;
+		for (int i = 0; i < with.length; i++)
+			if (!with[i].equals(target[i]))
+				return false;
+		return true;
 	}
 }

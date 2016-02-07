@@ -4,7 +4,6 @@ package me.jezza.oc.common.interfaces;
  * @author Jezza
  */
 public interface RoundingMethod {
-
 	RoundingMethod FLOOR = new RoundingMethod() {
 		@Override
 		public int round(double value) {

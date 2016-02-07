@@ -11,17 +11,17 @@ public class MutableCoordSet extends CoordSet {
 	}
 
 	@Override
-	public int getX() {
+	public int x() {
 		return x;
 	}
 
 	@Override
-	public int getY() {
+	public int y() {
 		return y;
 	}
 
 	@Override
-	public int getZ() {
+	public int z() {
 		return z;
 	}
 
@@ -81,28 +81,9 @@ public class MutableCoordSet extends CoordSet {
 		return this;
 	}
 
-	public static void main(String[] args) {
-		CoordSet two = CoordSet.of(2);
-		System.out.println(two);
-		CoordSet lock = two.lock();
-		System.out.println(lock == two.lock());
-		System.out.println(two.add(2).at(lock));
-		System.out.println(lock);
-	}
-
 	@Override
 	public CoordSet lock() {
 		return lockSet != null ? lockSet : (lockSet = new ImmutableCoordSet());
-	}
-
-	@Override
-	public String toPacketString() {
-		return x + ":" + y + ":" + z;
-	}
-
-	@Override
-	public String toString() {
-		return '[' + toPacketString() + ']';
 	}
 
 	@Override
@@ -115,26 +96,21 @@ public class MutableCoordSet extends CoordSet {
 		return o != null && o instanceof CoordSet && at((CoordSet) o);
 	}
 
-	@Override
-	public CoordSet copy() {
-		return clone();
-	}
-
 	public class ImmutableCoordSet extends CoordSet {
 
 		@Override
-		public int getX() {
-			return MutableCoordSet.this.getX();
+		public int x() {
+			return MutableCoordSet.this.x();
 		}
 
 		@Override
-		public int getY() {
-			return MutableCoordSet.this.getY();
+		public int y() {
+			return MutableCoordSet.this.y();
 		}
 
 		@Override
-		public int getZ() {
-			return MutableCoordSet.this.getZ();
+		public int z() {
+			return MutableCoordSet.this.z();
 		}
 
 		@Override
@@ -175,16 +151,6 @@ public class MutableCoordSet extends CoordSet {
 		@Override
 		public CoordSet lock() {
 			return this;
-		}
-
-		@Override
-		public String toPacketString() {
-			return MutableCoordSet.this.toPacketString();
-		}
-
-		@Override
-		public String toString() {
-			return MutableCoordSet.this.toString();
 		}
 
 		@Override

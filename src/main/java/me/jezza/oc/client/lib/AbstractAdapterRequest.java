@@ -1,7 +1,7 @@
 package me.jezza.oc.client.lib;
 
 import me.jezza.oc.common.interfaces.AdapterRequest;
-import me.jezza.oc.common.utils.ASM;
+import me.jezza.oc.common.utils.reflect.ASM;
 
 /**
  * @author Jezza

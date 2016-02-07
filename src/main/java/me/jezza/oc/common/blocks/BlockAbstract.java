@@ -6,7 +6,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.common.interfaces.IBlockInteract;
 import me.jezza.oc.common.interfaces.IBlockNotifier;
 import me.jezza.oc.common.interfaces.ITileProvider;
-import me.jezza.oc.common.utils.ASM;
+import me.jezza.oc.common.utils.reflect.ASM;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.texture.IIconRegister;

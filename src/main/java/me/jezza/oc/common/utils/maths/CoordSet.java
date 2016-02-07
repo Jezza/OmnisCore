@@ -2,6 +2,7 @@ package me.jezza.oc.common.utils.maths;
 
 import io.netty.buffer.ByteBuf;
 import me.jezza.oc.common.interfaces.Copyable;
+import me.jezza.oc.common.interfaces.RoundingMethod;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -18,20 +19,20 @@ import java.util.regex.Pattern;
  */
 public abstract class CoordSet implements Copyable<CoordSet> {
 	public static final String COORD_SET_NBT_TAG = "CoordSet";
-	public static final Pattern COORD_SET_PATTERN = Pattern.compile("-?\\d+?:-?\\d+?:-?\\d+?");
+	public static final Pattern COORD_SET_PATTERN = Pattern.compile("-?\\d+?:-?\\d+?:-?\\d*");
 
-	public abstract int getX();
+	public abstract int x();
 
-	public abstract int getY();
+	public abstract int y();
 
-	public abstract int getZ();
+	public abstract int z();
 
 	public CoordSet add(int value) {
 		return add(value, value, value);
 	}
 
 	public CoordSet add(CoordSet set) {
-		return add(set.getX(), set.getY(), set.getZ());
+		return add(set.x(), set.y(), set.z());
 	}
 
 	public CoordSet add(ForgeDirection direction) {
@@ -45,7 +46,7 @@ public abstract class CoordSet implements Copyable<CoordSet> {
 	}
 
 	public CoordSet subtract(CoordSet set) {
-		return subtract(set.getX(), set.getY(), set.getZ());
+		return subtract(set.x(), set.y(), set.z());
 	}
 
 	public CoordSet subtract(ForgeDirection direction) {
@@ -59,7 +60,7 @@ public abstract class CoordSet implements Copyable<CoordSet> {
 	}
 
 	public CoordSet multiply(CoordSet set) {
-		return multiply(set.getX(), set.getY(), set.getZ());
+		return multiply(set.x(), set.y(), set.z());
 	}
 
 	public CoordSet multiply(ForgeDirection direction) {
@@ -73,7 +74,7 @@ public abstract class CoordSet implements Copyable<CoordSet> {
 	}
 
 	public CoordSet divide(CoordSet set) {
-		return divide(set.getX(), set.getY(), set.getZ());
+		return divide(set.x(), set.y(), set.z());
 	}
 
 	public CoordSet divide(ForgeDirection direction) {
@@ -83,21 +84,21 @@ public abstract class CoordSet implements Copyable<CoordSet> {
 	public abstract CoordSet divide(int x, int y, int z);
 
 	public boolean at(CoordSet set) {
-		return at(set.getX(), set.getY(), set.getZ());
+		return at(set.x(), set.y(), set.z());
 	}
 
 	public boolean at(int x, int y, int z) {
-		return x == getX() && y == getY() && z == getZ();
+		return x == x() && y == y() && z == z();
 	}
 
 	public boolean isAdjacent(CoordSet coordSet) {
-		return isAdjacent(coordSet.getX(), coordSet.getY(), coordSet.getZ());
+		return isAdjacent(coordSet.x(), coordSet.y(), coordSet.z());
 	}
 
 	public boolean isAdjacent(int x, int y, int z) {
-		int ourX = getX();
-		int ourY = getY();
-		int ourZ = getZ();
+		int ourX = x();
+		int ourY = y();
+		int ourZ = z();
 		if (ourX == x && ourY == y)
 			return ourZ == z - 1 || ourZ == z + 1;
 		if (ourX == x && ourZ == z)
@@ -106,7 +107,7 @@ public abstract class CoordSet implements Copyable<CoordSet> {
 	}
 
 	public boolean within(CoordSet set, double range) {
-		return withinSq(set.getX(), set.getY(), set.getZ(), range * range);
+		return withinSq(set.x(), set.y(), set.z(), range * range);
 	}
 
 	public boolean within(int x, int y, int z, double range) {
@@ -114,7 +115,7 @@ public abstract class CoordSet implements Copyable<CoordSet> {
 	}
 
 	public boolean withinSq(CoordSet set, double rangeSq) {
-		return withinSq(set.getX(), set.getY(), set.getZ(), rangeSq);
+		return withinSq(set.x(), set.y(), set.z(), rangeSq);
 	}
 
 	public boolean withinSq(int x, int y, int z, double rangeSq) {
@@ -122,7 +123,7 @@ public abstract class CoordSet implements Copyable<CoordSet> {
 	}
 
 	public double getDistance(CoordSet set) {
-		return Math.sqrt(getDistanceSq(set.getX(), set.getY(), set.getZ()));
+		return Math.sqrt(getDistanceSq(set.x(), set.y(), set.z()));
 	}
 
 	public double getDistance(int x, int y, int z) {
@@ -130,26 +131,26 @@ public abstract class CoordSet implements Copyable<CoordSet> {
 	}
 
 	public double getDistanceSq(CoordSet set) {
-		return getDistanceSq(set.getX(), set.getY(), set.getZ());
+		return getDistanceSq(set.x(), set.y(), set.z());
 	}
 
 	public double getDistanceSq(int x, int y, int z) {
-		double x2 = x - getX();
-		double y2 = y - getY();
-		double z2 = z - getZ();
+		double x2 = x - x();
+		double y2 = y - y();
+		double z2 = z - z();
 		return x2 * x2 + y2 * y2 + z2 * z2;
 	}
 
 	public boolean isAirBlock(World world) {
-		return world.isAirBlock(getX(), getY(), getZ());
+		return world.isAirBlock(x(), y(), z());
 	}
 
 	public boolean setBlockToAir(World world) {
-		return world.setBlockToAir(getX(), getY(), getZ());
+		return world.setBlockToAir(x(), y(), z());
 	}
 
 	public Block getBlock(IBlockAccess world) {
-		return world.getBlock(getX(), getY(), getZ());
+		return world.getBlock(x(), y(), z());
 	}
 
 	public boolean hasTileEntity(IBlockAccess world) {
@@ -157,7 +158,7 @@ public abstract class CoordSet implements Copyable<CoordSet> {
 	}
 
 	public TileEntity getTileEntity(IBlockAccess world) {
-		return world.getTileEntity(getX(), getY(), getZ());
+		return world.getTileEntity(x(), y(), z());
 	}
 
 	public abstract CoordSet chunkCoords();
@@ -169,13 +170,13 @@ public abstract class CoordSet implements Copyable<CoordSet> {
 	public abstract CoordSet lock();
 
 	public int[] asArray() {
-		return new int[]{getX(), getY(), getZ()};
+		return new int[]{x(), y(), z()};
 	}
 
 	public void writeBytes(ByteBuf bytes) {
-		bytes.writeInt(getX());
-		bytes.writeInt(getY());
-		bytes.writeInt(getZ());
+		bytes.writeInt(x());
+		bytes.writeInt(y());
+		bytes.writeInt(z());
 	}
 
 	public void writeToNBT(NBTTagCompound tag) {
@@ -197,10 +198,14 @@ public abstract class CoordSet implements Copyable<CoordSet> {
 		return clone();
 	}
 
-	public abstract String toPacketString();
-
 	@Override
-	public abstract String toString();
+	public String toString() {
+		return Integer.toString(x()) + ':' + Integer.toString(y()) + ':' + Integer.toString(z());
+	}
+
+	public String toPacketString() {
+		return "[" + toString() + ']';
+	}
 
 	@Override
 	public abstract int hashCode();

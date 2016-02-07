@@ -8,7 +8,7 @@ import me.jezza.oc.common.core.config.ICEFactory;
 import me.jezza.oc.common.core.config.OmnisConfiguration;
 import me.jezza.oc.common.interfaces.InputBuffer;
 import me.jezza.oc.common.interfaces.OutputBuffer;
-import me.jezza.oc.common.utils.ASM;
+import me.jezza.oc.common.utils.reflect.ASM;
 import net.minecraft.entity.player.EntityPlayer;
 
 import java.io.File;

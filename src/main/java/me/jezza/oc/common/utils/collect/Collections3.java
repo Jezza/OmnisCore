@@ -1,6 +1,7 @@
 package me.jezza.oc.common.utils.collect;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -15,22 +16,22 @@ public class Collections3 {
 	}
 
 	public static <T> List<T> filter(List<T> unfiltered, Predicate<T> predicate) {
-		return (List<T>) filter((Collection<T>) unfiltered, new ArrayList<T>(unfiltered.size()), predicate);
+		return filter((Collection<T>) unfiltered, new ArrayList<T>(unfiltered.size()), predicate);
 	}
 
 	public static <T> List<T> filter(List<T> unfiltered, List<T> populator, Predicate<T> predicate) {
-		return (List<T>) filter((Collection<T>) unfiltered, populator, predicate);
+		return filter((Collection<T>) unfiltered, populator, predicate);
 	}
 
 	public static <T> Set<T> filter(Set<T> unfiltered, Predicate<T> predicate) {
-		return (Set<T>) filter((Collection<T>) unfiltered, new HashSet<T>(unfiltered.size()), predicate);
+		return filter((Collection<T>) unfiltered, new HashSet<T>(unfiltered.size()), predicate);
 	}
 
 	public static <T> Set<T> filter(Set<T> unfiltered, Set<T> populator, Predicate<T> predicate) {
-		return (Set<T>) filter((Collection<T>) unfiltered, populator, predicate);
+		return filter((Collection<T>) unfiltered, populator, predicate);
 	}
 
-	public static <T> Collection<T> filter(Collection<T> unfiltered, Collection<T> populator, Predicate<T> predicate) {
+	public static <C extends Collection<T>, T> C filter(Collection<T> unfiltered, C populator, Predicate<T> predicate) {
 		for (T t : unfiltered)
 			if (predicate.apply(t))
 				populator.add(t);
@@ -63,16 +64,49 @@ public class Collections3 {
 		return populator;
 	}
 
-	public static <T> Collection<T> add(Collection<T> collection, T item, Predicate<T> predicate) {
-		if (predicate.apply(item))
-			collection.add(item);
-		return collection;
-	}
-
-	public static <T> Collection<T> addAll(Collection<T> collection, Collection<T> items, Predicate<T> predicate) {
+	public static <C extends Collection<T>, T> C addAll(C collection, Collection<T> items, Predicate<T> predicate) {
 		for (T item : items)
 			if (predicate.apply(item))
 				collection.add(item);
 		return collection;
 	}
+
+	public static <T> Collection<T> unmodifiable(Collection<T> collection) {
+		if (collection == null || collection.isEmpty())
+			return Collections.emptySet();
+		if (collection.size() == 1) {
+			T first = Iterables.getFirst(collection, null);
+			return first != null ? Collections.singleton(first) : Collections.<T>emptySet();
+		}
+		return Collections.unmodifiableCollection(collection);
+	}
+
+	public static <T> Set<T> unmodifiable(Set<T> set) {
+		if (set == null || set.isEmpty())
+			return Collections.emptySet();
+		if (set.size() == 1) {
+			T first = Iterables.getFirst(set, null);
+			return first != null ? Collections.singleton(first) : Collections.<T>emptySet();
+		}
+		return Collections.unmodifiableSet(set);
+	}
+
+	public static <T> List<T> unmodifiable(List<T> list) {
+		if (list == null || list.isEmpty())
+			return Collections.emptyList();
+		if (list.size() == 1)
+			return Collections.singletonList(list.get(0));
+		return Collections.unmodifiableList(list);
+	}
+
+	public static <K, V> Map<K, V> unmodifiable(Map<K, V> map) {
+		if (map == null || map.isEmpty())
+			return Collections.emptyMap();
+		if (map.size() == 1) {
+			Entry<K, V> first = Iterables.getFirst(map.entrySet(), null);
+			return first != null ? Collections.singletonMap(first.getKey(), first.getValue()) : Collections.<K, V>emptyMap();
+		}
+		return Collections.unmodifiableMap(map);
+	}
+
 }

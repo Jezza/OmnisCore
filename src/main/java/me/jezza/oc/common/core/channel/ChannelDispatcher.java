@@ -12,7 +12,7 @@ import me.jezza.oc.OmnisCore;
 import me.jezza.oc.common.core.config.Config.ConfigDouble;
 import me.jezza.oc.common.interfaces.IChannel;
 import me.jezza.oc.common.interfaces.SidedChannel;
-import me.jezza.oc.common.utils.ASM;
+import me.jezza.oc.common.utils.reflect.ASM;
 import me.jezza.oc.common.utils.Mods;
 import me.jezza.oc.common.utils.helpers.StringHelper;
 

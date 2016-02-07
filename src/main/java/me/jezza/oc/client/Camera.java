@@ -8,7 +8,7 @@ import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.OmnisCore;
 import me.jezza.oc.client.lib.AbstractResourceRequest;
 import me.jezza.oc.common.interfaces.CameraAction;
-import me.jezza.oc.common.utils.ASM;
+import me.jezza.oc.common.utils.reflect.ASM;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 
@@ -20,11 +20,13 @@ import java.util.concurrent.LinkedBlockingDeque;
 @SideOnly(Side.CLIENT)
 public final class Camera {
 	private static final LinkedBlockingDeque<CameraRequest> REQUESTS = new LinkedBlockingDeque<>();
-	private static final LinkedBlockingDeque<CameraAction> ACTIONS = new LinkedBlockingDeque<>();
+	protected static final LinkedBlockingDeque<CameraAction> ACTIONS = new LinkedBlockingDeque<>();
 	protected static final Camera INSTANCE = new Camera();
 
 	private CameraRequest activeRequest;
 	private CameraAction activeAction;
+	private boolean stateStored = false;
+	private boolean actionFinished = false;
 
 	private Camera() {
 	}
@@ -64,20 +66,32 @@ public final class Camera {
 	}
 
 	public void tick(RenderTickEvent event) {
+		EntityLivingBase view = Minecraft.getMinecraft().renderViewEntity;
+		if (view == null) {
+			activeAction = null;
+			ACTIONS.clear();
+			return;
+		}
 		if (activeAction != null) {
-			EntityLivingBase view = Minecraft.getMinecraft().renderViewEntity;
-			if (view == null) {
-				ACTIONS.clear();
-				return;
+			if (!stateStored) {
+				stateStored = true;
+				activeAction.storeState(view, event.renderTickTime);
 			}
-			if (activeAction.cameraRender(event, view))
+			if (event.phase == Phase.START) {
+				actionFinished = activeAction.cameraRender(view, event.renderTickTime);
+			} else if (actionFinished) {
+				activeAction.restoreState(view, event.renderTickTime);
 				activeAction = null;
+			}
 			return;
 		}
 		if (ACTIONS.isEmpty())
 			return;
 		while (activeAction == null && !ACTIONS.isEmpty())
 			activeAction = ACTIONS.pollFirst();
+		// Just make sure it's been reset.
+		actionFinished = false;
+		stateStored = false;
 	}
 
 	public static void queue(CameraAction action) {
@@ -86,16 +100,19 @@ public final class Camera {
 		ACTIONS.offerLast(action);
 	}
 
-	protected static void internalQueue(CameraAction action) {
-		ACTIONS.offerLast(action);
+	public static CameraRequest request() {
+		// TODO Should probably clear all actions, and then stop any more actions being queued.
+		throw new UnsupportedOperationException("Not Yet Implemented!");
+//		String modId = ASM.callingMod().getModId();
+//		CameraRequest request = new CameraRequest(modId);
+//		OmnisCore.logger.info(request.modId + " requested Camera control.");
+//		REQUESTS.offerLast(request);
+//		return request;
 	}
 
-	public static CameraRequest request() {
-		String modId = ASM.callingMod().getModId();
-		CameraRequest request = new CameraRequest(modId);
-		OmnisCore.logger.info(request.modId + " requested Camera control.");
-		REQUESTS.offerLast(request);
-		return request;
+	public static CameraControl control() {
+		throw new UnsupportedOperationException("Not Yet Implemented!");
+		// return new CameraControl();
 	}
 
 	public static class CameraRequest extends AbstractResourceRequest<CameraControl> {

@@ -129,10 +129,25 @@ public enum ASM {
 		return acf;
 	}
 
-	public static ModContainer overrideAC(ModContainer container) throws IllegalAccessException {
-		ModContainer oldContainer = acf().get(loadController());
-		acf().set(loadController(), container);
-		return oldContainer;
+	public static ModContainer overrideAC(ModContainer container) {
+		try {
+			ModContainer oldContainer = acf().get(loadController());
+			acf().set(loadController(), container);
+			return oldContainer;
+		} catch (IllegalAccessException e) {
+			throw Throwables.propagate(e);
+		}
+	}
+
+	public static void runWithContainer(ModContainer container, Runnable runnable) {
+		try {
+			ModContainer oldContainer = acf().get(loadController());
+			acf().set(loadController(), container);
+			runnable.run();
+			acf().set(loadController(), oldContainer);
+		} catch (IllegalAccessException e) {
+			throw Throwables.propagate(e);
+		}
 	}
 
 	public static Class<?>[] callingStack() {
@@ -284,5 +299,9 @@ public enum ASM {
 		} catch (NoSuchMethodException e) {
 			throw Throwables.propagate(e);
 		}
+	}
+
+	public static <T> TypedField<T> findTypedFind(Class<?> clazz, Class<T> type, String... fieldNames) {
+		return TypedField.find(clazz, type, fieldNames);
 	}
 }

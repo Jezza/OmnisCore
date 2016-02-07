@@ -11,6 +11,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import org.lwjgl.input.Keyboard;
 
+import java.util.List;
+
 import static org.lwjgl.input.Keyboard.*;
 
 @SideOnly(Side.CLIENT)
@@ -18,6 +20,7 @@ public final class Client {
 	private static final Minecraft MC = Minecraft.getMinecraft();
 	private static final Client INSTANCE = new Client();
 	private static boolean init = false;
+	private static List<String> sentMessages;
 
 	public static void init() {
 		if (init)
@@ -31,7 +34,7 @@ public final class Client {
 
 	@SubscribeEvent(priority = EventPriority.HIGHEST)
 	public void tick(ClientTickEvent event) {
-		Camera.INSTANCE.tick(event);
+		// Camera.INSTANCE.tick(event);
 		me.jezza.oc.client.Keyboard.INSTANCE.tick(event);
 		Mouse.INSTANCE.tick(event);
 	}
@@ -79,5 +82,12 @@ public final class Client {
 
 	public static void clearScreen() {
 		MC.displayGuiScreen(null);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static List<String> sentMessages() {
+		if (sentMessages == null)
+			sentMessages = (List<String>) Minecraft.getMinecraft().ingameGUI.getChatGUI().getSentMessages();
+		return sentMessages;
 	}
 }

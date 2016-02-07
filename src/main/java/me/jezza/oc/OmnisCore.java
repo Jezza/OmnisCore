@@ -9,6 +9,7 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import me.jezza.oc.common.CommonProxy;
 import me.jezza.oc.common.core.channel.ChannelDispatcher;
+import me.jezza.oc.common.core.command.CommandTest;
 import me.jezza.oc.common.core.config.Config.Controller;
 import me.jezza.oc.common.core.config.ConfigHandler;
 import me.jezza.oc.common.core.network.search.SearchThread;
@@ -48,6 +49,7 @@ public class OmnisCore {
 		ChannelDispatcher.init();
 		new ItemControl();
 		proxy.preInit();
+		new CommandTest().registerClient();
 	}
 
 	@EventHandler

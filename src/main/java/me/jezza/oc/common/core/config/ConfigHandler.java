@@ -13,7 +13,7 @@ import me.jezza.oc.common.core.config.discovery.ConfigData;
 import me.jezza.oc.common.core.intern.ConfigSyncPacket;
 import me.jezza.oc.common.interfaces.InputBuffer;
 import me.jezza.oc.common.interfaces.OutputBuffer;
-import me.jezza.oc.common.utils.ASM;
+import me.jezza.oc.common.utils.reflect.ASM;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.config.Configuration;
 import org.apache.commons.lang3.ClassUtils;

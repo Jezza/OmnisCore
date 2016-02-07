@@ -10,7 +10,7 @@ public class Graph<T> {
 	}
 
 	public boolean addNode(T node) {
-		if (containsNode(node))
+		if (node == null || containsNode(node))
 			return false;
 		size++;
 		nodeMap.put(node, new ArrayList<T>());
@@ -18,7 +18,7 @@ public class Graph<T> {
 	}
 
 	public boolean removeNode(T node) {
-		if (!containsNode(node))
+		if (node == null || !containsNode(node))
 			return false;
 		size--;
 		Collection<T> nodes = nodeMap.remove(node);
@@ -42,6 +42,8 @@ public class Graph<T> {
 	 * @return true if the edge was added.
 	 */
 	public boolean addEdge(T from, T to) {
+		if (from == null || to == null)
+			return false;
 		if (from == to)
 			return false;
 		if (!(containsNode(from) && containsNode(to)))
