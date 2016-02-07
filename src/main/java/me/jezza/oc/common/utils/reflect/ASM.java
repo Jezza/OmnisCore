@@ -1,4 +1,4 @@
-package me.jezza.oc.common.utils;
+package me.jezza.oc.common.utils.reflect;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
@@ -15,6 +15,7 @@ import cpw.mods.fml.common.discovery.ModCandidate;
 import cpw.mods.fml.common.discovery.ModDiscoverer;
 import cpw.mods.fml.relauncher.ReflectionHelper;
 import me.jezza.oc.OmnisCore;
+import me.jezza.oc.common.utils.Mods;
 import me.jezza.oc.common.utils.collect.Collections3;
 import me.jezza.oc.common.utils.helpers.StringHelper;
 import org.apache.commons.lang3.ClassUtils;
@@ -48,7 +49,7 @@ public enum ASM {
 	private static ModDiscoverer discoverer;
 	private static ASMDataTable dataTable;
 	private static LoadController loadController;
-	private static Field acField;
+	private static TypedField<ModContainer> acf;
 	private static ModContainer minecraft;
 	private static Method callingStack;
 
@@ -122,11 +123,15 @@ public enum ASM {
 		return Loader.instance().hasReachedState(state);
 	}
 
-	public static ModContainer overrideActiveContainer(ModContainer container) throws IllegalAccessException {
-		if (acField == null)
-			acField = ReflectionHelper.findField(LoadController.class, "activeContainer");
-		ModContainer oldContainer = (ModContainer) acField.get(loadController());
-		acField.set(loadController(), container);
+	private static TypedField<ModContainer> acf() {
+		if (acf == null)
+			acf = TypedField.find(LoadController.class, ModContainer.class, "activeContainer");
+		return acf;
+	}
+
+	public static ModContainer overrideAC(ModContainer container) throws IllegalAccessException {
+		ModContainer oldContainer = acf().get(loadController());
+		acf().set(loadController(), container);
 		return oldContainer;
 	}
 

@@ -1,4 +1,4 @@
-package me.jezza.oc.common.utils.maths;
+package me.jezza.oc.common.interfaces;
 
 /**
  * @author Jezza
