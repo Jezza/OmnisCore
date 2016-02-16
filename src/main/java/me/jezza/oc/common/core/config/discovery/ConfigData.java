@@ -1,5 +1,12 @@
 package me.jezza.oc.common.core.config.discovery;
 
+import static me.jezza.oc.common.utils.helpers.StringHelper.useable;
+
+import java.io.File;
+import java.lang.annotation.Annotation;
+import java.util.*;
+import java.util.Map.Entry;
+
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import me.jezza.oc.OmnisCore;
 import me.jezza.oc.common.core.config.ConfigEntry;
@@ -8,13 +15,6 @@ import me.jezza.oc.common.interfaces.InputBuffer;
 import me.jezza.oc.common.interfaces.OutputBuffer;
 import net.minecraft.entity.player.EntityPlayer;
 import org.apache.commons.lang3.ClassUtils;
-
-import java.io.File;
-import java.lang.annotation.Annotation;
-import java.util.*;
-import java.util.Map.Entry;
-
-import static me.jezza.oc.common.utils.helpers.StringHelper.useable;
 
 /**
  * The config data for any given mod.

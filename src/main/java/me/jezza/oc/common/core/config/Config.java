@@ -1,8 +1,8 @@
 package me.jezza.oc.common.core.config;
 
-import me.jezza.oc.common.core.config.entries.*;
-
 import java.lang.annotation.*;
+
+import me.jezza.oc.common.core.config.entries.*;
 
 public class Config {
 

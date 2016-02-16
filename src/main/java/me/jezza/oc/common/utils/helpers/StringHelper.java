@@ -1,5 +1,7 @@
 package me.jezza.oc.common.utils.helpers;
 
+import java.util.*;
+
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Splitter;
 import cpw.mods.fml.relauncher.ReflectionHelper;
@@ -8,13 +10,10 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.util.IChatComponent;
 import net.minecraft.util.StatCollector;
 
-import java.util.*;
-
 /**
  * @author Jezza
  */
-public enum StringHelper {
-	;
+public class StringHelper {
 
 	public static final char FORMATTING_CHAR = '$';
 	public static final Map<Character, EnumChatFormatting> COLOUR_MAP;
@@ -25,6 +24,10 @@ public enum StringHelper {
 	static {
 		Map<Character, EnumChatFormatting> formattingMap = ReflectionHelper.getPrivateValue(EnumChatFormatting.class, null, "formattingCodeMapping");
 		COLOUR_MAP = Collections.unmodifiableMap(formattingMap);
+	}
+
+	private StringHelper() {
+		throw new IllegalStateException();
 	}
 
 	public static boolean nullOrEmpty(CharSequence charSequence) {

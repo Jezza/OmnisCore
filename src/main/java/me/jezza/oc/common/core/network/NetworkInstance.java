@@ -1,5 +1,9 @@
 package me.jezza.oc.common.core.network;
 
+import static me.jezza.oc.common.core.network.NetworkResponse.*;
+
+import java.util.*;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import me.jezza.oc.common.core.network.exceptions.NetworkAddException;
 import me.jezza.oc.common.core.network.exceptions.NetworkCreationException;
@@ -7,10 +11,6 @@ import me.jezza.oc.common.core.network.exceptions.NetworkException;
 import me.jezza.oc.common.core.network.exceptions.NetworkRemoveException;
 import me.jezza.oc.common.core.network.interfaces.INetworkNode;
 import me.jezza.oc.common.core.network.interfaces.INetworkNodeHandler;
-
-import java.util.*;
-
-import static me.jezza.oc.common.core.network.NetworkResponse.*;
 
 /**
  * This is the master instance.

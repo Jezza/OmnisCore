@@ -1,9 +1,9 @@
 package me.jezza.oc.client.gui.components.interactions;
 
+import static org.lwjgl.opengl.GL11.*;
+
 import me.jezza.oc.client.gui.interfaces.ITextAlignment;
 import net.minecraft.util.MathHelper;
-
-import static org.lwjgl.opengl.GL11.*;
 
 public class GuiUnicodeGlyphButton extends GuiDefaultButton {
 

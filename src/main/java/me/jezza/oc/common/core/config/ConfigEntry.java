@@ -1,5 +1,12 @@
 package me.jezza.oc.common.core.config;
 
+import static me.jezza.oc.common.utils.helpers.StringHelper.*;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import me.jezza.oc.OmnisCore;
 import me.jezza.oc.common.core.config.Config.ConfigKey;
 import me.jezza.oc.common.core.config.Config.ConfigSync;
@@ -10,13 +17,6 @@ import me.jezza.oc.common.utils.Debug;
 import me.jezza.oc.common.utils.helpers.StringHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import org.apache.logging.log4j.Level;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import static me.jezza.oc.common.utils.helpers.StringHelper.*;
 
 public abstract class ConfigEntry<A extends Annotation, V> {
 	protected final Map<String, AnnotatedField<A, V>> configMap = new LinkedHashMap<>(8);

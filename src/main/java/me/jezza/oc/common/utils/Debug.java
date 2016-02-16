@@ -1,14 +1,17 @@
 package me.jezza.oc.common.utils;
 
-import me.jezza.oc.common.core.config.Config.ConfigBoolean;
-
 import static me.jezza.oc.OmnisCore.logger;
 
-public enum Debug {
-	;
+import me.jezza.oc.common.core.config.Config.ConfigBoolean;
+
+public class Debug {
 
 	private static final String DEBUG_CONSOLE_KEY = "OC_DBG_CONSOLE";
 	private static final String DEBUG_CHAT_KEY = "OC_DBG_CHAT";
+
+	private Debug() {
+		throw new IllegalStateException();
+	}
 
 	@ConfigBoolean(category = "Debug", name = "debug_console")
 	private static boolean debugConsole = false;

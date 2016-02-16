@@ -1,8 +1,8 @@
 package me.jezza.oc.common.core.network.interfaces;
 
-import net.minecraft.world.World;
-
 import java.util.Collection;
+
+import net.minecraft.world.World;
 
 public interface INetworkNode<T extends INetworkNode<T>> {
 

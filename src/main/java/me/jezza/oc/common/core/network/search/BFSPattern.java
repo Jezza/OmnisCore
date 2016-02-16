@@ -1,9 +1,9 @@
 package me.jezza.oc.common.core.network.search;
 
+import java.util.*;
+
 import me.jezza.oc.common.core.network.interfaces.INetworkNode;
 import me.jezza.oc.common.core.network.interfaces.ISearchPattern;
-
-import java.util.*;
 
 public class BFSPattern<T extends INetworkNode<T>> implements ISearchPattern<T> {
 

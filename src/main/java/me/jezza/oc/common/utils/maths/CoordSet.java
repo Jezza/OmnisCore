@@ -1,5 +1,7 @@
 package me.jezza.oc.common.utils.maths;
 
+import java.util.regex.Pattern;
+
 import io.netty.buffer.ByteBuf;
 import me.jezza.oc.common.interfaces.Copyable;
 import me.jezza.oc.common.interfaces.RoundingMethod;
@@ -11,8 +13,6 @@ import net.minecraft.util.ChunkCoordinates;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
-
-import java.util.regex.Pattern;
 
 /**
  * @author Jezza

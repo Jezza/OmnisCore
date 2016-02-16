@@ -1,8 +1,8 @@
 package me.jezza.oc.client.lib;
 
-import me.jezza.oc.common.interfaces.Request;
-
 import java.util.concurrent.CancellationException;
+
+import me.jezza.oc.common.interfaces.Request;
 
 /**
  * @author Jezza

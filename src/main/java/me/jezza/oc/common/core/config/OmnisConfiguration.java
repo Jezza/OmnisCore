@@ -1,13 +1,13 @@
 package me.jezza.oc.common.core.config;
 
-import me.jezza.oc.common.utils.maths.Maths;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
+import static net.minecraftforge.common.config.Property.Type.STRING;
 
 import java.io.File;
 import java.util.regex.Pattern;
 
-import static net.minecraftforge.common.config.Property.Type.STRING;
+import me.jezza.oc.common.utils.maths.Maths;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.config.Property;
 
 /**
  * @author Jezza

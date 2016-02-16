@@ -1,8 +1,8 @@
 package me.jezza.oc.common.core.network.interfaces;
 
-import net.minecraft.world.World;
-
 import java.util.List;
+
+import net.minecraft.world.World;
 
 /**
  * This removes the need for the node to have a direct reference to the {@link me.jezza.oc.common.core.network.interfaces.INetworkNodeHandler}

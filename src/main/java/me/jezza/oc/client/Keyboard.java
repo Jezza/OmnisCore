@@ -1,5 +1,7 @@
 package me.jezza.oc.client;
 
+import java.util.concurrent.LinkedBlockingDeque;
+
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.relauncher.Side;
@@ -8,8 +10,6 @@ import me.jezza.oc.OmnisCore;
 import me.jezza.oc.client.lib.AbstractAdapterRequest;
 import me.jezza.oc.common.interfaces.AdapterRequest;
 import me.jezza.oc.common.interfaces.KeyboardAdapter;
-
-import java.util.concurrent.LinkedBlockingDeque;
 
 /**
  * @author Jezza

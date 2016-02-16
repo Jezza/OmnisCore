@@ -1,14 +1,14 @@
 package me.jezza.oc.common.core.intern;
 
+import static me.jezza.oc.common.core.CoreProperties.MOD_ID;
+
 import io.netty.channel.ChannelHandlerContext;
 import me.jezza.oc.client.gui.interfaces.IGuiMessageHandler;
 import me.jezza.oc.common.interfaces.IOmnisPacket;
 import me.jezza.oc.common.interfaces.InputBuffer;
-import me.jezza.oc.common.interfaces.OutputBuffer;
 import me.jezza.oc.common.interfaces.ModPacket;
+import me.jezza.oc.common.interfaces.OutputBuffer;
 import net.minecraft.entity.player.EntityPlayer;
-
-import static me.jezza.oc.common.core.CoreProperties.MOD_ID;
 
 @ModPacket(MOD_ID)
 public class GuiNotifyPacket implements IOmnisPacket {
@@ -19,7 +19,7 @@ public class GuiNotifyPacket implements IOmnisPacket {
 	}
 
 	/**
-	 * @param id The ID of the button.
+	 * @param id      The ID of the button.
 	 * @param process The ID of the process to be executed.
 	 */
 	public GuiNotifyPacket(int id, int process) {

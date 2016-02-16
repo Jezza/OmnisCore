@@ -1,15 +1,15 @@
 package me.jezza.oc.common.core.network.search;
 
-import me.jezza.oc.common.core.network.interfaces.INetworkNode;
-import me.jezza.oc.common.core.network.interfaces.ISearchPattern;
-import me.jezza.oc.common.core.network.interfaces.ISearchResult;
-import me.jezza.oc.common.core.CoreProperties;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingDeque;
+
+import me.jezza.oc.common.core.CoreProperties;
+import me.jezza.oc.common.core.network.interfaces.INetworkNode;
+import me.jezza.oc.common.core.network.interfaces.ISearchPattern;
+import me.jezza.oc.common.core.network.interfaces.ISearchResult;
 
 public class SearchThread extends Thread {
 

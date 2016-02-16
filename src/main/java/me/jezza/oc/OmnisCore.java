@@ -1,5 +1,7 @@
 package me.jezza.oc;
 
+import static me.jezza.oc.common.core.CoreProperties.*;
+
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -9,7 +11,7 @@ import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import me.jezza.oc.common.CommonProxy;
 import me.jezza.oc.common.core.channel.ChannelDispatcher;
-import me.jezza.oc.common.core.command.CommandTest;
+import me.jezza.oc.common.core.command.CommandRegistry;
 import me.jezza.oc.common.core.config.Config.Controller;
 import me.jezza.oc.common.core.config.ConfigHandler;
 import me.jezza.oc.common.core.network.search.SearchThread;
@@ -18,8 +20,6 @@ import me.jezza.oc.common.interfaces.SidedChannel;
 import me.jezza.oc.common.items.ItemControl;
 import me.jezza.oc.common.utils.Debug;
 import org.apache.logging.log4j.Logger;
-
-import static me.jezza.oc.common.core.CoreProperties.*;
 
 @Controller
 @Mod(modid = MOD_ID, name = MOD_NAME, version = VERSION, dependencies = DEPENDENCIES)
@@ -34,10 +34,10 @@ public class OmnisCore {
 	@SidedChannel(MOD_ID)
 	public static IChannel channel;
 
-	public static Logger logger; //  = LogManager.getLogger(MOD_ID);
+	public static Logger logger; // = LogManager.getLogger(MOD_ID);
 
 	@EventHandler
-	public void preInit(FMLPreInitializationEvent event) {
+	public void preInitialise(FMLPreInitializationEvent event) {
 		logger = event.getModLog();
 		logger.info("-- Pre-Initialising " + MOD_ID + " (" + VERSION + ") --");
 
@@ -47,9 +47,11 @@ public class OmnisCore {
 		ConfigHandler.init();
 		logger.info("-- Configuring Channels --");
 		ChannelDispatcher.init();
+		logger.info("-- Initialising Commands --");
+		CommandRegistry.init();
+
 		new ItemControl();
 		proxy.preInit();
-		new CommandTest().registerClient();
 	}
 
 	@EventHandler
@@ -61,7 +63,7 @@ public class OmnisCore {
 	}
 
 	@EventHandler
-	public void postInit(FMLPostInitializationEvent event) {
+	public void postInitialise(FMLPostInitializationEvent event) {
 		logger.info("-- Post-Initialising --");
 		proxy.postInit();
 	}

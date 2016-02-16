@@ -6,8 +6,10 @@ import net.minecraft.nbt.NBTTagCompound;
 /**
  * @author Jezza
  */
-public enum ItemStackHelper {
-	;
+public class ItemStackHelper {
+	private ItemStackHelper() {
+		throw new IllegalStateException();
+	}
 
 	public static NBTTagCompound tag(ItemStack itemStack) {
 		return tag(itemStack, true);

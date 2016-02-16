@@ -1,5 +1,11 @@
 package me.jezza.oc.common.core.channel;
 
+import static cpw.mods.fml.common.network.FMLOutboundHandler.FML_MESSAGETARGET;
+import static cpw.mods.fml.common.network.FMLOutboundHandler.FML_MESSAGETARGETARGS;
+import static cpw.mods.fml.common.network.FMLOutboundHandler.OutboundTarget.*;
+import static cpw.mods.fml.common.network.NetworkRegistry.CHANNEL_SOURCE;
+import static me.jezza.oc.common.core.channel.ChannelDispatcher.NETWORK_UPDATE_RANGE;
+
 import cpw.mods.fml.common.network.FMLEmbeddedChannel;
 import cpw.mods.fml.common.network.NetworkRegistry.TargetPoint;
 import cpw.mods.fml.relauncher.Side;
@@ -11,12 +17,6 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.Packet;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
-
-import static cpw.mods.fml.common.network.FMLOutboundHandler.FML_MESSAGETARGET;
-import static cpw.mods.fml.common.network.FMLOutboundHandler.FML_MESSAGETARGETARGS;
-import static cpw.mods.fml.common.network.FMLOutboundHandler.OutboundTarget.*;
-import static cpw.mods.fml.common.network.NetworkRegistry.CHANNEL_SOURCE;
-import static me.jezza.oc.common.core.channel.ChannelDispatcher.NETWORK_UPDATE_RANGE;
 
 /**
  * @author Jezza

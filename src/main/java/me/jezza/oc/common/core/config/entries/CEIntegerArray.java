@@ -1,5 +1,9 @@
 package me.jezza.oc.common.core.config.entries;
 
+import static me.jezza.oc.common.utils.helpers.StringHelper.useable;
+
+import java.lang.reflect.Field;
+
 import me.jezza.oc.common.core.config.Config.ConfigIntegerArray;
 import me.jezza.oc.common.core.config.ConfigEntry;
 import me.jezza.oc.common.core.config.OmnisConfiguration;
@@ -8,10 +12,6 @@ import me.jezza.oc.common.interfaces.InputBuffer;
 import me.jezza.oc.common.interfaces.OutputBuffer;
 import me.jezza.oc.common.utils.Classes;
 import net.minecraft.entity.player.EntityPlayer;
-
-import java.lang.reflect.Field;
-
-import static me.jezza.oc.common.utils.helpers.StringHelper.useable;
 
 public class CEIntegerArray extends ConfigEntry<ConfigIntegerArray, int[]> {
 	public CEIntegerArray(OmnisConfiguration config) {

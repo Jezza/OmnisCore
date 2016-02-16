@@ -1,5 +1,7 @@
 package me.jezza.oc.common.items;
 
+import java.util.List;
+
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.client.Client;
@@ -9,8 +11,6 @@ import me.jezza.oc.common.utils.helpers.StringHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import org.lwjgl.input.Keyboard;
-
-import java.util.List;
 
 @SideOnly(Side.CLIENT)
 public class ItemTooltipInformation implements TooltipPopulator {

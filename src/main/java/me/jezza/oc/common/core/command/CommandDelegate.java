@@ -1,9 +1,9 @@
 package me.jezza.oc.common.core.command;
 
+import java.util.List;
+
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
-
-import java.util.List;
 
 /**
  * @author Jezza
@@ -63,6 +63,6 @@ public class CommandDelegate implements ICommand {
 
 	@Override
 	public int compareTo(Object o) {
-		return delegate.compareTo(o);
+		return delegate.compareTo((ICommand) o);
 	}
 }

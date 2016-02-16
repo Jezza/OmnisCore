@@ -1,12 +1,12 @@
 package me.jezza.oc.common.core.config.discovery;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+
 import com.google.common.base.Throwables;
 import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.OmnisCore;
 import me.jezza.oc.common.core.config.Config.ConfigSync;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 
 /**
  * A representation of a field that was annotated by a specific annotation.

@@ -1,5 +1,9 @@
 package me.jezza.oc.common.core.config.entries;
 
+import static me.jezza.oc.common.utils.helpers.StringHelper.useable;
+
+import java.lang.reflect.Field;
+
 import me.jezza.oc.common.core.config.Config.ConfigString;
 import me.jezza.oc.common.core.config.ConfigEntry;
 import me.jezza.oc.common.core.config.OmnisConfiguration;
@@ -7,10 +11,6 @@ import me.jezza.oc.common.core.config.discovery.AnnotatedField;
 import me.jezza.oc.common.interfaces.InputBuffer;
 import me.jezza.oc.common.interfaces.OutputBuffer;
 import net.minecraft.entity.player.EntityPlayer;
-
-import java.lang.reflect.Field;
-
-import static me.jezza.oc.common.utils.helpers.StringHelper.useable;
 
 public class CEString extends ConfigEntry<ConfigString, String> {
 	public CEString(OmnisConfiguration config) {

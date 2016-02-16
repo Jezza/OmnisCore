@@ -1,5 +1,7 @@
 package me.jezza.oc.client.gui.components.interactions;
 
+import static org.lwjgl.opengl.GL11.*;
+
 import me.jezza.oc.client.gui.components.GuiTexturedButtonExpandable;
 import me.jezza.oc.client.gui.interfaces.ITextAlignment;
 import me.jezza.oc.client.gui.lib.TextAlignment;
@@ -7,8 +9,6 @@ import me.jezza.oc.client.lib.Colour;
 import me.jezza.oc.client.lib.ResourceHelper;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.util.ResourceLocation;
-
-import static org.lwjgl.opengl.GL11.*;
 
 public class GuiDefaultButton extends GuiTexturedButtonExpandable<GuiDefaultButton> {
 	public static final ResourceLocation BUTTON_TEXTURE = ResourceHelper.getOCTexture("gui/defaultButtons.png");

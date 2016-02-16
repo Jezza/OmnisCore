@@ -1,12 +1,14 @@
 package me.jezza.oc.common.items;
 
+import java.util.List;
+
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
 import me.jezza.oc.common.interfaces.Tooltip;
 import me.jezza.oc.common.interfaces.TooltipPopulator;
-import me.jezza.oc.common.utils.reflect.ASM;
 import me.jezza.oc.common.utils.RayTrace;
+import me.jezza.oc.common.utils.reflect.ASM;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,8 +16,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.util.MovingObjectPosition;
-
-import java.util.List;
 
 public abstract class ItemAbstract extends Item {
 	protected boolean textureReg = true;

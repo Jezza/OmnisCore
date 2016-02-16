@@ -1,5 +1,7 @@
 package me.jezza.oc.common.core.network;
 
+import java.util.*;
+
 import com.google.common.collect.ImmutableList;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
@@ -11,8 +13,6 @@ import me.jezza.oc.common.utils.collect.Graph;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.NotImplementedException;
-
-import java.util.*;
 
 public class NetworkCore<T extends INetworkNode<T>> implements INetworkNodeHandler<T>, IMessageProcessor<T> {
 

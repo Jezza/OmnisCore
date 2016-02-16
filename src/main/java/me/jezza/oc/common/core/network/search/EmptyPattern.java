@@ -1,9 +1,9 @@
 package me.jezza.oc.common.core.network.search;
 
+import java.util.List;
+
 import me.jezza.oc.common.core.network.interfaces.INetworkNode;
 import me.jezza.oc.common.core.network.interfaces.ISearchPattern;
-
-import java.util.List;
 
 public class EmptyPattern implements ISearchPattern {
 

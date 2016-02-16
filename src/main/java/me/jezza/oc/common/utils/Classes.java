@@ -5,8 +5,10 @@ import com.google.common.primitives.Primitives;
 /**
  * @author Jezza
  */
-public enum Classes {
-	;
+public class Classes {
+	private Classes() {
+		throw new IllegalStateException();
+	}
 
 	public static Class<?> unwrap(Class<?> clazz) {
 		if (clazz.isArray())

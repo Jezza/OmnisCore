@@ -1,10 +1,10 @@
 package me.jezza.oc.common.utils.collect;
 
+import static me.jezza.oc.common.utils.helpers.StringHelper.format;
+
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectShortHashMap;
 import me.jezza.oc.common.core.channel.ChannelException;
-
-import static me.jezza.oc.common.utils.helpers.StringHelper.format;
 
 /**
  * @author Jezza

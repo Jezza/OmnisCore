@@ -14,14 +14,23 @@ import net.minecraft.world.World;
  */
 public interface IChannel {
 	ChannelFuture sendTo(IOmnisPacket packet, EntityPlayer player);
+
 	ChannelFuture sendTo(IOmnisPacket packet, EntityPlayerMP player);
+
 	ChannelFuture sendToAll(IOmnisPacket packet);
+
 	ChannelFuture sendToServer(IOmnisPacket packet);
+
 	ChannelFuture sendToDimension(IOmnisPacket packet, int dimId);
+
 	ChannelFuture sendToAllAround(IOmnisPacket packet, TargetPoint point);
+
 	ChannelFuture sendToAllAround(IOmnisPacket packet, TileEntity point);
+
 	ChannelFuture sendToAllAround(IOmnisPacket packet, TileEntity point, double range);
+
 	ChannelFuture sendToAllAround(IOmnisPacket packet, World world, int x, int y, int z);
+
 	ChannelFuture sendToAllAround(IOmnisPacket packet, World world, int x, int y, int z, double range);
 
 	Side source();

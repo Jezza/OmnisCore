@@ -1,12 +1,12 @@
 package me.jezza.oc.common.utils;
 
+import java.util.List;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-
-import java.util.List;
 
 /**
  * @author Jezza

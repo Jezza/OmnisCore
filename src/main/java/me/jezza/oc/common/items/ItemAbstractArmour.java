@@ -1,5 +1,7 @@
 package me.jezza.oc.common.items;
 
+import java.util.List;
+
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.registry.GameRegistry;
 import cpw.mods.fml.relauncher.Side;
@@ -11,8 +13,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
-
-import java.util.List;
 
 public abstract class ItemAbstractArmour extends ItemArmor {
 	private String textureLocation;

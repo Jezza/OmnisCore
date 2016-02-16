@@ -1,5 +1,15 @@
 package me.jezza.oc.common.core.channel;
 
+import static cpw.mods.fml.common.LoaderState.POSTINITIALIZATION;
+import static me.jezza.oc.common.utils.helpers.StringHelper.format;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.google.common.base.Throwables;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
@@ -12,27 +22,15 @@ import me.jezza.oc.OmnisCore;
 import me.jezza.oc.common.core.config.Config.ConfigDouble;
 import me.jezza.oc.common.interfaces.IChannel;
 import me.jezza.oc.common.interfaces.SidedChannel;
-import me.jezza.oc.common.utils.reflect.ASM;
 import me.jezza.oc.common.utils.Mods;
 import me.jezza.oc.common.utils.helpers.StringHelper;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import static cpw.mods.fml.common.LoaderState.POSTINITIALIZATION;
-import static me.jezza.oc.common.utils.helpers.StringHelper.format;
+import me.jezza.oc.common.utils.reflect.ASM;
 
 /**
  * @author Jezza
  */
 public final class ChannelDispatcher {
 	public static final String OC_CHANNEL_SUFFIX = "|OC";
-
-	private static ChannelDispatcher INSTANCE;
 
 	@ConfigDouble(category = "Networking", minValue = 5, maxValue = 120, comment = "The default network update range.")
 	protected static double NETWORK_UPDATE_RANGE = 60;
@@ -44,17 +42,20 @@ public final class ChannelDispatcher {
 		channelMap.put(Side.SERVER, new HashMap<String, IChannel>());
 	}
 
-	public static void init() {
-		if (INSTANCE != null)
-			return;
-		INSTANCE = new ChannelDispatcher();
-		INSTANCE.parseControllers();
-	}
+	private static boolean init = false;
 
 	private ChannelDispatcher() {
+		throw new IllegalStateException();
 	}
 
-	private void parseControllers() {
+	public static void init() {
+		if (init)
+			return;
+		init = true;
+		parseControllers();
+	}
+
+	private static void parseControllers() {
 		for (Entry<ASMData, Field> entry : ASM.fieldsWith(SidedChannel.class).entrySet()) {
 			try {
 				Field field = entry.getValue();

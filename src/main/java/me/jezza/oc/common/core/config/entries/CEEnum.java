@@ -1,5 +1,9 @@
 package me.jezza.oc.common.core.config.entries;
 
+import static me.jezza.oc.common.utils.helpers.StringHelper.useable;
+
+import java.lang.reflect.Field;
+
 import com.google.common.base.Joiner;
 import me.jezza.oc.common.core.config.Config.ConfigEnum;
 import me.jezza.oc.common.core.config.ConfigEntry;
@@ -10,10 +14,6 @@ import me.jezza.oc.common.interfaces.OutputBuffer;
 import me.jezza.oc.common.utils.helpers.StringHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.config.Property;
-
-import java.lang.reflect.Field;
-
-import static me.jezza.oc.common.utils.helpers.StringHelper.useable;
 
 /**
  * @author Jezza

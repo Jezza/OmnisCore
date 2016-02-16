@@ -1,5 +1,7 @@
 package me.jezza.oc.client.gui.components;
 
+import java.util.List;
+
 import me.jezza.oc.client.gui.interfaces.IGuiRenderHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -9,8 +11,6 @@ import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Keyboard;
-
-import java.util.List;
 
 public abstract class GuiWidget<T extends GuiWidget> extends Gui {
 

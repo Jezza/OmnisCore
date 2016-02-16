@@ -1,16 +1,19 @@
 package me.jezza.oc.common.utils;
 
+import java.util.Map;
+
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.ModContainer;
-
-import java.util.Map;
 
 /**
  * @author Jezza
  */
-public enum Mods {
-	;
+public class Mods {
 	private static Map<String, ModContainer> indexedModMap;
+
+	private Mods() {
+		throw new IllegalStateException();
+	}
 
 	/**
 	 * This way only one unmodifiable list is created.

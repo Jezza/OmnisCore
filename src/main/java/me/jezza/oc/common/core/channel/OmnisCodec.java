@@ -1,5 +1,16 @@
 package me.jezza.oc.common.core.channel;
 
+import static cpw.mods.fml.common.network.NetworkRegistry.FML_CHANNEL;
+import static cpw.mods.fml.common.network.NetworkRegistry.NET_HANDLER;
+import static me.jezza.oc.common.interfaces.ModPacket.DEFAULT_SPLITTER;
+import static me.jezza.oc.common.utils.helpers.StringHelper.format;
+import static me.jezza.oc.common.utils.helpers.StringHelper.useable;
+
+import java.lang.reflect.Modifier;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
@@ -15,24 +26,13 @@ import io.netty.handler.codec.MessageToMessageCodec;
 import me.jezza.oc.OmnisCore;
 import me.jezza.oc.common.interfaces.IOmnisPacket;
 import me.jezza.oc.common.interfaces.ModPacket;
-import me.jezza.oc.common.utils.reflect.ASM;
 import me.jezza.oc.common.utils.collect.PacketShortHashMap;
 import me.jezza.oc.common.utils.helpers.StringHelper;
+import me.jezza.oc.common.utils.reflect.ASM;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.INetHandler;
 import net.minecraft.network.NetHandlerPlayServer;
-
-import java.lang.reflect.Modifier;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import static cpw.mods.fml.common.network.NetworkRegistry.FML_CHANNEL;
-import static cpw.mods.fml.common.network.NetworkRegistry.NET_HANDLER;
-import static me.jezza.oc.common.interfaces.ModPacket.DEFAULT_SPLITTER;
-import static me.jezza.oc.common.utils.helpers.StringHelper.format;
-import static me.jezza.oc.common.utils.helpers.StringHelper.useable;
 
 /**
  * @author Jezza

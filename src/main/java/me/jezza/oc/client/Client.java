@@ -1,5 +1,9 @@
 package me.jezza.oc.client;
 
+import static org.lwjgl.input.Keyboard.*;
+
+import java.util.List;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.EventPriority;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
@@ -10,10 +14,6 @@ import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import org.lwjgl.input.Keyboard;
-
-import java.util.List;
-
-import static org.lwjgl.input.Keyboard.*;
 
 @SideOnly(Side.CLIENT)
 public final class Client {

@@ -1,13 +1,13 @@
 package me.jezza.oc.common.utils.reflect;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Type;
+
 import cpw.mods.fml.relauncher.ReflectionHelper.UnableToFindFieldException;
 import me.jezza.oc.common.utils.helpers.StringHelper;
 import org.apache.http.util.Args;
 import sun.reflect.CallerSensitive;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Type;
 
 /**
  * @author Jezza

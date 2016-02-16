@@ -1,5 +1,13 @@
 package me.jezza.oc.common.utils.reflect;
 
+import static me.jezza.oc.common.utils.helpers.PredicateHelper.startsWith;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.*;
+
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.base.Throwables;
@@ -20,19 +28,10 @@ import me.jezza.oc.common.utils.collect.Collections3;
 import me.jezza.oc.common.utils.helpers.StringHelper;
 import org.apache.commons.lang3.ClassUtils;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.*;
-
-import static me.jezza.oc.common.utils.helpers.PredicateHelper.startsWith;
-
 /**
  * @author Jezza
  */
-public enum ASM {
-	;
+public class ASM {
 
 	private static final Splitter ARG_SPLITTER = Splitter.on(";").omitEmptyStrings().trimResults();
 
@@ -52,6 +51,10 @@ public enum ASM {
 	private static TypedField<ModContainer> acf;
 	private static ModContainer minecraft;
 	private static Method callingStack;
+
+	private ASM() {
+		throw new IllegalStateException();
+	}
 
 	public static ModContainer findOwner(Object object) {
 		return findOwner(ClassUtils.getPackageName(object.getClass()));
@@ -202,8 +205,15 @@ public enum ASM {
 		if (classes != null)
 			return Maps.newHashMap(classes);
 		ImmutableMap.Builder<ASMData, Class<?>> builder = ImmutableMap.builder();
-		for (ASMData data : dataTable(annotationClass))
-			builder.put(data, getClass(data));
+		Set<String> discovered = new HashSet<>();
+		for (ASMData data : dataTable(annotationClass)) {
+			String className = data.getClassName();
+			if (!discovered.contains(className) && className.equals(data.getObjectName())) {
+				Class<?> dataClass = loadClass(className);
+				builder.put(data, dataClass);
+				discovered.add(className);
+			}
+		}
 		ImmutableMap<ASMData, Class<?>> map = builder.build();
 		classCache.put(annotationClass, map);
 		return Maps.newHashMap(map);

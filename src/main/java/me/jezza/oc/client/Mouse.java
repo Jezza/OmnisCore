@@ -1,5 +1,7 @@
 package me.jezza.oc.client;
 
+import java.util.concurrent.LinkedBlockingDeque;
+
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.relauncher.Side;
@@ -10,8 +12,6 @@ import me.jezza.oc.common.interfaces.AdapterRequest;
 import me.jezza.oc.common.interfaces.MouseAdapter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
-
-import java.util.concurrent.LinkedBlockingDeque;
 
 /**
  * @author Jezza

@@ -1,5 +1,17 @@
 package me.jezza.oc.common.core.config;
 
+import static me.jezza.oc.common.core.config.Config.ConfigAnnotation;
+import static me.jezza.oc.common.core.config.Config.Controller;
+import static me.jezza.oc.common.utils.helpers.StringHelper.format;
+import static me.jezza.oc.common.utils.helpers.StringHelper.useable;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
+import java.util.*;
+import java.util.Map.Entry;
+
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.Loader;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
@@ -17,18 +29,6 @@ import me.jezza.oc.common.utils.reflect.ASM;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.config.Configuration;
 import org.apache.commons.lang3.ClassUtils;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
-import java.util.*;
-import java.util.Map.Entry;
-
-import static me.jezza.oc.common.core.config.Config.ConfigAnnotation;
-import static me.jezza.oc.common.core.config.Config.Controller;
-import static me.jezza.oc.common.utils.helpers.StringHelper.format;
-import static me.jezza.oc.common.utils.helpers.StringHelper.useable;
 
 public final class ConfigHandler {
 	private static ConfigHandler INSTANCE;

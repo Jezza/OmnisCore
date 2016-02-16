@@ -1,10 +1,10 @@
 package me.jezza.oc.client.gui.interfaces;
 
+import java.util.List;
+
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
-
-import java.util.List;
 
 public interface IGuiRenderHandler {
 

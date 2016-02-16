@@ -1,9 +1,9 @@
 package me.jezza.oc.common.core.network;
 
+import java.util.HashMap;
+
 import me.jezza.oc.common.core.network.interfaces.INetworkMessage;
 import me.jezza.oc.common.core.network.interfaces.INetworkNode;
-
-import java.util.HashMap;
 
 /**
  * Just a simple abstract class to remove the monotony of setting and getting owners

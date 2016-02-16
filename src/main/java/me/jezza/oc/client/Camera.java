@@ -1,5 +1,7 @@
 package me.jezza.oc.client;
 
+import java.util.concurrent.LinkedBlockingDeque;
+
 import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import cpw.mods.fml.common.gameevent.TickEvent.Phase;
 import cpw.mods.fml.common.gameevent.TickEvent.RenderTickEvent;
@@ -11,8 +13,6 @@ import me.jezza.oc.common.interfaces.CameraAction;
 import me.jezza.oc.common.utils.reflect.ASM;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
-
-import java.util.concurrent.LinkedBlockingDeque;
 
 /**
  * @author Jezza

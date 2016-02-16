@@ -1,5 +1,15 @@
 package me.jezza.oc.common.core.config.discovery;
 
+import java.io.File;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.google.common.base.Throwables;
 import cpw.mods.fml.common.discovery.ASMDataTable.ASMData;
 import me.jezza.oc.OmnisCore;
@@ -10,16 +20,6 @@ import me.jezza.oc.common.interfaces.InputBuffer;
 import me.jezza.oc.common.interfaces.OutputBuffer;
 import me.jezza.oc.common.utils.reflect.ASM;
 import net.minecraft.entity.player.EntityPlayer;
-
-import java.io.File;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 /**
  * A config container for all config annotations under a specified package (Includes all sub-packages).

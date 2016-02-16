@@ -1,10 +1,10 @@
 package me.jezza.oc.common.utils.collect;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
-
 import java.util.*;
 import java.util.Map.Entry;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 
 /**
  * @author Jezza
@@ -71,7 +71,7 @@ public class Collections3 {
 		return collection;
 	}
 
-	public static <T> Collection<T> unmodifiable(Collection<T> collection) {
+	public static <T> Collection<T> immutable(Collection<T> collection) {
 		if (collection == null || collection.isEmpty())
 			return Collections.emptySet();
 		if (collection.size() == 1) {
@@ -81,7 +81,7 @@ public class Collections3 {
 		return Collections.unmodifiableCollection(collection);
 	}
 
-	public static <T> Set<T> unmodifiable(Set<T> set) {
+	public static <T> Set<T> immutable(Set<T> set) {
 		if (set == null || set.isEmpty())
 			return Collections.emptySet();
 		if (set.size() == 1) {
@@ -91,7 +91,7 @@ public class Collections3 {
 		return Collections.unmodifiableSet(set);
 	}
 
-	public static <T> List<T> unmodifiable(List<T> list) {
+	public static <T> List<T> immutable(List<T> list) {
 		if (list == null || list.isEmpty())
 			return Collections.emptyList();
 		if (list.size() == 1)
@@ -99,7 +99,7 @@ public class Collections3 {
 		return Collections.unmodifiableList(list);
 	}
 
-	public static <K, V> Map<K, V> unmodifiable(Map<K, V> map) {
+	public static <K, V> Map<K, V> immutable(Map<K, V> map) {
 		if (map == null || map.isEmpty())
 			return Collections.emptyMap();
 		if (map.size() == 1) {

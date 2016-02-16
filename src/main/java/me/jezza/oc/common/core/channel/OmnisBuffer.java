@@ -1,5 +1,7 @@
 package me.jezza.oc.common.core.channel;
 
+import java.util.BitSet;
+
 import cpw.mods.fml.common.network.ByteBufUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -11,8 +13,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
-
-import java.util.BitSet;
 
 /**
  * @author Jezza

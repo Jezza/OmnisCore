@@ -1,5 +1,8 @@
 package me.jezza.oc.client.gui;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import me.jezza.oc.client.gui.components.GuiWidget;
 import me.jezza.oc.client.gui.interfaces.IGuiRenderHandler;
 import me.jezza.oc.client.lib.Colour;
@@ -7,9 +10,6 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.item.ItemStack;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class GuiScreenAbstract extends GuiScreen implements IGuiRenderHandler {
 

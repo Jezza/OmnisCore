@@ -4,22 +4,22 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import me.jezza.oc.common.utils.helpers.StringHelper;
+
 /**
- * A spanning tree based off the array. Each value of an array defines an edge.
- * Any branched generated from a part of an array will not have a value, unless the option is chosen during construction.
- *
  * @author Jezza
  */
-public class BranchedMap<K, V> {
+public class BranchedClassMap<V> {
 	private final boolean inheritParentValue;
 	private final boolean fallback;
 	private final Node root;
+	private final Class<?> rootClass;
 
 	/**
 	 * Constructs a basic BranchedMap.
 	 */
-	public BranchedMap() {
-		this(null, false, false);
+	public BranchedClassMap() {
+		this(Object.class, null, false, false);
 	}
 
 	/**
@@ -28,8 +28,8 @@ public class BranchedMap<K, V> {
 	 *
 	 * @param rootValue - The default value to return on an empty or null array key.
 	 */
-	public BranchedMap(V rootValue) {
-		this(rootValue, false, false);
+	public BranchedClassMap(V rootValue) {
+		this(Object.class, rootValue, false, false);
 	}
 
 	/**
@@ -37,7 +37,8 @@ public class BranchedMap<K, V> {
 	 * @param inheritParentValue - If any generated edges inherit their parent's value. By default, this is not the case.
 	 * @param fallback           - On a failed retrieval, this option will cause the path to be generated, and returned.
 	 */
-	public BranchedMap(V rootValue, boolean inheritParentValue, boolean fallback) {
+	public BranchedClassMap(Class<?> rootClass, V rootValue, boolean inheritParentValue, boolean fallback) {
+		this.rootClass = rootClass;
 		root = new Node();
 		root.value = rootValue;
 		this.inheritParentValue = inheritParentValue;
@@ -48,14 +49,16 @@ public class BranchedMap<K, V> {
 	 * Places the value along the given path.
 	 * Any edges or nodes that need to be generated will be generated, with the options passed in during construction.
 	 *
-	 * @param keys  - The path that the value should be placed at.
+	 * @param key   - The key that can be used to retrieve this value.
 	 * @param value - The value that should be stored.
 	 * @return - Any old value that was previously stored at the path, null otherwise.
 	 */
-	public V put(K[] keys, V value) {
-		if (keys == null || keys.length == 0)
+	public V put(Class<?> key, V value) {
+		if (key == null)
 			return null;
-		Node base = node(keys, true);
+		if (!(rootClass.isAssignableFrom(key)))
+			throw new IllegalArgumentException(StringHelper.format("Given class [{}] is outside scope: {}", key.getCanonicalName(), rootClass.getCanonicalName()));
+		Node base = node(key, true);
 		if (base == null)
 			return null;
 		V oldValue = base.value;
@@ -66,14 +69,16 @@ public class BranchedMap<K, V> {
 	/**
 	 * Retrieve the value that is defined by the given path.
 	 *
-	 * @param keys - The path to the value.
+	 * @param key - The path to the value.
 	 * @return - The value, if found.
 	 */
-	public V get(K[] keys) {
-		if (keys == null || keys.length == 0)
-			return root.value;
+	public V get(Class<?> key) {
+		if (key == null)
+			return null;
+		if (!(rootClass.isAssignableFrom(key)))
+			throw new IllegalArgumentException(StringHelper.format("Given class [{}] is outside scope: {}", key.getCanonicalName(), rootClass.getCanonicalName()));
 		if (fallback) {
-			Node base = node(keys, true);
+			Node base = node(key, true);
 			if (base == null) // Will never happen.
 				return null;
 			if (base.value != null)
@@ -87,20 +92,22 @@ public class BranchedMap<K, V> {
 			base.value = parent.value;
 			return base.value;
 		}
-		Node base = node(keys, false);
+		Node base = node(key, false);
 		return base != null ? base.value : null;
 	}
 
 	/**
 	 * Removes the node that is at the given path, this also means all of its children.
 	 *
-	 * @param keys - The path to the value.
+	 * @param key - The path to the value.
 	 * @return - The value of the node that was removed.
 	 */
-	public V remove(K[] keys) {
-		if (keys == null || keys.length == 0)
+	public V remove(Class<?> key) {
+		if (key == null)
 			return null;
-		Node base = node(keys, false);
+		if (!(rootClass.isAssignableFrom(key)))
+			throw new IllegalArgumentException(StringHelper.format("Given class [{}] is outside scope: {}", key.getCanonicalName(), rootClass.getCanonicalName()));
+		Node base = node(key, false);
 		if (base == null)
 			return null;
 		V value = base.value;
@@ -136,18 +143,36 @@ public class BranchedMap<K, V> {
 	/**
 	 * Internal method, used to grab the node at the path, potentially generating nodes as it goes, if the boolean is true.
 	 *
-	 * @param keys   - The path of the node to get.
+	 * @param key    - The path of the node to get.
 	 * @param create - If the path should be generated. (This means that the result is never null)
 	 * @return - The node at the path.
 	 */
-	private Node node(K[] keys, boolean create) {
+	private Node node(Class<?> key, boolean create) {
+		if (key == rootClass)
+			return root;
 		Node base = root;
-		for (K link : keys) {
+		for (Class<?> link : path(key)) {
 			base = nextNode(base, link, create);
 			if (base == null)
 				return null;
 		}
 		return base;
+	}
+
+	/**
+	 * Constructs a path for a given class.
+	 *
+	 * @param key - The destination.
+	 * @return - An ordered LinkedList, from highest parent to the given class.
+	 */
+	private LinkedList<Class<?>> path(Class<?> key) {
+		LinkedList<Class<?>> hierarchy = new LinkedList<>();
+		Class<?> parent = key;
+		while (parent != null && rootClass.isAssignableFrom(parent)) {
+			hierarchy.addFirst(parent);
+			parent = parent.getSuperclass();
+		}
+		return hierarchy;
 	}
 
 	/**
@@ -158,13 +183,13 @@ public class BranchedMap<K, V> {
 	 * @param create - If true, the necessary nodes will be generated.
 	 * @return - The node that should be the next one in line. Can be null.
 	 */
-	private Node nextNode(Node check, K link, boolean create) {
+	private Node nextNode(Node check, Class<?> link, boolean create) {
 		if (link == null)
 			throw new NullPointerException("link");
 		List<Edge> children = check.children;
 		if (!children.isEmpty()) {
 			for (Edge edge : children) {
-				if (edge.link.equals(link))
+				if (edge.link == link)
 					return edge.node;
 			}
 		}
@@ -178,7 +203,7 @@ public class BranchedMap<K, V> {
 	 * @param link   - The connection between the two nodes.
 	 * @return - The created child node.
 	 */
-	private Node createChild(Node parent, K link) {
+	private Node createChild(Node parent, Class<?> link) {
 		Node child = new Node();
 		child.parent = parent;
 		Edge edge = new Edge();
@@ -233,7 +258,7 @@ public class BranchedMap<K, V> {
 		for (Edge child : children) {
 			for (int i = 0; i < depth; i++)
 				builder.append('-');
-			builder.append('|').append('"').append(child.link).append('"').append("=");
+			builder.append('|').append('"').append(child.link.getCanonicalName()).append('"').append("=");
 			toString0(child.node, builder, depth + 1);
 		}
 		return builder;
@@ -253,6 +278,7 @@ public class BranchedMap<K, V> {
 	 */
 	private class Edge {
 		private Node node;
-		private K link;
+		private Class<?> link;
 	}
 }
+

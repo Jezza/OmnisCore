@@ -1,11 +1,11 @@
 package me.jezza.oc.client.gui;
 
+import java.util.List;
+
 import cpw.mods.fml.client.GuiScrollingList;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.Tessellator;
-
-import java.util.List;
 
 /**
  * @author Jezza

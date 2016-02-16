@@ -1,10 +1,10 @@
 package me.jezza.oc.common.core.network.interfaces;
 
-import net.minecraft.world.World;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import net.minecraft.world.World;
 
 /**
  * Yes, IMessageProcessor and INetworkNodeHandler should be implemented on the same object.

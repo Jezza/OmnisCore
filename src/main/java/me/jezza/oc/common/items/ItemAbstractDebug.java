@@ -1,12 +1,12 @@
 package me.jezza.oc.common.items;
 
+import java.util.ArrayList;
+
 import me.jezza.oc.common.interfaces.Tooltip;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
-
-import java.util.ArrayList;
 
 /**
  * TODO: Revisit
