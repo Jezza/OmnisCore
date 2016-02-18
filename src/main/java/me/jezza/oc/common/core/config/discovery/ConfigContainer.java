@@ -1,5 +1,7 @@
 package me.jezza.oc.common.core.config.discovery;
 
+import static me.jezza.oc.common.utils.helpers.StringHelper.format;
+
 import java.io.File;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -75,8 +77,19 @@ public class ConfigContainer {
 	}
 
 	public void operate(boolean saveFlag) {
-		for (ConfigEntry<? extends Annotation, ?> configEntry : annotationMap.values())
-			configEntry.processFields(saveFlag);
+		config.load();
+		try {
+			for (ConfigEntry<? extends Annotation, ?> configEntry : annotationMap.values()) {
+				try {
+					configEntry.processFields(saveFlag);
+				} catch (Exception e) {
+					OmnisCore.logger.error(format("Caught exception from {}:", configEntry.getClass().getCanonicalName()), e);
+				}
+			}
+		} finally {
+			if (config.hasChanged())
+				config.save();
+		}
 	}
 
 	public void writeSync(EntityPlayer player, OutputBuffer buffer) {

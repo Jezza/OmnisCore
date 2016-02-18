@@ -16,7 +16,9 @@ import net.minecraft.entity.EntityLivingBase;
 
 /**
  * @author Jezza
+ * @deprecated - W.I.P. - Use at your own risk.
  */
+@Deprecated
 @SideOnly(Side.CLIENT)
 public final class Camera {
 	private static final LinkedBlockingDeque<CameraRequest> REQUESTS = new LinkedBlockingDeque<>();

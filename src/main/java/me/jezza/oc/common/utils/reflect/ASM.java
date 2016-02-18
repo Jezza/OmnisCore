@@ -33,6 +33,8 @@ import org.apache.commons.lang3.ClassUtils;
  */
 public class ASM {
 
+	public static final int CALLING_DEPTH = 5;
+
 	private static final Splitter ARG_SPLITTER = Splitter.on(";").omitEmptyStrings().trimResults();
 
 	private static final Map<String, Set<String>> ownedPackages = Maps.newHashMap();
@@ -41,8 +43,6 @@ public class ASM {
 	private static final Map<Class<? extends Annotation>, Map<ASMData, Class<?>>> classCache = Maps.newHashMap();
 	private static final Map<Class<? extends Annotation>, Map<ASMData, Field>> fieldCache = Maps.newHashMap();
 	private static final Map<Class<? extends Annotation>, Map<ASMData, Method>> methodCache = Maps.newHashMap();
-
-	private static final int CALLING_DEPTH = 5;
 
 	private static ListMultimap<String, ModContainer> packageOwners;
 	private static ModDiscoverer discoverer;
@@ -151,6 +151,14 @@ public class ASM {
 		} catch (IllegalAccessException e) {
 			throw Throwables.propagate(e);
 		}
+	}
+
+	public static StackTraceElement[] callingFrames() {
+		return Thread.currentThread().getStackTrace();
+	}
+
+	public static StackTraceElement callingFrame() {
+		return callingFrames()[CALLING_DEPTH];
 	}
 
 	public static Class<?>[] callingStack() {

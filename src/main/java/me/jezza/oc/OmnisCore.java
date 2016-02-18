@@ -2,6 +2,10 @@ package me.jezza.oc;
 
 import static me.jezza.oc.common.core.CoreProperties.*;
 
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -19,6 +23,8 @@ import me.jezza.oc.common.interfaces.IChannel;
 import me.jezza.oc.common.interfaces.SidedChannel;
 import me.jezza.oc.common.items.ItemControl;
 import me.jezza.oc.common.utils.Debug;
+import me.jezza.oc.common.utils.TracingPrintStream;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 @Controller
@@ -45,6 +51,10 @@ public class OmnisCore {
 		Debug.checkOverrides();
 		logger.info("-- Initialising ConfigAnnotations --");
 		ConfigHandler.init();
+		if (Debug.tracingPrintStream()) {
+			System.setOut(new TracingPrintStream(LogManager.getLogger("STDOUT"), new PrintStream(new FileOutputStream(FileDescriptor.out))));
+			System.setErr(new TracingPrintStream(LogManager.getLogger("STDERR"), new PrintStream(new FileOutputStream(FileDescriptor.err))));
+		}
 		logger.info("-- Configuring Channels --");
 		ChannelDispatcher.init();
 		logger.info("-- Initialising Commands --");

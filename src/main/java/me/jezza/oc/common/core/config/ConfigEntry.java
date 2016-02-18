@@ -42,7 +42,6 @@ public abstract class ConfigEntry<A extends Annotation, V> {
 		for (AnnotatedField<A, V> field : configMap.values()) {
 			if (Debug.console())
 				OmnisCore.logger.info("Operating on: " + field);
-			config.load();
 			try {
 				if (saveFlag) {
 					save(config, field);
@@ -51,9 +50,6 @@ public abstract class ConfigEntry<A extends Annotation, V> {
 				}
 			} catch (Exception e) {
 				OmnisCore.logger.log(Level.FATAL, format("Failed to configure field: {}", field), e);
-			} finally {
-				if (config.hasChanged())
-					config.save();
 			}
 		}
 	}
